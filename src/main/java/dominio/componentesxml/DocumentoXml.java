@@ -43,6 +43,7 @@ public class DocumentoXml {
     private DatosRConsumo datosRConsumo;
     private DatosRLecturaDesde datosRLecturaDesde;
     private DatosRLecturaHasta datosRLecturaHasta;
+    private ReactivaImporteTotal reactivaImporteTotal;
     
     //DatosPM
     private DatosPmConsumo datosPmConsumo;
@@ -60,7 +61,7 @@ public class DocumentoXml {
     public DocumentoXml() {
     }
 
-    public DocumentoXml(Cliente cliente, DatosCabecera datosCabecera, DatosGeneralesFactura datosGeneralesFactura, DatosFacturaAtr datosFacturaAtr, DatosExcesoPotencia datosExcesoPotencia, DatosPotenciaContratada datosPotenciaContratada, DatosPotenciaMaxDemandada datosPotenciaMaxDemandada, DatosPotenciaAFacturar datosPotenciaAFacturar, DatosPotenciaPrecio datosPotenciaPrecio, DatosPotenciaImporteTotal datosPotenciaImporteTotal, DatosEnergiaActiva datosEnergiaActiva, DatosEnergiaActivaValores datosEnergiaActivaValores, DatosEnergiaActivaPrecio datosEnergiaActivaPrecio, DatosEnergiaActivaImporteTotal datosEnergiaActivaImporteTotal, DatosImpuestoElectrico datosImpuestoElectrico, DatosAlquileres datosAlquileres, DatosIva datosIva, DatosAeConsumo datosAeConsumo, DatosAeLecturaDesde datosAeLecturaDesde, DatosAeLecturaHasta datosAeLecturaHasta, DatosAeProcedenciaDesde datosAeProcedenciaDesde, DatosAeProcedenciaHasta datosAeProcedenciaHasta, DatosRConsumo datosRConsumo, DatosRLecturaDesde datosRLecturaDesde, DatosRLecturaHasta datosRLecturaHasta, DatosPmConsumo datosPmConsumo, DatosPmLecturaHasta datosPmLecturaHasta, DatosFinDeRegistro datosFinDeRegistro, String comentarios, String errores) {
+    public DocumentoXml(Cliente cliente, DatosCabecera datosCabecera, DatosGeneralesFactura datosGeneralesFactura, DatosFacturaAtr datosFacturaAtr, DatosExcesoPotencia datosExcesoPotencia, DatosPotenciaContratada datosPotenciaContratada, DatosPotenciaMaxDemandada datosPotenciaMaxDemandada, DatosPotenciaAFacturar datosPotenciaAFacturar, DatosPotenciaPrecio datosPotenciaPrecio, DatosPotenciaImporteTotal datosPotenciaImporteTotal, DatosEnergiaActiva datosEnergiaActiva, DatosEnergiaActivaValores datosEnergiaActivaValores, DatosEnergiaActivaPrecio datosEnergiaActivaPrecio, DatosEnergiaActivaImporteTotal datosEnergiaActivaImporteTotal, DatosImpuestoElectrico datosImpuestoElectrico, DatosAlquileres datosAlquileres, DatosIva datosIva, DatosAeConsumo datosAeConsumo, DatosAeLecturaDesde datosAeLecturaDesde, DatosAeLecturaHasta datosAeLecturaHasta, DatosAeProcedenciaDesde datosAeProcedenciaDesde, DatosAeProcedenciaHasta datosAeProcedenciaHasta, DatosRConsumo datosRConsumo, DatosRLecturaDesde datosRLecturaDesde, DatosRLecturaHasta datosRLecturaHasta, ReactivaImporteTotal reactivaImporteTotal, DatosPmConsumo datosPmConsumo, DatosPmLecturaHasta datosPmLecturaHasta, DatosFinDeRegistro datosFinDeRegistro, String comentarios, String errores) {
         this.cliente = cliente;
         this.datosCabecera = datosCabecera;
         this.datosGeneralesFactura = datosGeneralesFactura;
@@ -86,6 +87,7 @@ public class DocumentoXml {
         this.datosRConsumo = datosRConsumo;
         this.datosRLecturaDesde = datosRLecturaDesde;
         this.datosRLecturaHasta = datosRLecturaHasta;
+        this.reactivaImporteTotal = reactivaImporteTotal;
         this.datosPmConsumo = datosPmConsumo;
         this.datosPmLecturaHasta = datosPmLecturaHasta;
         this.datosFinDeRegistro = datosFinDeRegistro;
@@ -193,6 +195,14 @@ public class DocumentoXml {
         return datosRLecturaHasta;
     }
 
+    public ReactivaImporteTotal getReactivaImporteTotal() {
+        return reactivaImporteTotal;
+    }
+
+    public void setReactivaImporteTotal(ReactivaImporteTotal reactivaImporteTotal) {
+        this.reactivaImporteTotal = reactivaImporteTotal;
+    }
+   
     public DatosPmConsumo getDatosPmConsumo() {
         return datosPmConsumo;
     }

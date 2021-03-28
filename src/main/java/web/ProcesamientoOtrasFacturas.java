@@ -8,8 +8,8 @@ import org.w3c.dom.*;
 public class ProcesamientoOtrasFacturas {
 
     private static final String LINEA = "\n------------------------------------------------------------------------------\n";
-    private StringBuilder comentarios = new StringBuilder().append("");
-    private StringBuilder errores = new StringBuilder().append("");
+    private String comentarios = "";
+    private String errores = "";
 
     public ProcesamientoOtrasFacturas() {
     }

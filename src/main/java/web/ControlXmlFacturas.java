@@ -16,8 +16,8 @@ import javax.servlet.http.*;
 public class ControlXmlFacturas extends HttpServlet {
 
     String mensaje = "Por favor, indique cuál es la actividad que desea realizar";
-    String titulo = "Control de facturas XML";
-    String tituloTabla = "Facturas XML";
+    String titulo = "Facturas XML";
+    String tituloTabla = "Facturas";
     String nombreServlet = "ControlXMLFacturas";
     String icono = "<i class='fas fa-address-card'></i> ";
 

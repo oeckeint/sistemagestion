@@ -1,0 +1,140 @@
+V0.4.2.1
+
+#Otras Facturas Procesamiento $180
+-Lectura de los archivos Otras Facturas (50)
+-Creacion de la base de datos correspondiente (50)
+-Procesamiento de Otras facturas (80)
+
+#Vistas para otras facturas $120
+-Interfaces para mostrar todos los registros (40)
+-Interfaz para mostrar el resumen de un solo registro (40)
+-Habilitar Filtros de busqueda avanzada (Cliente, Remesa) con resumen general (40)
+
+#Control clientes $20
+- Validación de formulario de clientes en registrar y editar (Cups, Tarifa) (20)
+
+###ReactivaImporteTotal $30###
+#Agregar el campo en la tabla de Registro_xml y registro_xml_facturas
+#Codificación para su correcto procesamiento de los datos en todas sus fases de vida 
+1. Leer el valor desde el archivo OK
+2. Crear el modelo de energia reactiva importe total OK
+3. Agregar el campo en la base de datos OK
+4. Editar el documento DAO para su insersion OK
+5. Verificar su insercion en la base de datos OK
+6. Crear el proceso para reconocerse desde las facturas rectificadas OK
+7. Editar la carga de los datos en la presentación del jsp OK
+
+*****Otros cambios*****
+- Mejoras en algunos metodos (Se continuarán mejorando para dar mayor velocidad a la aplicación)
+- Cambio en el direccionamiento de inicio
+- Cambio en los titulos de las páginas
+- Se creó el acceso en la barra de navegación
+- Se presentan nuevos botones para el acceso más rapido de la applicacion
+- Se agregaron datos a los comentarios al Rectificar una factura (Archivo originial, archivo que reemplaza, remesa original, remesa que reemplaza)
+- Se deshabilito el campo cups en la interfaz de editar un cliente (0)
+- Al cargar una factura rectificada, el valor de la remesa se debe mantener en la copia y el nuevo registro OK
+
+V0.4.1.1
+**Novedades
+Implementación de la validación del formulario clientes
+
+V0.4.1
+**Novedades
+Implementación de filtros de búsqueda por facturas y peajes (ID Cliente, remesa)
+
+V0.3.1.9
+**Novedades
+Ahora se pueden evaluar los archivos xml con EmpresaEmisora 0894
+Ahora se puede procesar la empresa emisora "0894" (Facturas)
+Implementación de busqueda de todas las facturas(0894) xml por id_cliente
+Implementación de busqueda de todos los registros xml por id_cliente
+
+**Interfaz
+Nueva interfaz de búsqueda en registros xml
+Nueva interfaz de facturas xml
+Nueva interfaz de búsqueda en facturas xml
+
+**Bugs
+Las facturas del tipo A, aún no son soportadas
+Al buscar una factura sin ningun carácter o 1 caracter se rompía el flujo del sistema
+
+**Código
+Instancias adecuadas al la función de busqueda
+Instancias adecuadas al la función de Facturas
+Se ha agregado la carpeta 0894
+
+-----------------------------------------------------------------------
+V0.3.1.8
+**Novedades
+Se han agregado las facturas del tipo G al procesamiento usando el mismo procesamiento que N
+Nueva notificación de error (Codificación no soportada, Archivo vacio). Es necesario rehacerla en UTF-8
+Ahora se pueden evaluar facturas de Tipo G, N (Y variantes), R, Tipos y motivos no soportados
+
+**Interfaz
+Clientes: Se han limitado los carácteres(30)  que aparecen en la lista de los registros
+Clientes: Se eliminino "id" de la etiqueta id Cliente en la lista de todos los clientes
+Clientes: Mejoras en la presentación de los clientes
+Lista XML: Mejoras en la presentación de los clientes
+Nuevas notificaciones sobre errores XML en procesamiento y evaluación
+Lista XML: Se Se eliminino "id" de la etiqueta id Cliente en la lista de todos los clientes
+Se agregaron algunas animaciones en los botones
+
+**Bugs
+Se detectaron errores en diversas facturas que contenian más campos de los especificados
+Se detectarón archivos que tienen una codificación distinta a UTF-8, No pueden ser procesados
+
+**Datos
+Las fechas que han sido rectificadas fueron invertidas
+
+**Codigo
+Mejoras en la estabilidad de los archivos
+----------------------------------------------------------------------
+V0.3.1.7
+**Novedades
+Ahora se pueden Clasificar las facturas de tipo R (Rectificada)
+Ahora se pueden agragar codigos de error en la base de datos ("id_error")
+Procesamiento exclusivo de Facturas N y R
+Pone en negativo varios campos (Es necesario confirmalos)
+Al procesar una factura R, crea un registro copia del original y coloca la terminación "-A" en codFiscal Factura, y tiene la posiblidad de cambiar otros campos
+Al procesar R, crea un registro nuevo con los datos
+No procesa los tipos de factura diferentes
+
+**Interfaz
+ver XML: Ahora se muestra el texto que corresponde a la procedencia
+Ver XML: Diseño responsivo para pantallas más pequeñas
+Ver XML: Cambios en las etiquetas de identificadores
+Ver XML: Ahora presentan el codigos de error
+ProcesarXML: Se añadieron estilos a las notificaciones
+
+**Datos
+Se cambio la longitud de la fecha a los primeros 10 caracteres del campo fecha Solicitud omitiendo hora
+Se eliminaron los 0's de el codigo de Solicitud presentes en algunos archivos
+
+**Bugs
+Se corrigio el error que daba al no encontrar algun registro xml
+
+**Código
+Se agregaron las instancias necesarias para poder interpretar los id_error en todas sus fases de vida
+Control de excepciones al procesar archivos XML de tipo R
+
+------------------------------------------------------------------------
+V0.3.1.6
+
+**Novedades
+Se agrego el campo de comentarios, ahora es más fácil hacer anotaciones sobre los archivos
+
+*Interfaz
+ver XML: Se presentan los comentarios de cada archivo procesado
+ver XML: Ahora muestra el nombre del archivo original que se proceso
+Mensaje: Ahora al no encontrar registro xml, se muestra un mensaje e indica el CodFiscal que se buscó
+idRemesa: Se han omitido los 0's para una mejor presentación
+
+*Bugs
+PotenciaAFacturar: Al encontrar más de 6 registros daba error fatal
+Fin de registro: En algunos archivos faltaban datos, por lo que daba un error fatal
+idRemesa: cuando comenzaba con un numero diferente a 0, provocaba un error fatal
+interfaz ver xml: Al no encontrar 1 registro xml, daba error fatal
+Archivos vacíos: Se detectó un archivo vacío, se mejoró el mensaje
+
+*Codigo
+DocumentoXML: Se agregaron las instancias necesarias para poder interpretar los comentarios en todas sus fases de vida

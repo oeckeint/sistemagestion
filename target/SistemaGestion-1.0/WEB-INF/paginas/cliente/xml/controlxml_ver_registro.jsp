@@ -642,6 +642,24 @@
                     </div>
                 </div>
                             
+                <div class="row justify-content-around">
+                    <div class="list-group col-12 col-md-5 col-lg-4 p-2">
+                        <h3 class="list-group-item list-group-item-action active text-center h4">Importe Total</h3>
+                        <div class="row">
+                            <div class="col-5">
+                            <ul class="list-group list-group-flush text-right">
+                                <dt class="list-group-item px-1">Importe</dt>
+                            </ul>
+                        </div>
+                        <div class="col-7">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item px-1">${documento.reactivaImporteTotal.importeTotal}</li>
+                            </ul>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                            
                             
                 <!-- Renglón-->
                 <hr>

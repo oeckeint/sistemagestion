@@ -18,9 +18,9 @@ import javax.servlet.http.*;
 public class ControlXmlOtrasFacturas extends HttpServlet {
 
     String mensaje = "Por favor, indique cuál es la actividad que desea realizar";
-    String titulo = "Otras facturas XML";
-    String tituloTabla = "Facturas XML";
-    String nombreServlet = "ControlXMLFacturas";
+    String titulo = "Otras facturas";
+    String tituloTabla = "Facturas";
+    String nombreServlet = "ControlXMLOtrasFacturas";
     String icono = "<i class='fas fa-address-card'></i> ";
 
     @Override
@@ -52,14 +52,14 @@ public class ControlXmlOtrasFacturas extends HttpServlet {
                 mensaje = "<Strong>Debe proporcionar un valor</Strong> para su búsqueda";
                 this.inicio(request, response);
             } else {
-                List<DocumentoXml> documentos = new ArrayList<>();
-                titulo = "Facturas XML por " + filtro;
+                List<DocumentoOtraFactura> documentos = new ArrayList<>();
+                titulo = "XML por " + filtro;
                 switch (filtro) {
                     case "cliente":
-                        documentos = new ContenidoXmlDao().buscarIdCliente(valor, 894);
+                        documentos = new OtrasFacturasDao().buscarByIdCliente(valor);
                         break;
                     case "remesa":
-                        documentos = new ContenidoXmlDao().buscarRemesa(valor, 894);
+                        documentos = new OtrasFacturasDao().buscarByRemesa(valor);
                         break;
                     default:
                         mensaje = "Filtro no soportado (" + filtro + ")";
@@ -73,7 +73,7 @@ public class ControlXmlOtrasFacturas extends HttpServlet {
                     this.conResultado(request, documentos, valor, titulo, filtro);
                 }
 
-                request.getRequestDispatcher("/WEB-INF/paginas/cliente/xml/controlxml.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/paginas/cliente/xml/controlxml_otras_facturas.jsp").forward(request, response);
                 this.reiniciarVariables();
             }
         }
@@ -107,42 +107,35 @@ public class ControlXmlOtrasFacturas extends HttpServlet {
             this.mensaje = "No se ingresó una factura válida.";
             this.inicio(request, response);
         } else {
-            DocumentoXml documento = new ContenidoXmlDao().buscarCodFiscal(cod, 894);
+            DocumentoOtraFactura documento = new OtrasFacturasDao().buscarByCodFiscal(cod);
             request.setAttribute("documento", documento);
-            request.setAttribute("tituloPagina", "Factura XML");
-            request.setAttribute("titulo", icono + "Factura XML");
+            request.setAttribute("tituloPagina", "Otros XML");
+            request.setAttribute("titulo", icono + "Otros XML");
             if (documento == null) {
-                request.setAttribute("mensajeRegistro", "!Vaya¡ No se encontraron datos de la factura (" + request.getParameter("cod") + ")");
+                request.setAttribute("mensajeRegistro", "!Vaya¡ No se encontraron datos de la factura (" + cod + ")");
             } else {
-                request.setAttribute("mensajeRegistro", "Se encontraron estos datos de la factura (" + documento.getDatosGeneralesFactura().getCodigoFiscalFactura() + ")");
+                request.setAttribute("mensajeRegistro", "Se encontraron estos datos de la factura (" + documento.getDatosGeneralesFactura().getCodFisFac() + ")");
             }
-            request.getRequestDispatcher("/WEB-INF/paginas/cliente/xml/controlxml_ver_registro.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/paginas/cliente/xml/controlxml_ver_registro_otras_facturas.jsp").forward(request, response);
             this.reiniciarVariables();
         }
     }
 
-    private DocumentoXml resumen(List<DocumentoXml> documentos) {
+    private DocumentoOtraFactura resumen(List<DocumentoOtraFactura> documentos) {
 
-        DocumentoXml documentoXml = new DocumentoXml();
+        DocumentoOtraFactura documentoXml = documentos.get(0);
         Cliente cliente = new Cliente();
         cliente.setCups(documentos.get(0).getCliente().getCups());
 
         double impPot = 0.0;
-        double impEneAct = 0.0;
-        double impFac = 0.0;
-
-        for (DocumentoXml documento : documentos) {
-            impPot += documento.getDatosPotenciaImporteTotal().getImporteTotal();
-            impEneAct += documento.getDatosEnergiaActivaImporteTotal().getImporteTotal();
-            System.out.println(impEneAct);
-            impFac += documento.getDatosFinDeRegistro().getImporteTotal();
+        
+        for (DocumentoOtraFactura documento : documentos) {
+            impPot += documento.getDatosGeneralesFactura().getImpTotFac();
         }
-
+        
+        
+        documentoXml.getDatosGeneralesFactura().setImpTotFac(impPot);
         documentoXml.setCliente(new ClienteDao().encontrarCups(cliente));
-        documentoXml.setDatosPotenciaImporteTotal(new DatosPotenciaImporteTotal(impPot));
-        documentoXml.setDatosEnergiaActivaImporteTotal(new DatosEnergiaActivaImporteTotal(impEneAct));
-        documentoXml.setDatosFinDeRegistro(new DatosFinDeRegistro(impFac));
-
         return documentoXml;
     }
 
@@ -161,7 +154,7 @@ public class ControlXmlOtrasFacturas extends HttpServlet {
         request.setAttribute("nombreServlet", this.nombreServlet);
     }
 
-    private void conResultado(HttpServletRequest request, List<DocumentoXml> documentos, String valor, String titulo, String filtro) {
+    private void conResultado(HttpServletRequest request, List<DocumentoOtraFactura> documentos, String valor, String titulo, String filtro) {
         request.setAttribute("documentos", documentos);
         request.setAttribute("totalRegistros", documentos.size());
         request.setAttribute("documentoResumen", this.resumen(documentos));

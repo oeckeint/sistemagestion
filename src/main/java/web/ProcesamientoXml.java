@@ -39,6 +39,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import utileria.texto.Cadenas;
 
 @WebServlet("/ProcesamientoXML")
 @MultipartConfig
@@ -103,8 +104,6 @@ public class ProcesamientoXml extends HttpServlet {
             ous.close();
 
             //Revisión de cada XML
-            
-
             this.procesar(f, nombreArchivo);
             //Eliminación del archivo temporal
             f.deleteOnExit();
@@ -124,7 +123,7 @@ public class ProcesamientoXml extends HttpServlet {
                 DocumentBuilder builder = dbFactory.newDocumentBuilder();
                 Document documento = builder.parse(archivo);
                 documento.getDocumentElement().normalize();
-                
+
                 //Revisión del nodo
                 if (documento.getElementsByTagName("OtrasFacturas").getLength() != 0) {
                     System.out.println("Procesando en otras facturas");
@@ -398,6 +397,7 @@ public class ProcesamientoXml extends HttpServlet {
         DatosRConsumo datosRConsumo = new DatosRConsumo(this.LeerIntegradorRConsumoXML(ruta));
         DatosRLecturaDesde datosRLecturaDesde = new DatosRLecturaDesde(this.LeerIntegradorRLecturaDesdeXML(ruta));
         DatosRLecturaHasta datosRLecturaHasta = new DatosRLecturaHasta(this.LeerIntegradorRLecturaHastaXML(ruta));
+        ReactivaImporteTotal reactivaImporteTotal = new ReactivaImporteTotal(this.ReactivaImporteTotal(ruta));
 
         //Datos PM
         DatosPmConsumo datosPmConsumo = new DatosPmConsumo(this.LeerIntegradorPMConsumoXML(ruta));
@@ -410,7 +410,15 @@ public class ProcesamientoXml extends HttpServlet {
         System.out.println(comentarios.get(0));
 
         //Inserción de registro
-        this.insertarDatos(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr, datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal, datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal, datosImpuestoElectrico, datosAlquileres, datosIva, datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta, datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, datosPmConsumo, datosPmLecturaHasta, datosFinDeRegistro, comentarios.get(0), errores);
+        this.insertarDatos(cliente, datosCabecera,
+                datosGeneralesFactura, datosFacturaAtr, datosExcesoPotencia,
+                datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal,
+                datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal,
+                datosImpuestoElectrico, datosAlquileres, datosIva,
+                datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta,
+                datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, reactivaImporteTotal,
+                datosPmConsumo, datosPmLecturaHasta,
+                datosFinDeRegistro, comentarios.get(0), errores);
 
         //Contador archivos
         this.archivosCorrectos++;
@@ -420,7 +428,7 @@ public class ProcesamientoXml extends HttpServlet {
         DocumentoXml documentoXmls = new ContenidoXmlDao().buscarCodFiscal(datosGeneralesFactura.getCodigoFacturaRectificadaAnulada(), Integer.parseInt(datosCabecera.getCodigoREEEmpresaEmisora()));
         if (documentoXmls != null) {
             System.out.println("Se encontro registro");
-            new ContenidoXmlDao().actualizarR(documentoXmls);
+            new ContenidoXmlDao().actualizarR(documentoXmls, this.LeerFinDeRegistroXML(ruta).get(5), nombreArchivo);
             this.procesarFacturaN(cliente, datosCabecera, datosGeneralesFactura, ruta);
         } else {
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque no se encontró el codRectificado (<Strong>" + datosGeneralesFactura.getCodigoFacturaRectificadaAnulada() + ")</Strong>");
@@ -438,8 +446,26 @@ public class ProcesamientoXml extends HttpServlet {
     }
 
     /*-----------------------------------Procesamiento de Datos-------------------------------*/
-    private int insertarDatos(Cliente cliente, DatosCabecera datosCabecera, DatosGeneralesFactura datosGeneralesFactura, DatosFacturaAtr datosFacturaAtr, DatosExcesoPotencia datosExcesoPotencia, DatosPotenciaContratada datosPotenciaContratada, DatosPotenciaMaxDemandada datosPotenciaMaxDemandada, DatosPotenciaAFacturar datosPotenciaAFacturar, DatosPotenciaPrecio datosPotenciaPrecio, DatosPotenciaImporteTotal datosPotenciaImporteTotal, DatosEnergiaActiva datosEnergiaActiva, DatosEnergiaActivaValores datosEnergiaActivaValores, DatosEnergiaActivaPrecio datosEnergiaActivaPrecio, DatosEnergiaActivaImporteTotal datosEnergiaActivaImporteTotal, DatosImpuestoElectrico datosImpuestoElectrico, DatosAlquileres datosAlquileres, DatosIva datosIva, DatosAeConsumo datosAeConsumo, DatosAeLecturaDesde datosAeLecturaDesde, DatosAeLecturaHasta datosAeLecturaHasta, DatosAeProcedenciaDesde datosAeProcedenciaDesde, DatosAeProcedenciaHasta datosAeProcedenciaHasta, DatosRConsumo datosRConsumo, DatosRLecturaDesde datosRLecturaDesde, DatosRLecturaHasta datosRLecturaHasta, DatosPmConsumo datosPmConsumo, DatosPmLecturaHasta datosPmLecturaHasta, DatosFinDeRegistro datosFinDeRegistro, String comentarios, String errores) {
-        DocumentoXml documentoXml = new DocumentoXml(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr, datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal, datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal, datosImpuestoElectrico, datosAlquileres, datosIva, datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta, datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, datosPmConsumo, datosPmLecturaHasta, datosFinDeRegistro, comentarios, errores);
+    private int insertarDatos(Cliente cliente, DatosCabecera datosCabecera,
+            DatosGeneralesFactura datosGeneralesFactura, DatosFacturaAtr datosFacturaAtr, 
+            DatosExcesoPotencia datosExcesoPotencia, DatosPotenciaContratada datosPotenciaContratada, DatosPotenciaMaxDemandada datosPotenciaMaxDemandada, DatosPotenciaAFacturar datosPotenciaAFacturar, DatosPotenciaPrecio datosPotenciaPrecio, DatosPotenciaImporteTotal datosPotenciaImporteTotal, 
+            DatosEnergiaActiva datosEnergiaActiva, DatosEnergiaActivaValores datosEnergiaActivaValores, DatosEnergiaActivaPrecio datosEnergiaActivaPrecio, DatosEnergiaActivaImporteTotal datosEnergiaActivaImporteTotal, 
+            DatosImpuestoElectrico datosImpuestoElectrico, DatosAlquileres datosAlquileres, DatosIva datosIva, 
+            DatosAeConsumo datosAeConsumo, DatosAeLecturaDesde datosAeLecturaDesde, DatosAeLecturaHasta datosAeLecturaHasta, DatosAeProcedenciaDesde datosAeProcedenciaDesde, DatosAeProcedenciaHasta datosAeProcedenciaHasta, 
+            DatosRConsumo datosRConsumo, DatosRLecturaDesde datosRLecturaDesde, DatosRLecturaHasta datosRLecturaHasta, ReactivaImporteTotal reactivaImporteTotal,
+            DatosPmConsumo datosPmConsumo, DatosPmLecturaHasta datosPmLecturaHasta, 
+            DatosFinDeRegistro datosFinDeRegistro, 
+            String comentarios, String errores) {
+        
+        DocumentoXml documentoXml = new DocumentoXml(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr, 
+                datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal, 
+                datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal, 
+                datosImpuestoElectrico, datosAlquileres, datosIva, 
+                datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta, 
+                datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, reactivaImporteTotal,
+                datosPmConsumo, datosPmLecturaHasta, 
+                datosFinDeRegistro, 
+                comentarios, errores);
 
         new ContenidoXmlDao().insertar(documentoXml);
 
@@ -2077,7 +2103,7 @@ public class ProcesamientoXml extends HttpServlet {
         return elementos;
     }
 
-    //DatosR
+    //Reactiva
     private List<Double> LeerIntegradorRConsumoXML(String ruta) {
         System.out.println("------------------------------------------------------------------------------");
         System.out.println("Nombre Nodo actual          (Integrador)Datos de consumo R (Reactiva)");
@@ -2407,6 +2433,44 @@ public class ProcesamientoXml extends HttpServlet {
                 System.out.println("<" + indice + ">" + "Lectura Hasta R" + (++indice) + "    " + elemento);
             }
             System.out.println("------------------------------------------------------------------------------");
+
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            System.err.println("Error " + e.getMessage());
+        }
+        return elementos;
+    }
+
+    private ArrayList<String> ReactivaImporteTotal(String ruta) {
+
+        ArrayList<String> elementos = new ArrayList<>(1);
+        elementos.add(0, "0.0");
+
+        try {
+            //Indica el archivo que será tomado
+            File archivoXml = new File(ruta);
+
+            //Preparación del procesamiento del XML
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = dbFactory.newDocumentBuilder();
+            Document documentoXml = builder.parse(archivoXml);
+            documentoXml.getDocumentElement().normalize();
+
+            //Recupera todos los elementos con el nombre brindado
+            NodeList flowListPeriodo = documentoXml.getElementsByTagName("EnergiaReactiva");
+
+            int indicePeriodo = 0;
+            for (int i = 0; i < flowListPeriodo.getLength(); i++) {
+                NodeList childListLecturaHasta = flowListPeriodo.item(i).getChildNodes();
+                for (int j = 0; j < childListLecturaHasta.getLength(); j++) {
+                    Node childNode = childListLecturaHasta.item(j);
+                    if ("ImporteTotalEnergiaReactiva".equals(childNode.getNodeName())) {
+                        elementos.set(indicePeriodo++, String.valueOf(Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim())));
+                    }
+                }
+            }
+            indicePeriodo = 0;
+
+            System.out.println(Cadenas.LINEA + "Rea-ImporteTotal" + elementos + Cadenas.LINEA);
 
         } catch (IOException | ParserConfigurationException | SAXException e) {
             System.err.println("Error " + e.getMessage());

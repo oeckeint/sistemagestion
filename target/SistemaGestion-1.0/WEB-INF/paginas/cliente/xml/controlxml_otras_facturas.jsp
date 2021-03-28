@@ -73,10 +73,11 @@
                             <tr>
                                 <th>#Reg</th>
                                 <th>Cliente</th>
+                                <th>Cups</th>
                                 <th>CodFiscal</th>
-                                <th>Fecha</th>
                                 <th>ImpTot</th>
                                 <th>Remesa</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -84,6 +85,11 @@
                                 <tr>
                                     <td>-R</td>
                                     <td>${documentoResumen.cliente.idCliente}</td>
+                                    <td>${documentoResumen.cabecera.cups}</td>
+                                    <td>--</td>
+                                    <td>${documentoResumen.datosGeneralesFactura.impTotFac}</td>
+                                    <td>--</td>
+                                    <td>--</td>
                                 </tr>
                             </c:if>
                             <c:forEach var="documento" items="${documentos}" varStatus="id">
@@ -92,8 +98,9 @@
                                     <td>${documento.cliente.idCliente}</td>
                                     <td>${documento.cliente.cups}</td>
                                     <td>${documento.datosGeneralesFactura.codFisFac}</td>
-                                    <td>${documento.datosGeneralesFactura.fecFac}</td>
+                                    <td>${documento.datosGeneralesFactura.impTotFac}</td>
                                     <td>${documento.registroFin.idRemesa}</td>
+                                    <td><a href="${pageContext.request.contextPath}/${nombreServlet}?accion=ver&cod=${documento.datosGeneralesFactura.codFisFac}" class="btn btn-danger"><i class="fas fa-eye"></i></a></td>
                                 </tr>
                             </c:forEach>
                         </tbody>

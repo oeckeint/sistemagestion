@@ -8,13 +8,13 @@ public class DocumentoOtraFactura {
     private DatosGeneralesFactura datosGeneralesFactura;
     private ConceptoRepercutible conceptoRepercutible;
     private RegistroFin registroFin;
-    private StringBuilder comentarios;
-    private StringBuilder errores;
+    private String comentarios;
+    private String errores;
 
     public DocumentoOtraFactura() {
     }
 
-    public DocumentoOtraFactura(Cabecera cabecera, DatosGeneralesFactura datosGeneralesFactura, ConceptoRepercutible conceptoRepercutible, RegistroFin registroFin, StringBuilder comentarios, StringBuilder errores) {
+    public DocumentoOtraFactura(Cabecera cabecera, DatosGeneralesFactura datosGeneralesFactura, ConceptoRepercutible conceptoRepercutible, RegistroFin registroFin, String comentarios, String errores) {
         this.cabecera = cabecera;
         this.datosGeneralesFactura = datosGeneralesFactura;
         this.conceptoRepercutible = conceptoRepercutible;
@@ -23,7 +23,7 @@ public class DocumentoOtraFactura {
         this.errores = errores;
     }
 
-    public DocumentoOtraFactura(Cliente cliente, Cabecera cabecera, DatosGeneralesFactura datosGeneralesFactura, ConceptoRepercutible conceptoRepercutible, RegistroFin registroFin, StringBuilder comentarios, StringBuilder errores) {
+    public DocumentoOtraFactura(Cliente cliente, Cabecera cabecera, DatosGeneralesFactura datosGeneralesFactura, ConceptoRepercutible conceptoRepercutible, RegistroFin registroFin, String comentarios, String errores) {
         this.cliente = cliente;
         this.cabecera = cabecera;
         this.datosGeneralesFactura = datosGeneralesFactura;
@@ -74,19 +74,19 @@ public class DocumentoOtraFactura {
         this.registroFin = registroFin;
     }
 
-    public StringBuilder getComentarios() {
+    public String getComentarios() {
         return comentarios;
     }
 
-    public void setComentarios(StringBuilder comentarios) {
+    public void setComentarios(String comentarios) {
         this.comentarios = comentarios;
     }
 
-    public StringBuilder getErrores() {
+    public String getErrores() {
         return errores;
     }
 
-    public void setErrores(StringBuilder errores) {
+    public void setErrores(String errores) {
         this.errores = errores;
     }
 

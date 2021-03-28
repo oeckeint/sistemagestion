@@ -16,7 +16,7 @@ public class ControlClientes extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession sesion = request.getSession();
         sesion.setAttribute("tituloPagina", "Control de Clientes");
-        sesion.setAttribute("titulo", icono + " Control de Clientes");
+        sesion.setAttribute("titulo", icono + " Clientes");
         String accion = request.getParameter("accion");
         System.out.println("Validando " + accion);
         if (accion != null) {
