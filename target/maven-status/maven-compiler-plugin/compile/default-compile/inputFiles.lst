@@ -21,6 +21,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\RegistroFi
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAlquileres.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\Lectura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\web\ControlXmlFacturas.java
+C:\NetBeansProjects\sistemagestion\src\main\java\web\ProcesarPeaje.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPotenciaImporteTotal.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\Distribuidora.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPotenciaAFacturar.java
@@ -37,8 +38,10 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRLe
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPotenciaPrecio.java
 C:\NetBeansProjects\sistemagestion\src\main\java\web\ControlClientes.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPmConsumo.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ClienteNoExisteException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\procesamientoxml\ResultadoArchivoXML.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\OtrasFacturasDao.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\FacturaYaExisteException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\DistribuidoraDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRLecturaDesde.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\ContenidoXmlDao.java

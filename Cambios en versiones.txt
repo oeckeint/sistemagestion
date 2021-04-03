@@ -1,3 +1,11 @@
+V0.4.2.2
+Mejoras en la velocidad de ejecución
+Creacion de instancias para procesar los diferentes tipos de facturas
+Implementacion de Excepciones personalizadas
+
+#Errores encontrados
+En los campos "Hasta", no hacia lectura de valores debido a la incorrecta lectura de los nodos
+
 V0.4.2.1
 
 #Otras Facturas Procesamiento $180

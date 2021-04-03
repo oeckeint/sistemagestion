@@ -17,6 +17,7 @@ web\EvaluacionXml.class
 dominio\procesamientoxml\Remesa.class
 dominio\componentesxml\DatosEnergiaActivaValores.class
 dominio\procesamientoxml\ResultadoArchivoXML.class
+web\ProcesarPeaje.class
 dominio\componentesxml\DatosPotenciaPrecio.class
 datos\ContenidoXmlDao.class
 datos\ClienteDao.class

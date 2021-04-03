@@ -12,8 +12,8 @@
                       <button class="btn btn-outline-secondary" type="submit" id="btnSubmit">${etiquetaBoton}</button>
                     </div>
                     <div class="custom-file">
-                        <input type="file" name="archivosxml" accept=".xml" multiple="true" class="custom-file-input" id="inputGroupFile03" aria-describedby="inputGroupFileAddon03">
-                        <label class="custom-file-label" for="inputGroupFile03">Seleccione sus archivos...</label>
+                        <input type="file" name="archivosxml" accept=".xml" multiple="true" class="custom-file-input" id="inputGroupFile03" aria-describedby="inputGroupFileAddon03" required>
+                        <label class="custom-file-label" for="inputGroupFile03">Seleccione sus archivos</label>
                     </div>
                 </div>
             </div>

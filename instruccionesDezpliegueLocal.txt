@@ -1,0 +1,22 @@
+Glassfish 5.0
+Ubicarse en la carpeta que contiene los binarios de Glassfish
+Ej. C:\AppServers\glassfish5\bin
+
+CMD
+asadmin start-domain --verbose  //Inicia el servicio
+asadmin stop-domain domain1     //Termina el servicio
+
+#Consideraciones
+Puerto por default del servidor es 8080
+Puerto de administracion del panel 4848
+usuario: admin / pass: 
+
+start-domain -> Inicia el servidor
+--verbose -> Marca todas las salidas de registro y depuracion
+La salida, va al registro del servidor en domain-dir` / logs / server.log`.
+
+#Errores posibles
+Razon       No esta configurado el path del JDK de Java
+Mensaje.    org.apache.jasper.JasperException: PWC6345: There is an error in invoking javac. A full JDK (not just JRE) is required
+Solucion.   Con el servidor corriendo, ejecutar en otra linea de comandos dentro de la carpeta de los binarios de Glassfish
+            asadmin set "server.java-config.java-home=C:\Program Files\Java\jdk1.8.0_231"

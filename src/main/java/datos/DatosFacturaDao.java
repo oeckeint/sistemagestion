@@ -27,6 +27,7 @@ public class DatosFacturaDao {
             rs = stmt.executeQuery();
             rs.absolute(1);//Posiciona el en primer registro
             if (rs.getRow() != 0) {
+                System.out.println("(DatosFacturaDao) Ya existe la factura en la tabla");
                 resultado = true;
             }
         } catch (SQLException ex) {
@@ -99,6 +100,7 @@ public class DatosFacturaDao {
             rs.absolute(1);//Posiciona el en primer registro
             if (rs.getRow() != 0) {
                 resultado = true;
+                System.out.println("\n\n(DatosFacturaDao) Se encontro un registro con el codF (" + codigoFiscal + ") y la empEmi(" + emisora + ") en la tabla -" + tabla + "-\n\n");
             }
         } catch (SQLException ex) {
             System.out.println("(DatosFactura DAO). No se encontró cups");
