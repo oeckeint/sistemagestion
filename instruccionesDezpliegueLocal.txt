@@ -6,6 +6,10 @@ CMD
 asadmin start-domain --verbose  //Inicia el servicio
 asadmin stop-domain domain1     //Termina el servicio
 
+Libreria
+Agregar en C:\AppServers\glassfish5\glassfish\lib
+el archivo mySQL connector 8.0.17
+
 #Consideraciones
 Puerto por default del servidor es 8080
 Puerto de administracion del panel 4848
