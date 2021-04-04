@@ -130,14 +130,13 @@ public class ProcesarPeaje {
                             elementos.set(3, childList.item(j).getTextContent().trim());
                             break;
                         case "CodigoDeSolicitud":
-                            elementos.set(4, String.valueOf(Integer.parseInt(childList.item(j).getTextContent().trim())));
+                            elementos.set(4, childList.item(j).getTextContent().trim());
                             break;
                         case "FechaSolicitud":
                             elementos.set(5, childList.item(j).getTextContent().trim().substring(0, 10));
                             break;
                         case "CUPS":
                             elementos.set(6, childList.item(j).getTextContent().trim());
-                            this.cups = childList.item(j).getTextContent().trim();
                             break;
                         default:
                             break;

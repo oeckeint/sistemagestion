@@ -16,6 +16,7 @@ dominio\otrasfactuas\DatosGeneralesFactura.class
 web\EvaluacionXml.class
 dominio\procesamientoxml\Remesa.class
 dominio\componentesxml\DatosEnergiaActivaValores.class
+excepciones\PeajeTipoFacturaNoSoportadaException.class
 dominio\procesamientoxml\ResultadoArchivoXML.class
 web\ProcesarPeaje.class
 dominio\componentesxml\DatosPotenciaPrecio.class
@@ -39,13 +40,16 @@ dominio\componentesxml\DatosPotenciaImporteTotal.class
 web\ProcesamientoXml.class
 dominio\componentesxml\DatosPmLecturaHasta.class
 utileria\texto\Cadenas.class
+excepciones\ClienteNoExisteException.class
 web\ControlXmlOtrasFacturas.class
+excepciones\ArchivoVacioException.class
 dominio\componentesxml\DatosExcesoPotencia.class
 dominio\componentesxml\DatosAeConsumo.class
 dominio\componentesxml\DatosPmConsumo.class
 datos\Conexion.class
 dominio\componentesxml\DatosAeProcedenciaDesde.class
 datos\OtrasFacturasDao.class
+excepciones\FacturaYaExisteException.class
 dominio\componentesxml\DatosRLecturaDesde.class
 web\ControlClientes.class
 web\Inicio.class

@@ -8,6 +8,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRCo
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaImporteTotal.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosImpuestoElectrico.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\Conexion.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ArchivoVacioException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeProcedenciaDesde.java
 C:\NetBeansProjects\sistemagestion\src\main\java\utileria\texto\Cadenas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaPrecio.java
@@ -23,6 +24,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\Lectura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\web\ControlXmlFacturas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\web\ProcesarPeaje.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPotenciaImporteTotal.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\PeajeTipoFacturaNoSoportadaException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\Distribuidora.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPotenciaAFacturar.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\DatosGeneralesFactura.java
