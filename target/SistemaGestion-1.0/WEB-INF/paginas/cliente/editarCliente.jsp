@@ -48,7 +48,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label for="cups">CUPS</label>
+                                        <label for="cups">CUPS:</label>
                                         <input type="text" class="form-control" value="${cliente.cups}" disabled>
                                         <input type="hidden" name="cups" name="cups" id="cups" value="${cliente.cups}">
                                     </div>
