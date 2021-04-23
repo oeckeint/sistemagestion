@@ -1,15 +1,10 @@
 package web;
 
-import datos.*;
-import dominio.Cliente;
-import dominio.componentesxml.*;
 import excepciones.*;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -18,7 +13,6 @@ import javax.servlet.http.*;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
-import utileria.texto.Cadenas;
 
 @WebServlet("/ProcesamientoXML")
 @MultipartConfig
@@ -37,8 +31,6 @@ public class ProcesamientoXml extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("(ProcesamientoXML). Dentro del servlet de procesamiento XML");
-
         request.setAttribute("tituloPagina", this.titulo);
         request.setAttribute("titulo", icono + " " + this.titulo);
         request.setAttribute("mensajeRegistro", this.mensaje);
@@ -103,29 +95,38 @@ public class ProcesamientoXml extends HttpServlet {
                 DocumentBuilder builder = dbFactory.newDocumentBuilder();
                 Document documento = builder.parse(archivo);
                 documento.getDocumentElement().normalize();
-
+                
+                //Revision de la compatiblidad
+                if (documento.getElementsByTagName("MensajeFacturacion").getLength() == 0 ) {
+                    throw new XmlNoSoportado();
+                }
+                
                 //Revisión del nodo
                 if (documento.getElementsByTagName("OtrasFacturas").getLength() != 0) {
                     System.out.println("Procesando en otras facturas");
                     ProcesamientoOtrasFacturas of = new ProcesamientoOtrasFacturas();
                     if (!of.registrar(documento, nombreArchivo).equals("")) {
                         archivosErroneos.add(of.registrar(documento, nombreArchivo));
-                    } else {
-                        archivosCorrectos++;
                     }
                 } else {
                     ProcesarPeaje pr = new ProcesarPeaje(documento);
                     pr.procesar(nombreArchivo);
-                    archivosCorrectos++;
-                    //this.LeerCabeceraXML(archivo.getAbsolutePath(), nombreArchivo);
                 }
+                System.out.println("Se proceso la factura");
+                archivosCorrectos++;
             } else {
                 throw new ArchivoVacioException();
             }
 
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-        } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | ArchivoVacioException ex) {
+        } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException 
+                | ArchivoVacioException | CodRectNoExisteException | XmlNoSoportado ex) {
             archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + ex.getMessage());
+            utileria.ArchivoTexto.escribirErrores(archivosErroneos.get(archivosErroneos.size()-1));
+        } catch (Exception ex){
+            archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + new ErrorDesconocidoException().getMessage() + " (<Strong>" + ex.getMessage() + "</Strong>)");
+            utileria.ArchivoTexto.escribirErrores(archivosErroneos.get(archivosErroneos.size()-1));
+            ex.printStackTrace(System.out);
         }
 
         System.out.println("(Fin)************************-----------------------------" + nombreArchivo);

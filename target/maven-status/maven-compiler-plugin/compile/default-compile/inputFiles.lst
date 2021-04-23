@@ -31,6 +31,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\DatosGener
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosFacturaAtr.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\ClienteDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosExcesoPotencia.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\XmlNoSoportado.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\ReactivaImporteTotal.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\procesamientoxml\PotenciaAFacturar.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\LecturaDao.java
@@ -46,6 +47,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\datos\OtrasFacturasDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\FacturaYaExisteException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\DistribuidoraDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRLecturaDesde.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\CodRectNoExisteException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\ContenidoXmlDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\procesamientoxml\Remesa.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActiva.java
@@ -58,5 +60,6 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosIva
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaValores.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\Cabecera.java
 C:\NetBeansProjects\sistemagestion\src\main\java\web\EvaluacionXml.java
+C:\NetBeansProjects\sistemagestion\src\main\java\utileria\ArchivoTexto.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPotenciaContratada.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\DocumentoOtraFactura.java

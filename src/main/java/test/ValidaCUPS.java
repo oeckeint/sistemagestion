@@ -5,7 +5,7 @@ public class ValidaCUPS {
     String CUPS = "a";
     boolean VerifyCups;
     int longitud = CUPS.length();
-
+    
     public void validar() {
         if (this.longitud < 23 && this.longitud > 19) {
 

@@ -1,3 +1,34 @@
+V0.4.2.3
+**Novedades**
+Implementacion del archivo de texto errores en peajes en donde se visualizan todos las excepciones lanzadas por la aplicacion
+Procesamiento de datos AE, R, PM de acuerdo al tipo de factura indicada y excepciones con clientes diferentes
+Limitacion de los tipos de facturas que pueden ser procesados (Peajes, Otras facturas)
+
+**Correcciones**
+Se detecto un error en la lectura del codigo de solicitud que terminaba la ejecucion de la aplicacion
+Se identifico el falso procesamiento de algunas facturas rectificadas en donde no notificaba cuando no existia el codigo de factura rectificada
+Se detecto un falso contador al procesar las facturas rectificadas
+Se detecto que algunas facturas de abono no tienen alquiler, por lo que indicaba un error de indices, se declaro el valor 0 por default.
+Mejoras generales en el rendimiento
+
+*Archivos especiales*
+Incosistencia detectada en los campos de EA Valores, Precio en donde tienen menos de 6 elementos (3)
+14-T30A_GRCW_IDERedesElectInteligSAU_Conecta2_F1_01_ES0021000009096102EJ0P_2_1.xml
+15-T30A_GRCW_IDERedesElectInteligSAU_Conecta2_F1_01_ES0021000006802053DF0P_54_53.xml
+19-T30A_GRCW_IDERedesElectInteligSAU_Conecta2_F1_01_ES0021000009161215RJ0P_56_55.xml
+
+No hay correspondencia con los valores esperados 11, 31. Aparecen como 21 22
+184-T20DHA_SCTDE_F1_01_ES0022000005453642SF1P_0022_0894_20201209154604981_(923803669).xml
+
+No se encontro el valor de EnergiaActivaImporteTotal en la factura Se especifico un valor por default (0)
+238-T31A_GRCW_IDERedesElectInteligSAU_Conecta2_F1_01_ES0021000011103562HX0P_1_0.xml
+
+No hay consistencia de acuerdo al FactATR(1) en el archivo en donde se esperan los datos (10), pero en su lugar estan los datos 21,22
+860-T20A_GRCW_IDERedesElectInteligSAU_Conecta2_F1_01_ES0021000008373876QX0P_2_1 (2).xml
+
+No hay consistencia de acuerdo al FactATR(1) en el archivo en donde se esperan los datos (6), con cliente 0022 pero en su lugar estan los datos 21,22
+1814-T21DHA_SCTDE_F1_01_ES0022000008735306GP1P_0022_0894_20201210203506473_(924744352).xml
+
 V0.4.2.2
 Mejoras en la velocidad de ejecución
 Creacion de instancias para procesar los diferentes tipos de facturas

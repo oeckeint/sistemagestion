@@ -23,6 +23,8 @@ public class ProcesarPeaje {
     private int empEmi;
     private String tipoFactura;
     private Cliente cliente;
+    private String EmpresaEmisora;
+    private String tarifaAtrFac;
 
     public ProcesarPeaje() {
         this.errores = new StringBuilder("");
@@ -33,7 +35,7 @@ public class ProcesarPeaje {
         this.iniciarVariables();
     }
 
-    public void procesar(String nombreArchivo) throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException {
+    public void procesar(String nombreArchivo) throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException {
         this.cliente = new ClienteDao().encontrarCups(new Cliente(this.cups));
         if (this.cliente.getIdCliente() != 0) {
             if (!new DatosFacturaDao().encontrarCodFiscal(codFactura, empEmi)) {
@@ -52,22 +54,26 @@ public class ProcesarPeaje {
                     default:
                         throw new PeajeTipoFacturaNoSoportadaException(tipoFactura);
                 }
+                if (this.errores.toString().contains("13")) {
+                    System.out.println("Inconsistencia en tarifa detectada");
+                }
             } else {
                 throw new FacturaYaExisteException(codFactura);
             }
         } else {
-            throw  new ClienteNoExisteException(cups);
+            throw new ClienteNoExisteException(cups);
         }
     }
 
     /*------------------------Registro de facturas--------------------------------------*/
-    private void registrarA() {
+    private void registrarA() throws CodRectNoExisteException {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         DocumentoXml documento = new ContenidoXmlDao().buscarCodFiscal(codRectificada, this.empEmi);
         if (documento != null) {
             this.registrarN();
         } else {
             System.out.println("(Procesar Peaje) No se encontro una factura para rectificar");
+            throw new CodRectNoExisteException(codFactura);
         }
     }
 
@@ -88,7 +94,7 @@ public class ProcesarPeaje {
         System.out.print("Codigo Errores : " + errores.toString());
     }
 
-    private void registrarR(String nombreArchivo) {
+    private void registrarR(String nombreArchivo) throws CodRectNoExisteException {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         DocumentoXml documento = new ContenidoXmlDao().buscarCodFiscal(codRectificada, empEmi);
         if (documento != null) {
@@ -96,10 +102,11 @@ public class ProcesarPeaje {
             this.registrarN();
         } else {
             System.out.println("(Procesar Peaje) No se encontro una factura para rectificar");
+            throw new CodRectNoExisteException(codFactura);
         }
     }
 
-    /*------------------------Obtencios de datos --------------------------------------*/
+    /*------------------------Obtencion de datos --------------------------------------*/
     private DatosCabecera cabecera() {
         elementos = new ArrayList<String>(7);
         elementos.add("");
@@ -119,6 +126,7 @@ public class ProcesarPeaje {
                     switch (childNode.getNodeName()) {
                         case "CodigoREEEmpresaEmisora":
                             elementos.set(0, childList.item(j).getTextContent().trim());
+                            this.EmpresaEmisora = childList.item(j).getTextContent().trim();
                             break;
                         case "CodigoREEEmpresaDestino":
                             elementos.set(1, childList.item(j).getTextContent().trim());
@@ -210,6 +218,7 @@ public class ProcesarPeaje {
                     switch (childNode.getNodeName()) {
                         case "TarifaATRFact":
                             elementos.set(0, childList.item(j).getTextContent().trim());
+                            this.tarifaAtrFac = String.valueOf(Integer.parseInt(elementos.get(0).toString()));
                             break;
                         case "ModoControlPotencia":
                             elementos.set(1, childList.item(j).getTextContent().trim());
@@ -244,6 +253,7 @@ public class ProcesarPeaje {
         }
 
         this.imprimirResultado("facturaAtr", elementos);
+        this.validarTarifa();
         return new DatosFacturaAtr(elementos);
     }
 
@@ -534,6 +544,13 @@ public class ProcesarPeaje {
 
         //Obtiene 12 posibles valores, los organiza en 6 (1+7, 2+8 ... 6+12) y los suma en un total
         elementos = new ArrayList<Double>(7);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
 
         //Busqueda en el nodo
         NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
@@ -553,7 +570,7 @@ public class ProcesarPeaje {
                         int aux = indice++ - 6;
                         elementos.set(aux, (double) elementos.get(aux) + (Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()) / 1000));
                     } else {
-                        elementos.add(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()) / 1000);
+                        elementos.set(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()) / 1000);
                     }
                 }
             }
@@ -565,7 +582,7 @@ public class ProcesarPeaje {
         for (Object elemento : elementos) {
             suma += (double) elemento;
         }
-        elementos.add(suma);
+        elementos.set(6, suma);
 
         this.imprimirResultado("energiaActivaValores", elementos);
         return new DatosEnergiaActivaValores(elementos);
@@ -575,7 +592,13 @@ public class ProcesarPeaje {
 
         //Obtiene 12 posibles valores y los suma en 6 correspondiendo a pocisiones 1+7 2+8 ... 6+12
         elementos = new ArrayList<Double>(6);
-
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        
         //Busqueda en el nodo
         NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
 
@@ -594,7 +617,7 @@ public class ProcesarPeaje {
                         int aux = indice++ - 6;
                         elementos.set(aux, (double) elementos.get(aux) + (Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim())));
                     } else {
-                        elementos.add(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                        elementos.set(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -609,6 +632,7 @@ public class ProcesarPeaje {
     private DatosEnergiaActivaImporteTotal energiaActivaImporteTotal() {
         //Obtiene 1 elemento denomidado ImporteTotalEnergiaActiva en el nodo EnergiaActiva
         elementos = new ArrayList<Double>(1);
+        elementos.add(0.0);
 
         //Búsqueda en el nodo
         NodeList flowListPeriodo = this.doc.getElementsByTagName("EnergiaActiva");
@@ -624,7 +648,7 @@ public class ProcesarPeaje {
                         this.agregarError("8");
                         break;
                     } else {
-                        elementos.add(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                        elementos.set(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -676,7 +700,8 @@ public class ProcesarPeaje {
 
         //Obtiene un unico dato
         elementos = new ArrayList<Double>(1);
-
+        elementos.add(0.0);
+        
         int indice = 0;
         boolean continuar = false;
 
@@ -692,7 +717,7 @@ public class ProcesarPeaje {
                         continuar = false;
                         break;
                     } else {
-                        elementos.add(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
+                        elementos.set(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -799,31 +824,91 @@ public class ProcesarPeaje {
                             sibling4 = sibling4.getPreviousSibling();
                         }
 
-                        //Revisa si el nodo de magnitud corresponde con Ae, y que el codigo periodo no comience en 0
-                        if ("AE".equals(sibling4.getTextContent().toUpperCase()) && !"0".equals(defPeriodo)) {
+                        //Revisa si el nodo de magnitud corresponde con Ae
+                        if ("AE".equals(sibling4.getTextContent().toUpperCase())) {
+
                             //Variable de control para revisar la cantidad de elementos coincidentes
                             contador++;
-                            switch (defPeriodo) {
-                                case "1":
-                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "2":
-                                    elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
+
+                            //Se revisa la tarifa a considerar
+                            switch (this.tarifaAtrFac) {
                                 case "3":
-                                    elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                case "7":
+                                case "8":
+                                case "11":
+                                case "12":
+                                case "13":
+                                case "14":
+                                    //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
+                                    if (!"0".equals(defPeriodo)) {
+                                        //Evaluacion de los periodos
+                                        switch (defPeriodo) {
+                                            case "1":
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "2":
+                                                elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "3":
+                                                elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "4":
+                                                elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "5":
+                                                elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "6":
+                                                elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                System.out.println("No se encontro el codigo de periodo valido");
+                                                break;
+                                        }
+                                    }
                                     break;
                                 case "4":
-                                    elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "5":
-                                    elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
                                 case "6":
-                                    elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    //Se verifica la empresa para definir los casos especiales
+                                    if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
+
+                                        //Se obtiene y evalua en primer caracter de la definicion del periodo}
+                                        char periodo = sibling4.getTextContent().charAt(0);
+                                        switch (periodo) {
+                                            case '1':
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '2':
+                                                elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                break;
+                                        }
+
+                                    } else {
+                                        //Se revisa que la definicion del segundo elemento del periodo sea diferente de 0
+                                        if (!defPeriodo.equals("0")) {
+                                            //Se evaluan los elementos que pueden coincidir con la descripción
+                                            switch (defPeriodo) {
+                                                case "1":
+                                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                case "2":
+                                                    elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
                                     break;
-                                default:
-                                    System.out.println("No se encontro el codigo de periodo valido");
+                                case "1":
+                                case "5":
+                                    //Se verifica que los elementos coincidan con 0
+                                    if (defPeriodo.equals("0")) {
+                                        elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    }
+                                    break;
                             }
                         }
                     }
@@ -918,31 +1003,91 @@ public class ProcesarPeaje {
                         sibling5 = sibling5.getPreviousSibling();
                     }
 
-                    //Revisa la magnitud a la que pertenece el valor de lectura Desde y que no sea en codigo 0
-                    if ("AE".equals(sibling5.getTextContent().toUpperCase()) && !"0".equals(defPeriodo)) {
-                        //Variable de control de elementos
+                    //Revisa la magnitud a la que pertenece el valor de lectura Desde
+                    if ("AE".equals(sibling5.getTextContent().toUpperCase())) {
+
+                        //Variable de control para revisar la cantidad de elementos coincidentes
                         contador++;
-                        switch (defPeriodo) {
-                            case "1":
-                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                break;
-                            case "2":
-                                elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                break;
+
+                        //Se revisa la tarifa a considerar
+                        switch (this.tarifaAtrFac) {
                             case "3":
-                                elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                            case "7":
+                            case "8":
+                            case "11":
+                            case "12":
+                            case "13":
+                            case "14":
+                                //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
+                                if (!"0".equals(defPeriodo)) {
+                                    //Evaluacion de los periodos
+                                    switch (defPeriodo) {
+                                        case "1":
+                                            elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case "2":
+                                            elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case "3":
+                                            elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case "4":
+                                            elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case "5":
+                                            elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case "6":
+                                            elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        default:
+                                            System.out.println("No se encontro el codigo de periodo valido");
+                                            break;
+                                    }
+                                }
                                 break;
                             case "4":
-                                elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                break;
-                            case "5":
-                                elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                break;
                             case "6":
-                                elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                //Se verifica la empresa para definir los casos especiales
+                                if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
+
+                                    //Se obtiene y evalua en primer caracter de la definicion del periodo}
+                                    char periodo = sibling4.getTextContent().charAt(0);
+                                    switch (periodo) {
+                                        case '1':
+                                            elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case '2':
+                                            elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                } else {
+                                    //Se revisa que la definicion del segundo elemento del periodo sea diferente de 0
+                                    if (!defPeriodo.equals("0")) {
+                                        //Se evaluan los elementos que pueden coincidir con la descripción
+                                        switch (defPeriodo) {
+                                            case "1":
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "2":
+                                                elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
                                 break;
-                            default:
-                                System.out.println("No se encontro el codigo de periodo valido");
+                            case "1":
+                            case "5":
+                                //Se verifica que los elementos coincidan con 0
+                                if (defPeriodo.equals("0")) {
+                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                }
+                                break;
                         }
                     }
                 }
@@ -966,7 +1111,7 @@ public class ProcesarPeaje {
         elementos.add(0.0);
         elementos.add(0.0);
 
-        int indice = 0;
+        int contador = 0;
         boolean continuar = true;
 
         //Búsqueda en el nodo
@@ -977,7 +1122,7 @@ public class ProcesarPeaje {
             for (int j = 0; j < childList.getLength(); j++) {
                 Node childNode = childList.item(j);
                 if ("Lectura".equals(childNode.getNodeName())) {
-                    if (indice > 11) {
+                    if (contador > 11) {
                         this.agregarError("12");
                         continuar = false;
                         break;
@@ -1033,29 +1178,91 @@ public class ProcesarPeaje {
                             sibling5 = sibling5.getPreviousSibling();
                         }
 
-                        if ("AE".equals(sibling5.getTextContent()) && !"0".equals(defPeriodo)) {
-                            indice++;
-                            switch (defPeriodo) {
-                                case "1":
-                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "2":
-                                    elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
+                        //Se revisa que la magnitud corresponda con lo indicado
+                        if ("AE".equals(sibling5.getTextContent().toUpperCase())) {
+
+                            //Variable de control para revisar la cantidad de elementos coincidentes
+                            contador++;
+
+                            //Se revisa la tarifa a considerar
+                            switch (this.tarifaAtrFac) {
                                 case "3":
-                                    elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                case "7":
+                                case "8":
+                                case "11":
+                                case "12":
+                                case "13":
+                                case "14":
+                                    //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
+                                    if (!"0".equals(defPeriodo)) {
+                                        //Evaluacion de los periodos
+                                        switch (defPeriodo) {
+                                            case "1":
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "2":
+                                                elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "3":
+                                                elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "4":
+                                                elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "5":
+                                                elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "6":
+                                                elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                System.out.println("No se encontro el codigo de periodo valido");
+                                                break;
+                                        }
+                                    }
                                     break;
                                 case "4":
-                                    elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "5":
-                                    elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
                                 case "6":
-                                    elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    //Se verifica la empresa para definir los casos especiales
+                                    if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
+
+                                        //Se obtiene y evalua en primer caracter de la definicion del periodo}
+                                        char periodo = sibling4.getTextContent().charAt(0);
+                                        switch (periodo) {
+                                            case '1':
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '2':
+                                                elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                break;
+                                        }
+
+                                    } else {
+                                        //Se revisa que la definicion del segundo elemento del periodo sea diferente de 0
+                                        if (!defPeriodo.equals("0")) {
+                                            //Se evaluan los elementos que pueden coincidir con la descripción
+                                            switch (defPeriodo) {
+                                                case "1":
+                                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                case "2":
+                                                    elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
                                     break;
-                                default:
-                                    System.out.println("No se encontro el codigo de periodo valido");
+                                case "1":
+                                case "5":
+                                    //Se verifica que los elementos coincidan con 0
+                                    if (defPeriodo.equals("0")) {
+                                        elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    }
+                                    break;
                             }
                         }
 
@@ -1123,9 +1330,62 @@ public class ProcesarPeaje {
                         sibling5 = sibling5.getPreviousSibling();
                     }
 
-                    if ("AE".equals(sibling5.getTextContent()) && !"0".equals(defPeriodo)) {
-                        continuar = false;
-                        elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                    //Verifica que corresponda con el nodo AE
+                    if ("AE".equals(sibling5.getTextContent())) {
+                        //Revision del tipo de tarifa a considerar
+                        switch (this.tarifaAtrFac) {
+                            case "3":
+                            case "7":
+                            case "8":
+                            case "11":
+                            case "12":
+                            case "13":
+                            case "14":
+                                if (!"0".equals(defPeriodo)) {
+                                    continuar = false;
+                                    elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                }
+                                break;
+                            //Tarifas del tipo 4,6
+                            case "4":
+                            case "6":
+                                //Se verifica la empresa emisora
+                                if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
+
+                                    //Se lee el primer caracter de la definicion del periodo
+                                    String periodo = sibling4.getTextContent().substring(0, 1);
+                                    switch (periodo) {
+                                        case "1":
+                                            elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            continuar = false;
+                                            break;
+                                        case "3":
+                                            elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            continuar = false;
+                                            break;
+                                    }
+
+                                    continuar = false;
+
+                                } else {
+                                    //En caso de que no coincida, buscará un elemento con la terminación de con una terminacion diferente de cero y termina el proceso
+                                    if (!"0".equals(defPeriodo)) {
+                                        continuar = false;
+                                        elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                    }
+                                }
+                                break;
+                            //Tarifas del tipo 1, 5
+                            case "1":
+                            case "5":
+                                if ("0".equals(defPeriodo)) {
+                                    continuar = false;
+                                    elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
@@ -1203,11 +1463,63 @@ public class ProcesarPeaje {
                         sibling5 = sibling5.getPreviousSibling();
                     }
 
-                    if ("AE".equals(sibling5.getTextContent()) && !"0".equals(defPeriodo)) {
-                        continuar = false;
-                        elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
-                    }
+                    //Verifica que corresponda con el nodo AE
+                    if ("AE".equals(sibling5.getTextContent())) {
+                        //Revision del tipo de tarifa a considerar
+                        switch (this.tarifaAtrFac) {
+                            case "3":
+                            case "7":
+                            case "8":
+                            case "11":
+                            case "12":
+                            case "13":
+                            case "14":
+                                if (!"0".equals(defPeriodo)) {
+                                    continuar = false;
+                                    elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                }
+                                break;
+                            //Tarifas del tipo 4,6
+                            case "4":
+                            case "6":
+                                //Se verifica la empresa emisora
+                                if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
+                                    //Se lee el primer caracter de la definicion del periodo
+                                    String periodo = sibling4.getTextContent().substring(0, 1);
+                                    switch (periodo) {
+                                        case "1":
+                                            elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            continuar = false;
+                                            break;
+                                        case "3":
+                                            elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            continuar = false;
+                                            break;
+                                    }
+
+                                    continuar = false;
+
+                                } else {
+                                    //En caso de que no coincida, buscará un elemento con la terminación de con una terminacion diferente de cero y termina el proceso
+                                    if (!"0".equals(defPeriodo)) {
+                                        continuar = false;
+                                        elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                    }
+                                }
+                                break;
+                            //Tarifas del tipo 1, 5
+                            case "1":
+                            case "5":
+                                if ("0".equals(defPeriodo)) {
+                                    continuar = false;
+                                    elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
                 }
             }
             if (!continuar) {
@@ -1282,31 +1594,91 @@ public class ProcesarPeaje {
                             sibling4 = sibling4.getPreviousSibling();
                         }
 
-                        //Revisa si el nodo de magnitud corresponde con Ae, y que el codigo periodo no comience en 0
-                        if ("R".equals(sibling4.getTextContent().toUpperCase().substring(0, 1)) && !"0".equals(defPeriodo)) {
+                        //Revisa si el nodo de magnitud corresponde con el valor proporcionado
+                        if ("R".equals(sibling4.getTextContent().toUpperCase().substring(0, 1))) {
+
                             //Variable de control para revisar la cantidad de elementos coincidentes
                             contador++;
-                            switch (defPeriodo) {
-                                case "1":
-                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "2":
-                                    elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
+
+                            //Se revisa la tarifa a considerar
+                            switch (this.tarifaAtrFac) {
                                 case "3":
-                                    elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                case "7":
+                                case "8":
+                                case "11":
+                                case "12":
+                                case "13":
+                                case "14":
+                                    //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
+                                    if (!"0".equals(defPeriodo)) {
+                                        //Evaluacion de los periodos
+                                        switch (defPeriodo) {
+                                            case "1":
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "2":
+                                                elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "3":
+                                                elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "4":
+                                                elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "5":
+                                                elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "6":
+                                                elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                System.out.println("No se encontro el codigo de periodo valido");
+                                                break;
+                                        }
+                                    }
                                     break;
                                 case "4":
-                                    elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "5":
-                                    elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
                                 case "6":
-                                    elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    //Se verifica la empresa para definir los casos especiales
+                                    if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
+
+                                        //Se obtiene y evalua en primer caracter de la definicion del periodo}
+                                        char periodo = sibling4.getTextContent().charAt(0);
+                                        switch (periodo) {
+                                            case '1':
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '2':
+                                                elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                break;
+                                        }
+
+                                    } else {
+                                        //Se revisa que la definicion del segundo elemento del periodo sea diferente de 0
+                                        if (!defPeriodo.equals("0")) {
+                                            //Se evaluan los elementos que pueden coincidir con la descripción
+                                            switch (defPeriodo) {
+                                                case "1":
+                                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                case "2":
+                                                    elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
                                     break;
-                                default:
-                                    System.out.println("No se encontro el codigo de periodo valido");
+                                case "1":
+                                case "5":
+                                    //Se verifica que los elementos coincidan con 0
+                                    if (defPeriodo.equals("0")) {
+                                        elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    }
+                                    break;
                             }
                         }
                     }
@@ -1401,31 +1773,91 @@ public class ProcesarPeaje {
                         sibling5 = sibling5.getPreviousSibling();
                     }
 
-                    //Revisa la magnitud a la que pertenece el valor de lectura Desde y que no sea en codigo 0
-                    if ("R".equals(sibling5.getTextContent().toUpperCase().substring(0, 1)) && !"0".equals(defPeriodo)) {
-                        //Variable de control de elementos
+                    //Revisa si el nodo de magnitud corresponde con el valor proporcionado
+                    if ("R".equals(sibling5.getTextContent().toUpperCase().substring(0, 1))) {
+
+                        //Variable de control para revisar la cantidad de elementos coincidentes
                         contador++;
-                        switch (defPeriodo) {
-                            case "1":
-                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                break;
-                            case "2":
-                                elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                break;
+
+                        //Se revisa la tarifa a considerar
+                        switch (this.tarifaAtrFac) {
                             case "3":
-                                elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                            case "7":
+                            case "8":
+                            case "11":
+                            case "12":
+                            case "13":
+                            case "14":
+                                //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
+                                if (!"0".equals(defPeriodo)) {
+                                    //Evaluacion de los periodos
+                                    switch (defPeriodo) {
+                                        case "1":
+                                            elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case "2":
+                                            elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case "3":
+                                            elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case "4":
+                                            elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case "5":
+                                            elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case "6":
+                                            elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        default:
+                                            System.out.println("No se encontro el codigo de periodo valido");
+                                            break;
+                                    }
+                                }
                                 break;
                             case "4":
-                                elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                break;
-                            case "5":
-                                elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                break;
                             case "6":
-                                elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                //Se verifica la empresa para definir los casos especiales
+                                if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
+
+                                    //Se obtiene y evalua en primer caracter de la definicion del periodo}
+                                    char periodo = sibling4.getTextContent().charAt(0);
+                                    switch (periodo) {
+                                        case '1':
+                                            elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case '2':
+                                            elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                } else {
+                                    //Se revisa que la definicion del segundo elemento del periodo sea diferente de 0
+                                    if (!defPeriodo.equals("0")) {
+                                        //Se evaluan los elementos que pueden coincidir con la descripción
+                                        switch (defPeriodo) {
+                                            case "1":
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "2":
+                                                elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
                                 break;
-                            default:
-                                System.out.println("No se encontro el codigo de periodo valido");
+                            case "1":
+                            case "5":
+                                //Se verifica que los elementos coincidan con 0
+                                if (defPeriodo.equals("0")) {
+                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                }
+                                break;
                         }
                     }
                 }
@@ -1449,7 +1881,7 @@ public class ProcesarPeaje {
         elementos.add(0.0);
         elementos.add(0.0);
 
-        int indice = 0;
+        int contador = 0;
         boolean continuar = true;
 
         //Búsqueda en el nodo
@@ -1460,7 +1892,7 @@ public class ProcesarPeaje {
             for (int j = 0; j < childList.getLength(); j++) {
                 Node childNode = childList.item(j);
                 if ("Lectura".equals(childNode.getNodeName())) {
-                    if (indice > 11) {
+                    if (contador > 11) {
                         this.agregarError("12");
                         continuar = false;
                         break;
@@ -1516,32 +1948,93 @@ public class ProcesarPeaje {
                             sibling5 = sibling5.getPreviousSibling();
                         }
 
-                        if ("R".equals(sibling5.getTextContent().toUpperCase().substring(0, 1)) && !"0".equals(defPeriodo)) {
-                            indice++;
-                            switch (defPeriodo) {
-                                case "1":
-                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "2":
-                                    elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
+                        //Revisa si el nodo de magnitud corresponde con el valor proporcionado
+                        if ("R".equals(sibling5.getTextContent().toUpperCase().substring(0, 1))) {
+
+                            //Variable de control para revisar la cantidad de elementos coincidentes
+                            contador++;
+
+                            //Se revisa la tarifa a considerar
+                            switch (this.tarifaAtrFac) {
                                 case "3":
-                                    elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                case "7":
+                                case "8":
+                                case "11":
+                                case "12":
+                                case "13":
+                                case "14":
+                                    //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
+                                    if (!"0".equals(defPeriodo)) {
+                                        //Evaluacion de los periodos
+                                        switch (defPeriodo) {
+                                            case "1":
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "2":
+                                                elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "3":
+                                                elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "4":
+                                                elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "5":
+                                                elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "6":
+                                                elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                System.out.println("No se encontro el codigo de periodo valido");
+                                                break;
+                                        }
+                                    }
                                     break;
                                 case "4":
-                                    elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "5":
-                                    elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
                                 case "6":
-                                    elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    //Se verifica la empresa para definir los casos especiales
+                                    if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
+
+                                        //Se obtiene y evalua en primer caracter de la definicion del periodo}
+                                        char periodo = sibling4.getTextContent().charAt(0);
+                                        switch (periodo) {
+                                            case '1':
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '2':
+                                                elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                break;
+                                        }
+
+                                    } else {
+                                        //Se revisa que la definicion del segundo elemento del periodo sea diferente de 0
+                                        if (!defPeriodo.equals("0")) {
+                                            //Se evaluan los elementos que pueden coincidir con la descripción
+                                            switch (defPeriodo) {
+                                                case "1":
+                                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                case "2":
+                                                    elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
                                     break;
-                                default:
-                                    System.out.println("No se encontro el codigo de periodo valido");
+                                case "1":
+                                case "5":
+                                    //Se verifica que los elementos coincidan con 0
+                                    if (defPeriodo.equals("0")) {
+                                        elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    }
+                                    break;
                             }
                         }
-
                     }
                 }
             }
@@ -1637,31 +2130,91 @@ public class ProcesarPeaje {
                             sibling4 = sibling4.getPreviousSibling();
                         }
 
-                        //Revisa si el nodo de magnitud corresponde con Ae, y que el codigo periodo no comience en 0
-                        if ("PM".equals(sibling4.getTextContent().toUpperCase()) && !"0".equals(defPeriodo)) {
+                        //Revisa si el nodo de magnitud corresponde con el valor proporcionado
+                        if ("PM".equals(sibling4.getTextContent().toUpperCase())) {
+
                             //Variable de control para revisar la cantidad de elementos coincidentes
                             contador++;
-                            switch (defPeriodo) {
-                                case "1":
-                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "2":
-                                    elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
+
+                            //Se revisa la tarifa a considerar
+                            switch (this.tarifaAtrFac) {
                                 case "3":
-                                    elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                case "7":
+                                case "8":
+                                case "11":
+                                case "12":
+                                case "13":
+                                case "14":
+                                    //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
+                                    if (!"0".equals(defPeriodo)) {
+                                        //Evaluacion de los periodos
+                                        switch (defPeriodo) {
+                                            case "1":
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "2":
+                                                elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "3":
+                                                elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "4":
+                                                elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "5":
+                                                elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "6":
+                                                elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                System.out.println("No se encontro el codigo de periodo valido");
+                                                break;
+                                        }
+                                    }
                                     break;
                                 case "4":
-                                    elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "5":
-                                    elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
                                 case "6":
-                                    elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    //Se verifica la empresa para definir los casos especiales
+                                    if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
+
+                                        //Se obtiene y evalua en primer caracter de la definicion del periodo}
+                                        char periodo = sibling4.getTextContent().charAt(0);
+                                        switch (periodo) {
+                                            case '1':
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '2':
+                                                elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                break;
+                                        }
+
+                                    } else {
+                                        //Se revisa que la definicion del segundo elemento del periodo sea diferente de 0
+                                        if (!defPeriodo.equals("0")) {
+                                            //Se evaluan los elementos que pueden coincidir con la descripción
+                                            switch (defPeriodo) {
+                                                case "1":
+                                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                case "2":
+                                                    elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
                                     break;
-                                default:
-                                    System.out.println("No se encontro el codigo de periodo valido");
+                                case "1":
+                                case "5":
+                                    //Se verifica que los elementos coincidan con 0
+                                    if (defPeriodo.equals("0")) {
+                                        elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    }
+                                    break;
                             }
                         }
                     }
@@ -1694,7 +2247,7 @@ public class ProcesarPeaje {
         elementos.add(0.0);
         elementos.add(0.0);
 
-        int indice = 0;
+        int contador = 0;
         boolean continuar = true;
 
         //Búsqueda en el nodo
@@ -1705,7 +2258,7 @@ public class ProcesarPeaje {
             for (int j = 0; j < childList.getLength(); j++) {
                 Node childNode = childList.item(j);
                 if ("Lectura".equals(childNode.getNodeName())) {
-                    if (indice > 11) {
+                    if (contador > 11) {
                         this.agregarError("12");
                         continuar = false;
                         break;
@@ -1761,32 +2314,93 @@ public class ProcesarPeaje {
                             sibling5 = sibling5.getPreviousSibling();
                         }
 
-                        if ("PM".equals(sibling5.getTextContent().toUpperCase()) && !"0".equals(defPeriodo)) {
-                            indice++;
-                            switch (defPeriodo) {
-                                case "1":
-                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "2":
-                                    elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
+                        //Revisa si el nodo de magnitud corresponde con el valor proporcionado
+                        if ("PM".equals(sibling5.getTextContent().toUpperCase())) {
+
+                            //Variable de control para revisar la cantidad de elementos coincidentes
+                            contador++;
+
+                            //Se revisa la tarifa a considerar
+                            switch (this.tarifaAtrFac) {
                                 case "3":
-                                    elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                case "7":
+                                case "8":
+                                case "11":
+                                case "12":
+                                case "13":
+                                case "14":
+                                    //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
+                                    if (!"0".equals(defPeriodo)) {
+                                        //Evaluacion de los periodos
+                                        switch (defPeriodo) {
+                                            case "1":
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "2":
+                                                elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "3":
+                                                elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "4":
+                                                elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "5":
+                                                elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case "6":
+                                                elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                System.out.println("No se encontro el codigo de periodo valido");
+                                                break;
+                                        }
+                                    }
                                     break;
                                 case "4":
-                                    elementos.set(3, (double) elementos.get(3) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
-                                case "5":
-                                    elementos.set(4, (double) elementos.get(4) + Double.parseDouble(childList.item(j).getTextContent().trim()));
-                                    break;
                                 case "6":
-                                    elementos.set(5, (double) elementos.get(5) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    //Se verifica la empresa para definir los casos especiales
+                                    if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
+
+                                        //Se obtiene y evalua en primer caracter de la definicion del periodo}
+                                        char periodo = sibling4.getTextContent().charAt(0);
+                                        switch (periodo) {
+                                            case '1':
+                                                elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '2':
+                                                elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            default:
+                                                break;
+                                        }
+
+                                    } else {
+                                        //Se revisa que la definicion del segundo elemento del periodo sea diferente de 0
+                                        if (!defPeriodo.equals("0")) {
+                                            //Se evaluan los elementos que pueden coincidir con la descripción
+                                            switch (defPeriodo) {
+                                                case "1":
+                                                    elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                case "2":
+                                                    elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
                                     break;
-                                default:
-                                    System.out.println("No se encontro el codigo de periodo valido");
+                                case "1":
+                                case "5":
+                                    //Se verifica que los elementos coincidan con 0
+                                    if (defPeriodo.equals("0")) {
+                                        elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                    }
+                                    break;
                             }
                         }
-
                     }
                 }
             }
@@ -1870,6 +2484,45 @@ public class ProcesarPeaje {
             this.errores.append(codError);
         } else {
             this.errores.append(", ").append(codError);
+        }
+    }
+
+    private void validarTarifa() {
+        Cliente c = new ClienteDao().encontrarCups(new Cliente(this.cups));
+        String control = "";
+
+        switch (c.getTarifa()) {
+            case "T20A":
+                control = "1";
+                break;
+            case "T21A":
+                control = "5";
+                break;
+            case "T20DHA":
+                control = "4";
+                break;
+            case "T21DHA":
+                control = "6";
+                break;
+            case "T30A":
+                control = "3";
+                break;
+            case "T31A":
+                control = "11";
+                break;
+            case "T61A":
+                control = "12";
+                break;
+            case "T62A":
+                control = "13";
+                break;
+            default:
+                break;
+        }
+
+        if (!control.equals(this.tarifaAtrFac)) {
+            System.out.println("Inconsistencia en el factor de tarifa, se encontro " + this.tarifaAtrFac + " en donde se esperaba " + control);
+            this.agregarError("13");
         }
     }
 

@@ -1,6 +1,7 @@
 dominio\componentesxml\DatosFinDeRegistro.class
 dominio\componentesxml\DocumentoXml.class
 dominio\componentesxml\DatosEnergiaActiva.class
+utileria\ArchivoTexto.class
 dominio\componentesxml\DatosAeLecturaHasta.class
 dominio\Lectura.class
 dominio\componentesxml\DatosEnergiaActivaPrecio.class
@@ -28,6 +29,7 @@ web\ProcesamientoOtrasFacturas.class
 datos\LecturaDao.class
 dominio\componentesxml\DatosPotenciaContratada.class
 dominio\otrasfactuas\Cabecera.class
+excepciones\CodRectNoExisteException.class
 dominio\componentesxml\DatosGeneralesFactura.class
 dominio\componentesxml\DatosFacturaAtr.class
 dominio\componentesxml\DatosAeProcedenciaHasta.class
@@ -46,6 +48,7 @@ excepciones\ArchivoVacioException.class
 dominio\componentesxml\DatosExcesoPotencia.class
 dominio\componentesxml\DatosAeConsumo.class
 dominio\componentesxml\DatosPmConsumo.class
+excepciones\XmlNoSoportado.class
 datos\Conexion.class
 dominio\componentesxml\DatosAeProcedenciaDesde.class
 datos\OtrasFacturasDao.class

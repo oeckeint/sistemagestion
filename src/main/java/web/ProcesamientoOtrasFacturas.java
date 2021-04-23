@@ -27,8 +27,8 @@ public class ProcesamientoOtrasFacturas {
                     comentarios, errores
             ));
             return "";
-        } else{
-            return "La factura <Strong>(" + this.datosGeneralesFactura(documentoXml).get(0) + ")</Strong> del archivo " +  nombreArchivo + " ya ha sido registrada en <Strong>Otras Facturas</Strong>";
+        } else {
+            return "La factura <Strong>(" + this.datosGeneralesFactura(documentoXml).get(0) + ")</Strong> del archivo " + nombreArchivo + " ya ha sido registrada en <Strong>Otras Facturas</Strong>";
         }
     }
 
@@ -62,7 +62,7 @@ public class ProcesamientoOtrasFacturas {
                             elementos.set(3, childList.item(j).getTextContent().trim());
                             break;
                         case "CodigoDeSolicitud":
-                            elementos.set(4, String.valueOf(Integer.parseInt(childList.item(j).getTextContent().trim())));
+                            elementos.set(4, String.valueOf(childList.item(j).getTextContent().trim()));
                             break;
                         case "CUPS":
                             elementos.set(5, childList.item(j).getTextContent().trim());
@@ -167,7 +167,11 @@ public class ProcesamientoOtrasFacturas {
                 if (null != childNode.getNodeName()) {
                     switch (childNode.getNodeName()) {
                         case "IdRemesa":
-                            elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
+                            if (childList.item(j).getTextContent().trim().substring(0, 1).equals("0")) {
+                                elementos.set(0, String.valueOf(Integer.parseInt(childList.item(j).getTextContent().trim())));
+                            } else {
+                                elementos.set(0, childList.item(j).getTextContent().trim());
+                            }
                             break;
                         default:
                             break;
