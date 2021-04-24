@@ -15,8 +15,7 @@
             <div class="container">
                 <strong>${mensajeRegistro}</strong>
             </div>
-        </div>
-        
+        </div>        
         
         <!--Formulario-->
         <form action="${pageContext.request.contextPath}/ControlClientes?accion=actualizar&idCliente=${cliente.idCliente}" method="post" class="was-validated" onsubmit="return validacion()">
@@ -48,7 +47,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label for="cups">CUPS:</label>
+                                        <label for="cups">CUPS</label>
                                         <input type="text" class="form-control" value="${cliente.cups}" disabled>
                                         <input type="hidden" name="cups" name="cups" id="cups" value="${cliente.cups}">
                                     </div>

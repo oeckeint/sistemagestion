@@ -25,6 +25,7 @@ public class ProcesarPeaje {
     private Cliente cliente;
     private String EmpresaEmisora;
     private String tarifaAtrFac;
+    private String nombreArchivo;
 
     public ProcesarPeaje() {
         this.errores = new StringBuilder("");
@@ -39,7 +40,8 @@ public class ProcesarPeaje {
         this.cliente = new ClienteDao().encontrarCups(new Cliente(this.cups));
         if (this.cliente.getIdCliente() != 0) {
             if (!new DatosFacturaDao().encontrarCodFiscal(codFactura, empEmi)) {
-                this.comentarios.append("Nombre del archivo original: <Strong>").append(nombreArchivo).append("</Strong><br/>");
+                this.nombreArchivo = nombreArchivo;
+                this.comentarios.append("Nombre del archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
                 switch (this.tipoFactura) {
                     case "A":
                         this.registrarA();
@@ -280,7 +282,7 @@ public class ProcesarPeaje {
                 if ("PotenciaContratada".equals(childNode.getNodeName())) {
                     if (indice > 11) {
                         continuar = false;
-                        this.agregarError("5");
+                        this.agregarError("1");
                         break;
                     } else if (indice > 5) {
                         int aux = indice++ - 6;
@@ -322,7 +324,7 @@ public class ProcesarPeaje {
                 if ("PotenciaMaxDemandada".equals(childNode.getNodeName())) {
                     if (indice > 11) {
                         continuar = false;
-                        this.agregarError("6");
+                        this.agregarError("2");
                         break;
                     } else if (indice > 5) {
                         int aux = indice++ - 6;
@@ -361,7 +363,7 @@ public class ProcesarPeaje {
                 if ("PotenciaAFacturar".equals(childNode.getNodeName())) {
                     if (indice > 5) {
                         continuar = false;
-                        this.agregarError("1");
+                        this.agregarError("3");
                         break;
                     } else {
                         if (indice > 2) {
@@ -404,7 +406,7 @@ public class ProcesarPeaje {
                 if ("PrecioPotencia".equals(childNode.getNodeName())) {
                     if (indice > 11) {
                         continuar = false;
-                        this.agregarError("7");
+                        this.agregarError("4");
                         break;
                     } else if (indice > 5) {
                         int aux = indice++ - 6;
@@ -437,8 +439,8 @@ public class ProcesarPeaje {
             for (int j = 0; j < childListLecturaHasta.getLength(); j++) {
                 Node childNode = childListLecturaHasta.item(j);
                 if ("ImporteTotalTerminoPotencia".equals(childNode.getNodeName())) {
-                    if (indicePeriodo > 1) {
-                        this.agregarError("9");
+                    if (indicePeriodo > 0) {
+                        this.agregarError("5");
                         continuar = false;
                         break;
                     } else {
@@ -521,7 +523,7 @@ public class ProcesarPeaje {
             for (int j = 0; j < childList.getLength(); j++) {
                 Node childNode = childList.item(j);
                 if (indice > 3) {
-                    this.agregarError("2");
+                    this.agregarError("6");
                     continuar = false;
                     break;
                 } else {
@@ -563,7 +565,7 @@ public class ProcesarPeaje {
                 Node childNode = childListLecturaHasta.item(j);
                 if ("ValorEnergiaActiva".equals(childNode.getNodeName())) {
                     if (indice > 11) {
-                        this.agregarError("3");
+                        this.agregarError("7");
                         continuar = false;
                         break;
                     } else if (indice > 5) {
@@ -610,7 +612,7 @@ public class ProcesarPeaje {
                 Node childNode = childListLecturaHasta.item(j);
                 if ("PrecioEnergia".equals(childNode.getNodeName())) {
                     if (indice > 11) {
-                        this.agregarError("4");
+                        this.agregarError("8");
                         continuar = false;
                         break;
                     } else if (indice > 5) {
@@ -645,7 +647,7 @@ public class ProcesarPeaje {
                 if ("ImporteTotalEnergiaActiva".equals(childNode.getNodeName())) {
                     if (indice > 0) {
                         continuar = false;
-                        this.agregarError("8");
+                        this.agregarError("9");
                         break;
                     } else {
                         elementos.set(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
@@ -677,7 +679,7 @@ public class ProcesarPeaje {
                     Node childNode = childList.item(j);
                     if ("Importe".equals(childNode.getNodeName())) {
                         if (indice > 0) {
-                            this.agregarError("9");
+                            this.agregarError("10");
                             continuar = false;
                             break;
                         } else {
@@ -786,7 +788,7 @@ public class ProcesarPeaje {
                 if ("ConsumoCalculado".equals(childNode.getNodeName())) {
                     //Revision de la cantidad máxima de datos permitidos (12)
                     if (contador > 11) {
-                        this.agregarError("11");
+                        this.agregarError("13");
                         continuar = false;
                         break;
                     } else {
@@ -953,7 +955,7 @@ public class ProcesarPeaje {
                 if ("Lectura".equals(childNode.getNodeName())) {
                     //Revision de que aún sean aceptados los elementos
                     if (contador > 11) {
-                        this.agregarError("12");
+                        this.agregarError("14");
                         continuar = false;
                         break;
                     }
@@ -1123,7 +1125,7 @@ public class ProcesarPeaje {
                 Node childNode = childList.item(j);
                 if ("Lectura".equals(childNode.getNodeName())) {
                     if (contador > 11) {
-                        this.agregarError("12");
+                        this.agregarError("15");
                         continuar = false;
                         break;
                     } else {
@@ -1280,6 +1282,7 @@ public class ProcesarPeaje {
     private DatosAeProcedenciaDesde aeProcedenciaDesde() {
 
         elementos = new ArrayList<Integer>(1);
+        elementos.add(0);
 
         //Variable de control
         boolean continuar = true;
@@ -1343,7 +1346,7 @@ public class ProcesarPeaje {
                             case "14":
                                 if (!"0".equals(defPeriodo)) {
                                     continuar = false;
-                                    elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                    elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
                                 }
                                 break;
                             //Tarifas del tipo 4,6
@@ -1356,11 +1359,11 @@ public class ProcesarPeaje {
                                     String periodo = sibling4.getTextContent().substring(0, 1);
                                     switch (periodo) {
                                         case "1":
-                                            elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
                                             continuar = false;
                                             break;
                                         case "3":
-                                            elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
                                             continuar = false;
                                             break;
                                     }
@@ -1371,7 +1374,7 @@ public class ProcesarPeaje {
                                     //En caso de que no coincida, buscará un elemento con la terminación de con una terminacion diferente de cero y termina el proceso
                                     if (!"0".equals(defPeriodo)) {
                                         continuar = false;
-                                        elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                        elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
                                     }
                                 }
                                 break;
@@ -1380,7 +1383,7 @@ public class ProcesarPeaje {
                             case "5":
                                 if ("0".equals(defPeriodo)) {
                                     continuar = false;
-                                    elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                    elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
                                 }
                                 break;
                             default:
@@ -1401,6 +1404,7 @@ public class ProcesarPeaje {
 
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Integer>(1);
+        elementos.add(0);
 
         boolean continuar = true;
 
@@ -1476,7 +1480,7 @@ public class ProcesarPeaje {
                             case "14":
                                 if (!"0".equals(defPeriodo)) {
                                     continuar = false;
-                                    elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                    elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
                                 }
                                 break;
                             //Tarifas del tipo 4,6
@@ -1489,11 +1493,11 @@ public class ProcesarPeaje {
                                     String periodo = sibling4.getTextContent().substring(0, 1);
                                     switch (periodo) {
                                         case "1":
-                                            elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
                                             continuar = false;
                                             break;
                                         case "3":
-                                            elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
                                             continuar = false;
                                             break;
                                     }
@@ -1504,7 +1508,7 @@ public class ProcesarPeaje {
                                     //En caso de que no coincida, buscará un elemento con la terminación de con una terminacion diferente de cero y termina el proceso
                                     if (!"0".equals(defPeriodo)) {
                                         continuar = false;
-                                        elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                        elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
                                     }
                                 }
                                 break;
@@ -1513,7 +1517,7 @@ public class ProcesarPeaje {
                             case "5":
                                 if ("0".equals(defPeriodo)) {
                                     continuar = false;
-                                    elementos.add(Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                    elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
                                 }
                                 break;
                             default:
@@ -1556,7 +1560,7 @@ public class ProcesarPeaje {
                 if ("ConsumoCalculado".equals(childNode.getNodeName())) {
                     //Revision de la cantidad máxima de datos permitidos (12)
                     if (contador > 11) {
-                        this.agregarError("11");
+                        this.agregarError("16");
                         continuar = false;
                         break;
                     } else {
@@ -1723,7 +1727,7 @@ public class ProcesarPeaje {
                 if ("Lectura".equals(childNode.getNodeName())) {
                     //Revision de que aún sean aceptados los elementos
                     if (contador > 11) {
-                        this.agregarError("12");
+                        this.agregarError("17");
                         continuar = false;
                         break;
                     }
@@ -1893,7 +1897,7 @@ public class ProcesarPeaje {
                 Node childNode = childList.item(j);
                 if ("Lectura".equals(childNode.getNodeName())) {
                     if (contador > 11) {
-                        this.agregarError("12");
+                        this.agregarError("18");
                         continuar = false;
                         break;
                     } else {
@@ -2092,7 +2096,7 @@ public class ProcesarPeaje {
                 if ("ConsumoCalculado".equals(childNode.getNodeName())) {
                     //Revision de la cantidad máxima de datos permitidos (12)
                     if (contador > 11) {
-                        this.agregarError("11");
+                        this.agregarError("19");
                         continuar = false;
                         break;
                     } else {
@@ -2259,7 +2263,7 @@ public class ProcesarPeaje {
                 Node childNode = childList.item(j);
                 if ("Lectura".equals(childNode.getNodeName())) {
                     if (contador > 11) {
-                        this.agregarError("12");
+                        this.agregarError("20");
                         continuar = false;
                         break;
                     } else {
@@ -2485,6 +2489,7 @@ public class ProcesarPeaje {
         } else {
             this.errores.append(", ").append(codError);
         }
+        utileria.ArchivoTexto.escribirAdvertencia(this.nombreArchivo, codError);
     }
 
     private void validarTarifa() {
@@ -2522,7 +2527,7 @@ public class ProcesarPeaje {
 
         if (!control.equals(this.tarifaAtrFac)) {
             System.out.println("Inconsistencia en el factor de tarifa, se encontro " + this.tarifaAtrFac + " en donde se esperaba " + control);
-            this.agregarError("13");
+            this.agregarError("21");
         }
     }
 

@@ -1,6 +1,7 @@
 V0.4.2.3
 **Novedades**
 Implementacion del archivo de texto errores en peajes en donde se visualizan todos las excepciones lanzadas por la aplicacion
+Implementacion del archivo de texto de advertencias en donde se presentan todas las observaciones encontradas al procesar el archivo
 Procesamiento de datos AE, R, PM de acuerdo al tipo de factura indicada y excepciones con clientes diferentes
 Limitacion de los tipos de facturas que pueden ser procesados (Peajes, Otras facturas)
 
@@ -9,10 +10,11 @@ Se detecto un error en la lectura del codigo de solicitud que terminaba la ejecu
 Se identifico el falso procesamiento de algunas facturas rectificadas en donde no notificaba cuando no existia el codigo de factura rectificada
 Se detecto un falso contador al procesar las facturas rectificadas
 Se detecto que algunas facturas de abono no tienen alquiler, por lo que indicaba un error de indices, se declaro el valor 0 por default.
+Se identifico un error que al no tener correspondencia la tarifa del cliente con la del archivo, daba error de lectura, se dio un valor por defecto a Procedencia desde y lectura hasta
 Mejoras generales en el rendimiento
 
 *Archivos especiales*
-Incosistencia detectada en los campos de EA Valores, Precio en donde tienen menos de 6 elementos (3)
+Incosistencia detectada en los campos de EA Valores, Precio en donde tienen menos de 6 elementos (3), de declararon valores por default
 14-T30A_GRCW_IDERedesElectInteligSAU_Conecta2_F1_01_ES0021000009096102EJ0P_2_1.xml
 15-T30A_GRCW_IDERedesElectInteligSAU_Conecta2_F1_01_ES0021000006802053DF0P_54_53.xml
 19-T30A_GRCW_IDERedesElectInteligSAU_Conecta2_F1_01_ES0021000009161215RJ0P_56_55.xml

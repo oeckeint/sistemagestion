@@ -122,10 +122,10 @@ public class ProcesamientoXml extends HttpServlet {
         } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException 
                 | ArchivoVacioException | CodRectNoExisteException | XmlNoSoportado ex) {
             archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + ex.getMessage());
-            utileria.ArchivoTexto.escribirErrores(archivosErroneos.get(archivosErroneos.size()-1));
+            utileria.ArchivoTexto.escribirError(archivosErroneos.get(archivosErroneos.size()-1));
         } catch (Exception ex){
             archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + new ErrorDesconocidoException().getMessage() + " (<Strong>" + ex.getMessage() + "</Strong>)");
-            utileria.ArchivoTexto.escribirErrores(archivosErroneos.get(archivosErroneos.size()-1));
+            utileria.ArchivoTexto.escribirError(archivosErroneos.get(archivosErroneos.size()-1));
             ex.printStackTrace(System.out);
         }
 
