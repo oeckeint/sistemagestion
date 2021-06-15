@@ -6,6 +6,8 @@ import datos.DatosFacturaDao;
 import dominio.Cliente;
 import dominio.componentesxml.*;
 import excepciones.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import org.w3c.dom.*;
 import utileria.texto.Cadenas;
@@ -84,6 +86,7 @@ public class ProcesarPeaje {
                 this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
                 this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
                 this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
+                this.Cargos01(), this.Cargos02(), this.ImporteTotalCargo01(), this.ImporteTotalCargo02(),
                 this.impuestoElectrico(), this.alquileres(), this.iva(),
                 this.aeConsumo(), this.aeLecturaDesde(), this.aeLecturaHasta(), this.aeProcedenciaDesde(), this.aeProcedenciaHasta(),
                 this.rConsumo(), this.rLecturaDesde(), this.rLecturaHasta(), this.rImporteTotal(),
@@ -354,6 +357,9 @@ public class ProcesarPeaje {
         //Busqueda en el nodo
         NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
 
+        DatosPotenciaPrecio datosPotenciaPrecio = this.potenciaPrecio();
+        double suma = 0;
+
         int indice = 0;
         boolean continuar = true;
         for (int i = 0; i < flowListPeriodo.getLength(); i++) {
@@ -368,9 +374,32 @@ public class ProcesarPeaje {
                     } else {
                         if (indice > 2) {
                             int aux = indice++ - 3;
-                            elementos.set(aux, (double) elementos.get(aux) + (Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()) / 1000));
+                            elementos.set(aux, (double) elementos.get(aux) + (Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim())));
                         } else {
-                            elementos.set(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()) / 1000);
+                            elementos.set(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                        }
+
+                        switch (indice) {
+                            case 1:
+                                suma += (datosPotenciaPrecio.getP1() * Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                                break;
+                            case 2:
+                                suma += (datosPotenciaPrecio.getP2() * Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                                break;
+                            case 3:
+                                suma += (datosPotenciaPrecio.getP3() * Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                                break;
+                            case 4:
+                                suma += (datosPotenciaPrecio.getP4() * Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                                break;
+                            case 5:
+                                suma += (datosPotenciaPrecio.getP5() * Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                                break;
+                            case 6:
+                                suma += (datosPotenciaPrecio.getP6() * Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                                break;
+                            default:
+                                break;
                         }
                     }
                 }
@@ -379,7 +408,9 @@ public class ProcesarPeaje {
                 break;
             }
         }
+
         this.imprimirResultado("potenciaAFacturar", elementos);
+        this.verificarPotenciaAFacturar(suma);
         return new DatosPotenciaAFacturar(elementos);
     }
 
@@ -600,7 +631,7 @@ public class ProcesarPeaje {
         elementos.add(0.0);
         elementos.add(0.0);
         elementos.add(0.0);
-        
+
         //Busqueda en el nodo
         NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
 
@@ -663,6 +694,176 @@ public class ProcesarPeaje {
         return new DatosEnergiaActivaImporteTotal(elementos);
     }
 
+    //Cargos
+    private Cargos Cargos01() {
+
+        elementos = new ArrayList<>(6);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+
+        int indice = 0;
+        boolean continuar = true;
+        NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
+        //Se iteran los nodos correspondan con el flowList
+        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
+            //Se obtienen los nodos internos
+            NodeList childList = flowListPeriodo.item(i).getChildNodes();
+            //Se recorren los nodos internos
+            for (int j = 0; j < childList.getLength(); j++) {
+                if (indice > elementos.size()) {
+                    continuar = false;
+                    this.agregarError("23");
+                }
+                Node childNode = childList.item(j);
+                if ("PrecioCargo".equals(childNode.getNodeName())) {
+                    Node tipoCargo = childNode.getParentNode().getParentNode().getPreviousSibling();
+                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
+                        tipoCargo = tipoCargo.getPreviousSibling();
+                    }
+                    if (tipoCargo.getTextContent().equals("01")) {
+                        elementos.set(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
+                    }
+                }
+            }
+            if (!continuar) {
+                break;
+            }
+        }
+        this.imprimirResultado("Cargos01", elementos);
+        return new Cargos(elementos);
+    }
+
+    private CargoImporteTotal ImporteTotalCargo01() {
+        elementos = new ArrayList<>(1);
+        elementos.add(0.0);
+
+        int indice = 0;
+        boolean continuar = true;
+        NodeList flowListPeriodo = this.doc.getElementsByTagName("Cargo");
+        //Se iteran los nodos correspondan con el flowList
+        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
+            //Se obtienen los nodos internos
+            NodeList childList = flowListPeriodo.item(i).getChildNodes();
+            //Se recorren los nodos internos
+            for (int j = 0; j < childList.getLength(); j++) {
+                if (indice > elementos.size()) {
+                    continuar = false;
+                    this.agregarError("25");
+                }
+                Node childNode = childList.item(j);
+                if ("TotalImporteTipoCargo".equals(childNode.getNodeName())) {
+                    Node terminoCargo = childNode.getPreviousSibling();
+                    while (null != terminoCargo && terminoCargo.getNodeType() != Node.ELEMENT_NODE) {
+                        terminoCargo = terminoCargo.getPreviousSibling();
+                    }
+
+                    Node tipoCargo = terminoCargo.getPreviousSibling();
+                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
+                        tipoCargo = tipoCargo.getPreviousSibling();
+                    }
+
+                    if (tipoCargo.getTextContent().equals("01")) {
+                        elementos.set(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
+                    }
+                }
+            }
+            if (!continuar) {
+                break;
+            }
+        }
+        this.imprimirResultado("TotalImporteTipoCargo01", elementos);
+        return new CargoImporteTotal(elementos);
+    }
+
+    private Cargos Cargos02() {
+
+        elementos = new ArrayList<>(6);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+
+        int indice = 0;
+        boolean continuar = true;
+        NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
+        //Se iteran los nodos correspondan con el flowList
+        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
+            //Se obtienen los nodos internos
+            NodeList childList = flowListPeriodo.item(i).getChildNodes();
+            //Se recorren los nodos internos
+            for (int j = 0; j < childList.getLength(); j++) {
+                if (indice > elementos.size()) {
+                    continuar = false;
+                    this.agregarError("24");
+                }
+                Node childNode = childList.item(j);
+                if ("PrecioCargo".equals(childNode.getNodeName())) {
+                    Node tipoCargo = childNode.getParentNode().getParentNode().getPreviousSibling();
+                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
+                        tipoCargo = tipoCargo.getPreviousSibling();
+                    }
+                    if (tipoCargo.getTextContent().equals("02")) {
+                        elementos.set(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
+                    }
+                }
+            }
+            if (!continuar) {
+                break;
+            }
+        }
+        this.imprimirResultado("Cargos02", elementos);
+        return new Cargos(elementos);
+    }
+
+    private CargoImporteTotal ImporteTotalCargo02() {
+        elementos = new ArrayList<>(1);
+        elementos.add(0.0);
+
+        int indice = 0;
+        boolean continuar = true;
+        NodeList flowListPeriodo = this.doc.getElementsByTagName("Cargo");
+        //Se iteran los nodos correspondan con el flowList
+        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
+            //Se obtienen los nodos internos
+            NodeList childList = flowListPeriodo.item(i).getChildNodes();
+            //Se recorren los nodos internos
+            for (int j = 0; j < childList.getLength(); j++) {
+                if (indice > elementos.size()) {
+                    continuar = false;
+                    this.agregarError("26");
+                }
+                Node childNode = childList.item(j);
+                if ("TotalImporteTipoCargo".equals(childNode.getNodeName())) {
+                    Node terminoCargo = childNode.getPreviousSibling();
+                    while (null != terminoCargo && terminoCargo.getNodeType() != Node.ELEMENT_NODE) {
+                        terminoCargo = terminoCargo.getPreviousSibling();
+                    }
+
+                    Node tipoCargo = terminoCargo.getPreviousSibling();
+                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
+                        tipoCargo = tipoCargo.getPreviousSibling();
+                    }
+
+                    if (tipoCargo.getTextContent().equals("02")) {
+                        elementos.set(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
+                    }
+                }
+            }
+            if (!continuar) {
+                break;
+            }
+        }
+        this.imprimirResultado("TotalImporteTipoCargo02", elementos);
+        return new CargoImporteTotal(elementos);
+    }
+
+    //Otros datos
     private DatosImpuestoElectrico impuestoElectrico() {
         //Se obtiene un solo dato denomidao Importe de impuesto electrico
 
@@ -703,7 +904,7 @@ public class ProcesarPeaje {
         //Obtiene un unico dato
         elementos = new ArrayList<Double>(1);
         elementos.add(0.0);
-        
+
         int indice = 0;
         boolean continuar = false;
 
@@ -2466,6 +2667,26 @@ public class ProcesarPeaje {
         }
         this.imprimirResultado("registroFin", elementos);
         return new DatosFinDeRegistro(elementos);
+    }
+
+    /*-----------------------------Otros Metodos-------------------------*/
+    private void verificarPotenciaAFacturar(double suma) {
+        double importeTotalTerminoPotencia = Double.parseDouble(this.doc.getElementsByTagName("ImporteTotalTerminoPotencia").item(0).getTextContent());
+        int numDias = Integer.parseInt(this.doc.getElementsByTagName("NumeroDias").item(0).getTextContent());
+
+        double importeCalculado = new BigDecimal(numDias * suma).setScale(2, RoundingMode.HALF_UP).doubleValue();
+
+        System.out.println(suma);
+        System.out.println(numDias);
+        System.out.println(importeTotalTerminoPotencia);
+
+        if (importeCalculado != importeTotalTerminoPotencia) {
+            System.out.println("Se esperaba encontrar el valor de " + importeTotalTerminoPotencia + ", en donde se calculó " + importeCalculado);
+            utileria.ArchivoTexto.escribirAdvertencia(nombreArchivo, "22");
+        } else {
+            System.out.println("Importe total termino potencia OK " + importeTotalTerminoPotencia);
+        }
+
     }
 
     /*-----------------------------Globales-------------------------*/

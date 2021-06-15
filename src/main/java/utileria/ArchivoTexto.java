@@ -124,8 +124,23 @@ public class ArchivoTexto {
             case "21":
                 advertencia.append("No corresponde la tarifa del cliente con la obtenida (Uno o varios elementos podrían no haber sido leídos)");
                 break;
+            case "22":
+                advertencia.append("No corresponde <ImporteTotalTerminoPotencia> con las obtenidas");
+                break;
+            case "23":
+                advertencia.append("Se encontraron más de 6 cargos del tipo 01");
+                break;
+            case "24":
+                advertencia.append("Se encontraron más de 6 cargos del tipo 02");
+                break;
+            case "25":
+                advertencia.append("Se encontraró más de 1 TotalImporteTipoCargo en el tipo de cargo 01");
+                break;
+            case "26":
+                advertencia.append("Se encontraró más de 1 TotalImporteTipoCargo en el tipo de cargo 02");
+                break;
             default:
-                advertencia.append("No se reconoce la advertencia con el código, contacte con el adminstrador del sistema ");
+                advertencia.append("No se reconoce la advertencia con el código, contacte con el adminstrador del sistema");
                 break;
         }
 

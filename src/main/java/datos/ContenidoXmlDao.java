@@ -12,11 +12,11 @@ public class ContenidoXmlDao {
 
     //Contenido XML por registro
     private static final String SQL_SELECT_BY_ID_CLIENTE = "SELECT * FROM contenido_xml where id_cliente = ? AND c_emp_emi != '0894' AND is_deleted = 0 order by idcontenido_xml desc";
-    
+
     //Por Remesa
     private static final String SQL_SELECT_BY_REMESA = "SELECT * FROM contenido_xml where rf_id_rem = ? AND is_deleted = 0 order by idcontenido_xml desc";
     private static final String SQL_SELECT_BY_REMESA0894 = "SELECT * FROM contenido_xml_factura where rf_id_rem = ? AND is_deleted = 0 order by idcontenido_xml_factura desc";
-    
+
     //Contenido XML por facturas
     private static final String SQL_SELECT_BY_ID_CLIENTE_0894 = "SELECT * FROM contenido_xml_factura where id_cliente = ? AND is_deleted = 0 order by idcontenido_xml_factura desc";
 
@@ -41,6 +41,10 @@ public class ContenidoXmlDao {
             + "ea_val1, ea_val2, ea_val3, ea_val4, ea_val5, ea_val6, ea_val_sum, "//EnergiaActiva Valores
             + "ea_pre1, ea_pre2, ea_pre3, ea_pre4, ea_pre5, ea_pre6, " //Energia Activa Precio
             + "ea_imp_tot, " //EnergiaActiva Importe total
+            + "car1_01, car2_01, car3_01, car4_01, car5_01, car6_01, " //Cargos01
+            + "car_imp_tot_01, " //Cargo Importe Total 01
+            + "car1_02, car2_02, car3_02, car4_02, car5_02, car6_02, " //Cargos02
+            + "car_imp_tot_02, " //Cargo Importe Total 02
             + "ie_importe, " //ImpuestoElectrico Importe
             + "a_imp_fact, " // Alquileres importe Facturacion
             + "i_bas_imp," //Iva base imponible
@@ -73,6 +77,10 @@ public class ContenidoXmlDao {
             + "?, ?, ?, ?, ?, ? ,?, " //Energia Activa Valores
             + "?, ?, ?, ?, ?, ?, " //EnergiaActiva Precio
             + "?, " // EnergiaActiva Importe total
+            + "?, ?, ?, ?, ?, ?, " //Costos 01
+            + "?, " //Costos importe Total 01
+            + "?, ?, ?, ?, ?, ?, " //Costos 02
+            + "?, " //Costos importe Total 02
             + "?, " //Impuestoelectrico Importe
             + "?, " //Alquileres Importe Facturacion
             + "?, " //Iva Base Imponible
@@ -133,13 +141,13 @@ public class ContenidoXmlDao {
         List<DocumentoXml> documentos = new ArrayList<>();
         try {
             conn = Conexion.getConnection();
-            
+
             if (emisora == 894) {
                 stmt = conn.prepareStatement(SQL_SELECT_0894);
-            }else {
+            } else {
                 stmt = conn.prepareStatement(SQL_SELECT);
             }
-            
+
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -263,6 +271,36 @@ public class ContenidoXmlDao {
                 datosIT.add(rs.getDouble("ea_imp_tot"));
                 DatosEnergiaActivaImporteTotal datosEnergiaActivaImporteTotal = new DatosEnergiaActivaImporteTotal(datosIT);
 
+                //Costos 01
+                List<Double> datosC1 = new ArrayList<>(6);
+                datosC1.add(rs.getDouble("car1_01"));
+                datosC1.add(rs.getDouble("car2_01"));
+                datosC1.add(rs.getDouble("car3_01"));
+                datosC1.add(rs.getDouble("car4_01"));
+                datosC1.add(rs.getDouble("car5_01"));
+                datosC1.add(rs.getDouble("car6_01"));
+                Cargos cargos1 = new Cargos(datosC1);
+
+                //Costos Importe Total 01
+                datosC1 = new ArrayList<>(1);
+                datosC1.add(rs.getDouble("car_imp_tot_01"));
+                CargoImporteTotal cargoImporteTotal1 = new CargoImporteTotal(datosC1);
+
+                //Costos 02
+                datosC1 = new ArrayList<>(6);
+                datosC1.add(rs.getDouble("car1_02"));
+                datosC1.add(rs.getDouble("car2_02"));
+                datosC1.add(rs.getDouble("car3_02"));
+                datosC1.add(rs.getDouble("car4_02"));
+                datosC1.add(rs.getDouble("car5_02"));
+                datosC1.add(rs.getDouble("car6_02"));
+                Cargos cargos2 = new Cargos(datosC1);
+
+                //Costos Importe Total 02
+                datosC1 = new ArrayList<>(1);
+                datosC1.add(rs.getDouble("car_imp_tot_02"));
+                CargoImporteTotal cargoImporteTotal2 = new CargoImporteTotal(datosC1);
+
                 //ImpuestoElectrico
                 List<Double> datosIE = new ArrayList<>();
                 datosIE.add(rs.getDouble("ie_importe"));
@@ -354,7 +392,7 @@ public class ContenidoXmlDao {
                 ArrayList<String> datosRIT = new ArrayList<>(1);
                 datosRIT.add(rs.getString("r_imp_tot"));
                 ReactivaImporteTotal reactivaImporteTotal = new ReactivaImporteTotal(datosRIT);
-                
+
                 //PM consumo
                 List<Double> datosPMC = new ArrayList<>();
                 datosPMC.add(rs.getDouble("pm_con1"));
@@ -392,16 +430,17 @@ public class ContenidoXmlDao {
                 //Errores
                 String errores = rs.getString("id_error");
 
-                DocumentoXml documentoXml = new DocumentoXml(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr, 
-                datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal, 
-                datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal, 
-                datosImpuestoElectrico, datosAlquileres, datosIva, 
-                datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta, 
-                datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, reactivaImporteTotal,
-                datosPmConsumo, datosPmLecturaHasta, 
-                datosFinDeRegistro, 
-                comentarios, errores);
-                
+                DocumentoXml documentoXml = new DocumentoXml(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr,
+                        datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal,
+                        datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal,
+                        cargos1, cargos2, cargoImporteTotal1, cargoImporteTotal2,
+                        datosImpuestoElectrico, datosAlquileres, datosIva,
+                        datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta,
+                        datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, reactivaImporteTotal,
+                        datosPmConsumo, datosPmLecturaHasta,
+                        datosFinDeRegistro,
+                        comentarios, errores);
+
                 documentos.add(documentoXml);
             }
 
@@ -420,10 +459,10 @@ public class ContenidoXmlDao {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         DocumentoXml documento = null;
-        
+
         String tabla;
-        
-        switch(emisora){
+
+        switch (emisora) {
             case 894:
                 tabla = "contenido_xml_factura";
                 break;
@@ -431,8 +470,7 @@ public class ContenidoXmlDao {
                 tabla = "contenido_xml";
                 break;
         }
-        
-        
+
         try {
             conn = Conexion.getConnection();
             stmt = conn.prepareStatement("SELECT * FROM " + tabla + SQL_SELECT_BY_COD_FISCAL);
@@ -566,6 +604,36 @@ public class ContenidoXmlDao {
                 datosIT.add(rs.getDouble("ea_imp_tot"));
                 DatosEnergiaActivaImporteTotal datosEnergiaActivaImporteTotal = new DatosEnergiaActivaImporteTotal(datosIT);
 
+                //Costos 01
+                List<Double> datosC1 = new ArrayList<>(6);
+                datosC1.add(rs.getDouble("car1_01"));
+                datosC1.add(rs.getDouble("car2_01"));
+                datosC1.add(rs.getDouble("car3_01"));
+                datosC1.add(rs.getDouble("car4_01"));
+                datosC1.add(rs.getDouble("car5_01"));
+                datosC1.add(rs.getDouble("car6_01"));
+                Cargos cargos1 = new Cargos(datosC1);
+
+                //Costos Importe Total 01
+                datosC1 = new ArrayList<>(1);
+                datosC1.add(rs.getDouble("car_imp_tot_01"));
+                CargoImporteTotal cargoImporteTotal1 = new CargoImporteTotal(datosC1);
+
+                //Costos 02
+                datosC1 = new ArrayList<>(6);
+                datosC1.add(rs.getDouble("car1_02"));
+                datosC1.add(rs.getDouble("car2_02"));
+                datosC1.add(rs.getDouble("car3_02"));
+                datosC1.add(rs.getDouble("car4_02"));
+                datosC1.add(rs.getDouble("car5_02"));
+                datosC1.add(rs.getDouble("car6_02"));
+                Cargos cargos2 = new Cargos(datosC1);
+
+                //Costos Importe Total 02
+                datosC1 = new ArrayList<>(1);
+                datosC1.add(rs.getDouble("car_imp_tot_02"));
+                CargoImporteTotal cargoImporteTotal2 = new CargoImporteTotal(datosC1);
+
                 //ImpuestoElectrico
                 List<Double> datosIE = new ArrayList<>();
                 datosIE.add(rs.getDouble("ie_importe"));
@@ -657,7 +725,7 @@ public class ContenidoXmlDao {
                 ArrayList<String> datosRIT = new ArrayList<>(1);
                 datosRIT.add(rs.getString("r_imp_tot"));
                 ReactivaImporteTotal reactivaImporteTotal = new ReactivaImporteTotal(datosRIT);
-                
+
                 //PM consumo
                 List<Double> datosPMC = new ArrayList<>();
                 datosPMC.add(rs.getDouble("pm_con1"));
@@ -695,15 +763,16 @@ public class ContenidoXmlDao {
                 //Errores
                 String errores = rs.getString("id_error");
 
-                documento = new DocumentoXml(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr, 
-                datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal, 
-                datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal, 
-                datosImpuestoElectrico, datosAlquileres, datosIva, 
-                datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta, 
-                datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, reactivaImporteTotal,
-                datosPmConsumo, datosPmLecturaHasta, 
-                datosFinDeRegistro, 
-                comentarios, errores);
+                documento = new DocumentoXml(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr,
+                        datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal,
+                        datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal,
+                        cargos1, cargos2, cargoImporteTotal1, cargoImporteTotal2,
+                        datosImpuestoElectrico, datosAlquileres, datosIva,
+                        datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta,
+                        datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, reactivaImporteTotal,
+                        datosPmConsumo, datosPmLecturaHasta,
+                        datosFinDeRegistro,
+                        comentarios, errores);
                 //}
             }
         } catch (SQLException ex) {
@@ -723,13 +792,13 @@ public class ContenidoXmlDao {
         List<DocumentoXml> documentos = new ArrayList<>();
         try {
             conn = Conexion.getConnection();
-            
+
             if (emisora == 894) {
                 stmt = conn.prepareStatement(SQL_SELECT_BY_ID_CLIENTE_0894);
-            }else {
+            } else {
                 stmt = conn.prepareStatement(SQL_SELECT_BY_ID_CLIENTE);
             }
-            
+
             stmt.setString(1, id_cliente);
             rs = stmt.executeQuery();
 
@@ -854,6 +923,36 @@ public class ContenidoXmlDao {
                 datosIT.add(rs.getDouble("ea_imp_tot"));
                 DatosEnergiaActivaImporteTotal datosEnergiaActivaImporteTotal = new DatosEnergiaActivaImporteTotal(datosIT);
 
+                //Costos 01
+                List<Double> datosC1 = new ArrayList<>(6);
+                datosC1.add(rs.getDouble("car1_01"));
+                datosC1.add(rs.getDouble("car2_01"));
+                datosC1.add(rs.getDouble("car3_01"));
+                datosC1.add(rs.getDouble("car4_01"));
+                datosC1.add(rs.getDouble("car5_01"));
+                datosC1.add(rs.getDouble("car6_01"));
+                Cargos cargos1 = new Cargos(datosC1);
+
+                //Costos Importe Total 01
+                datosC1 = new ArrayList<>(1);
+                datosC1.add(rs.getDouble("car_imp_tot_01"));
+                CargoImporteTotal cargoImporteTotal1 = new CargoImporteTotal(datosC1);
+
+                //Costos 02
+                datosC1 = new ArrayList<>(6);
+                datosC1.add(rs.getDouble("car1_02"));
+                datosC1.add(rs.getDouble("car2_02"));
+                datosC1.add(rs.getDouble("car3_02"));
+                datosC1.add(rs.getDouble("car4_02"));
+                datosC1.add(rs.getDouble("car5_02"));
+                datosC1.add(rs.getDouble("car6_02"));
+                Cargos cargos2 = new Cargos(datosC1);
+
+                //Costos Importe Total 02
+                datosC1 = new ArrayList<>(1);
+                datosC1.add(rs.getDouble("car_imp_tot_02"));
+                CargoImporteTotal cargoImporteTotal2 = new CargoImporteTotal(datosC1);
+
                 //ImpuestoElectrico
                 List<Double> datosIE = new ArrayList<>();
                 datosIE.add(rs.getDouble("ie_importe"));
@@ -945,7 +1044,7 @@ public class ContenidoXmlDao {
                 ArrayList<String> datosRIT = new ArrayList<>(1);
                 datosRIT.add(rs.getString("r_imp_tot"));
                 ReactivaImporteTotal reactivaImporteTotal = new ReactivaImporteTotal(datosRIT);
-                
+
                 //PM consumo
                 List<Double> datosPMC = new ArrayList<>();
                 datosPMC.add(rs.getDouble("pm_con1"));
@@ -983,16 +1082,17 @@ public class ContenidoXmlDao {
                 //Errores
                 String errores = rs.getString("id_error");
 
-                DocumentoXml documentoXml = new DocumentoXml(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr, 
-                datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal, 
-                datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal, 
-                datosImpuestoElectrico, datosAlquileres, datosIva, 
-                datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta, 
-                datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, reactivaImporteTotal,
-                datosPmConsumo, datosPmLecturaHasta, 
-                datosFinDeRegistro, 
-                comentarios, errores);
-                
+                DocumentoXml documentoXml = new DocumentoXml(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr,
+                        datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal,
+                        datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal,
+                        cargos1, cargos2, cargoImporteTotal1, cargoImporteTotal2,
+                        datosImpuestoElectrico, datosAlquileres, datosIva,
+                        datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta,
+                        datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, reactivaImporteTotal,
+                        datosPmConsumo, datosPmLecturaHasta,
+                        datosFinDeRegistro,
+                        comentarios, errores);
+
                 documentos.add(documentoXml);
             }
 
@@ -1004,7 +1104,7 @@ public class ContenidoXmlDao {
         }
         return documentos;
     }
-    
+
     public List<DocumentoXml> buscarRemesa(String remesa, int emisora) {
 
         Connection conn = null;
@@ -1013,10 +1113,10 @@ public class ContenidoXmlDao {
         List<DocumentoXml> documentos = new ArrayList<>();
         try {
             conn = Conexion.getConnection();
-            
+
             if (emisora == 894) {
                 stmt = conn.prepareStatement(SQL_SELECT_BY_REMESA0894);
-            }else {
+            } else {
                 stmt = conn.prepareStatement(SQL_SELECT_BY_REMESA);
             }
             stmt.setString(1, remesa);
@@ -1143,6 +1243,36 @@ public class ContenidoXmlDao {
                 datosIT.add(rs.getDouble("ea_imp_tot"));
                 DatosEnergiaActivaImporteTotal datosEnergiaActivaImporteTotal = new DatosEnergiaActivaImporteTotal(datosIT);
 
+                //Costos 01
+                List<Double> datosC1 = new ArrayList<>(6);
+                datosC1.add(rs.getDouble("car1_01"));
+                datosC1.add(rs.getDouble("car2_01"));
+                datosC1.add(rs.getDouble("car3_01"));
+                datosC1.add(rs.getDouble("car4_01"));
+                datosC1.add(rs.getDouble("car5_01"));
+                datosC1.add(rs.getDouble("car6_01"));
+                Cargos cargos1 = new Cargos(datosC1);
+
+                //Costos Importe Total 01
+                datosC1 = new ArrayList<>(1);
+                datosC1.add(rs.getDouble("car_imp_tot_01"));
+                CargoImporteTotal cargoImporteTotal1 = new CargoImporteTotal(datosC1);
+
+                //Costos 02
+                datosC1 = new ArrayList<>(6);
+                datosC1.add(rs.getDouble("car1_02"));
+                datosC1.add(rs.getDouble("car2_02"));
+                datosC1.add(rs.getDouble("car3_02"));
+                datosC1.add(rs.getDouble("car4_02"));
+                datosC1.add(rs.getDouble("car5_02"));
+                datosC1.add(rs.getDouble("car6_02"));
+                Cargos cargos2 = new Cargos(datosC1);
+
+                //Costos Importe Total 02
+                datosC1 = new ArrayList<>(1);
+                datosC1.add(rs.getDouble("car_imp_tot_02"));
+                CargoImporteTotal cargoImporteTotal2 = new CargoImporteTotal(datosC1);
+
                 //ImpuestoElectrico
                 List<Double> datosIE = new ArrayList<>();
                 datosIE.add(rs.getDouble("ie_importe"));
@@ -1234,7 +1364,7 @@ public class ContenidoXmlDao {
                 ArrayList<String> datosRIT = new ArrayList<>(1);
                 datosRIT.add(rs.getString("r_imp_tot"));
                 ReactivaImporteTotal reactivaImporteTotal = new ReactivaImporteTotal(datosRIT);
-                
+
                 //PM consumo
                 List<Double> datosPMC = new ArrayList<>();
                 datosPMC.add(rs.getDouble("pm_con1"));
@@ -1272,16 +1402,17 @@ public class ContenidoXmlDao {
                 //Errores
                 String errores = rs.getString("id_error");
 
-                DocumentoXml documentoXml = new DocumentoXml(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr, 
-                datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal, 
-                datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal, 
-                datosImpuestoElectrico, datosAlquileres, datosIva, 
-                datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta, 
-                datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, reactivaImporteTotal,
-                datosPmConsumo, datosPmLecturaHasta, 
-                datosFinDeRegistro, 
-                comentarios, errores);
-                
+                DocumentoXml documentoXml = new DocumentoXml(cliente, datosCabecera, datosGeneralesFactura, datosFacturaAtr,
+                        datosExcesoPotencia, datosPotenciaContratada, datosPotenciaMaxDemandada, datosPotenciaAFacturar, datosPotenciaPrecio, datosPotenciaImporteTotal,
+                        datosEnergiaActiva, datosEnergiaActivaValores, datosEnergiaActivaPrecio, datosEnergiaActivaImporteTotal,
+                        cargos1, cargos2, cargoImporteTotal1, cargoImporteTotal2,
+                        datosImpuestoElectrico, datosAlquileres, datosIva,
+                        datosAeConsumo, datosAeLecturaDesde, datosAeLecturaHasta, datosAeProcedenciaDesde, datosAeProcedenciaHasta,
+                        datosRConsumo, datosRLecturaDesde, datosRLecturaHasta, reactivaImporteTotal,
+                        datosPmConsumo, datosPmLecturaHasta,
+                        datosFinDeRegistro,
+                        comentarios, errores);
+
                 documentos.add(documentoXml);
             }
 
@@ -1298,7 +1429,7 @@ public class ContenidoXmlDao {
         //Preparación de las variables necesarias para el programa
         Connection conn = null;
         PreparedStatement stmt = null;
-        
+
         //Variables de proceso
         int rows = 0;
         String tablaXml;
@@ -1313,7 +1444,7 @@ public class ContenidoXmlDao {
                 tablaXml = "contenido_xml";
                 break;
         }
-        
+
         try {
             //Conecta a la base de datos
             conn = Conexion.getConnection();
@@ -1476,10 +1607,10 @@ public class ContenidoXmlDao {
             stmt.setString(i++, String.valueOf(documentoXml.getDatosRLecturaHasta().getLectura4() * -1));
             stmt.setString(i++, String.valueOf(documentoXml.getDatosRLecturaHasta().getLectura5() * -1));
             stmt.setString(i++, String.valueOf(documentoXml.getDatosRLecturaHasta().getLectura6() * -1));
-            
+
             //R ImporteTotal
             stmt.setString(i++, String.valueOf(documentoXml.getReactivaImporteTotal().getImporteTotal()));
-            
+
             //PM Consumo
             stmt.setString(i++, String.valueOf(documentoXml.getDatosPmConsumo().getConsumo1() * -1));
             stmt.setString(i++, String.valueOf(documentoXml.getDatosPmConsumo().getConsumo2() * -1));
@@ -1548,7 +1679,7 @@ public class ContenidoXmlDao {
                 tablaXml = "contenido_xml";
                 break;
         }
-        
+
         //Revisión de la existencia de la factura en las tablas
         if (new DatosFacturaDao().encontrarCodFiscal(documentoXml.getDatosGeneralesFactura().getCodigoFiscalFactura(), tablaXml)) {
             System.out.println("Ya existe la factura en la tabla " + tablaXml);
@@ -1652,6 +1783,28 @@ public class ContenidoXmlDao {
                 //EnergiaActiva Importe Total
                 stmt.setString(i++, String.valueOf(documentoXml.getDatosEnergiaActivaImporteTotal().getImporteTotal()));
 
+                //Costos 01
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos1().getC1()));
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos1().getC2()));
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos1().getC3()));
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos1().getC4()));
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos1().getC5()));
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos1().getC6()));
+
+                //Costos importe total 01
+                stmt.setString(i++, String.valueOf(documentoXml.getCargoImporteTotal1().getImpTot()));
+
+                //Costos 01
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos2().getC1()));
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos2().getC2()));
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos2().getC3()));
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos2().getC4()));
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos2().getC5()));
+                stmt.setString(i++, String.valueOf(documentoXml.getCargos2().getC6()));
+
+                //Costos importe total 02
+                stmt.setString(i++, String.valueOf(documentoXml.getCargoImporteTotal2().getImpTot()));
+
                 //Impuesto Electrico
                 stmt.setString(i++, String.valueOf(documentoXml.getDatosImpuestoElectrico().getImporte()));
 
@@ -1716,10 +1869,10 @@ public class ContenidoXmlDao {
                 stmt.setString(i++, String.valueOf(documentoXml.getDatosRLecturaHasta().getLectura4()));
                 stmt.setString(i++, String.valueOf(documentoXml.getDatosRLecturaHasta().getLectura5()));
                 stmt.setString(i++, String.valueOf(documentoXml.getDatosRLecturaHasta().getLectura6()));
-                
+
                 //R ImporteTotal
                 stmt.setString(i++, String.valueOf(documentoXml.getReactivaImporteTotal().getImporteTotal()));
-                
+
                 //PM Consumo
                 stmt.setString(i++, String.valueOf(documentoXml.getDatosPmConsumo().getConsumo1()));
                 stmt.setString(i++, String.valueOf(documentoXml.getDatosPmConsumo().getConsumo2()));

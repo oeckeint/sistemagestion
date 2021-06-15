@@ -6,6 +6,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeC
 C:\NetBeansProjects\sistemagestion\src\main\java\web\Inicio.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRConsumo.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaImporteTotal.java
+C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\Cargos.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosImpuestoElectrico.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\Conexion.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ArchivoVacioException.java
@@ -45,6 +46,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ClienteNoExisteExce
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\procesamientoxml\ResultadoArchivoXML.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\OtrasFacturasDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\FacturaYaExisteException.java
+C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\CargoImporteTotal.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\DistribuidoraDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRLecturaDesde.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\CodRectNoExisteException.java

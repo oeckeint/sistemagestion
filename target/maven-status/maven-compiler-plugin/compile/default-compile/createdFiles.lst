@@ -1,6 +1,7 @@
 dominio\componentesxml\DatosFinDeRegistro.class
 dominio\componentesxml\DocumentoXml.class
 dominio\componentesxml\DatosEnergiaActiva.class
+dominio\componentesxml\CargoImporteTotal.class
 utileria\ArchivoTexto.class
 dominio\componentesxml\DatosAeLecturaHasta.class
 dominio\Lectura.class
@@ -50,6 +51,7 @@ dominio\componentesxml\DatosAeConsumo.class
 dominio\componentesxml\DatosPmConsumo.class
 excepciones\XmlNoSoportado.class
 datos\Conexion.class
+dominio\componentesxml\Cargos.class
 dominio\componentesxml\DatosAeProcedenciaDesde.class
 datos\OtrasFacturasDao.class
 excepciones\FacturaYaExisteException.class
