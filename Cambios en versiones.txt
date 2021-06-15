@@ -1,5 +1,5 @@
 V0.4.2.3
-
+aa
 Se corrgió la lectura de los nodos de impTotCargos 01-02 que apuntaba a null al revisar nodos previos
 
 **Novedades**
