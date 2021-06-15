@@ -1,4 +1,7 @@
 V0.4.2.3
+
+Se corrgió la lectura de los nodos de impTotCargos 01-02 que apuntaba a null al revisar nodos previos
+
 **Novedades**
 Implementacion del archivo de texto errores en peajes en donde se visualizan todos las excepciones lanzadas por la aplicacion
 Implementacion del archivo de texto de advertencias en donde se presentan todas las observaciones encontradas al procesar el archivo
