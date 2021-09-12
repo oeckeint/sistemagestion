@@ -76,26 +76,26 @@
                             <c:if test="${documentoResumen != null}">
                                 <tr>
                                     <td>-R</td>
-                                    <td>${documentoResumen.cliente.idCliente}</td>
-                                    <td>${documentoResumen.cliente.cups}</td>
+                                    <td>${documentoResumen.idCliente}</td>
+                                    <td>${documentoResumen.cups}</td>
                                     <td>--</td>
-                                    <td>${documentoResumen.datosPotenciaImporteTotal.importeTotal}</td>
-                                    <td>${documentoResumen.datosEnergiaActivaImporteTotal.importeTotal}</td>
+                                    <td>${documentoResumen.potImpTot}</td>
+                                    <td>${documentoResumen.eaImpTot}</td>
                                     <td>--</td>
-                                    <td>${documentoResumen.datosFinDeRegistro.importeTotal}</td>
+                                    <td>${documentoResumen.rfImpTot}</td>
                                     <td>--</td>
                                 </tr>
                             </c:if>
                             <c:forEach var="documento" items="${documentos}" varStatus="id">
                                 <tr>
                                     <td>${id.count}</td>
-                                    <td>${documento.cliente.idCliente}</td>
-                                    <td>${documento.cliente.cups}</td>
-                                    <td>${documento.datosEnergiaActiva.fechaHasta1}</td>
-                                    <td>${documento.datosPotenciaImporteTotal.importeTotal}</td>
-                                    <td>${documento.datosEnergiaActivaImporteTotal.importeTotal}</td>
-                                    <td>${documento.datosGeneralesFactura.codigoFiscalFactura}</td>
-                                    <td>${documento.datosFinDeRegistro.importeTotal}</td>
+                                    <td>${documento.idCliente}</td>
+                                    <td>${documento.cups}</td>
+                                    <td>${documento.eaFecHas1}</td>
+                                    <td>${documento.potImpTot}</td>
+                                    <td>${documento.eaImpTot}</td>
+                                    <td>${documento.codFisFac}</td>
+                                    <td>${documento.rfImpTot}</td>
                                     <td><a href="${pageContext.request.contextPath}/${nombreServlet}?accion=ver&cod=${documento.datosGeneralesFactura.codigoFiscalFactura}" class="btn btn-danger"><i class="fas fa-eye"></i></a></td>
                                 </tr>
                             </c:forEach>
