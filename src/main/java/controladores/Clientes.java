@@ -60,7 +60,7 @@ public class Clientes {
         if (ClientesHelper.validarCliente(cliente)) {
             clienteService.guardar(cliente);
             ClientesHelper.cliente = null;
-            return "redirect:/clientes/listar";
+            return "redirect:/clientes";
         } else {
             ClientesHelper.cliente = cliente;
             return "redirect:/clientes/formulario";
@@ -78,7 +78,7 @@ public class Clientes {
     public String eliminar(@RequestParam("idCliente") long idCliente, @RequestParam("cups") String cups) {
         this.clienteService.eliminar(idCliente);
         ClientesHelper.mensaje = ClientesHelper.FORMULARIO_EXITO_ELIMINAR + cups;
-        return "redirect:/clientes/listar";
+        return "redirect:/clientes";
     }
 
 

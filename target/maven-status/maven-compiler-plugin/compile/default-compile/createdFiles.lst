@@ -43,6 +43,7 @@ dominio\componentesxml\DatosAeProcedenciaHasta.class
 dominio\componentesxml\DatosRConsumo.class
 utileria\StringHelper.class
 dominio\componentesxml\DatosAlquileres.class
+controladores\helper\xmlHelper.class
 datos\entity\Factura.class
 controladores\ProcesamientoXml.class
 dominio\componentesxml\DatosPotenciaAFacturar.class
@@ -67,6 +68,7 @@ datos\dao\DatosFacturaDao.class
 dominio\componentesxml\DatosImpuestoElectrico.class
 datos\dao\PeajesImp.class
 dominio\componentesxml\DatosRLecturaHasta.class
+controladores\helper\ProcesarPeaje.class
 excepciones\ErrorDesconocidoException.class
 controladores\PeajesHelper.class
 dominio\componentesxml\DatosIva.class

@@ -44,6 +44,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\ClienteDaoImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosFacturaAtr.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosExcesoPotencia.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\XmlNoSoportado.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarPeaje.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\DocumentoXmlDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\ReactivaImporteTotal.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\procesamientoxml\PotenciaAFacturar.java
@@ -67,6 +68,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\ClienteDao.jav
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Clientes.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeProcedenciaHasta.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPotenciaMaxDemandada.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\xmlHelper.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\service\FacturasServiceImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosCabecera.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\PeajesImp.java
