@@ -35,24 +35,22 @@ public class ProcesamientoXml extends HttpServlet {
     private ClienteService clienteService;
 
     String titulo = "Procesamiento XML";
-    String mensaje = "Procesaremos la información contenida dentro de un XML. <Strong>(Antes de esto, los archivos debieron haber sido evaluados)</Strong>";
+    String mensaje = "Procesaremos la información contenida dentro de un XML. (Antes de esto, los archivos debieron haber sido evaluados).";
     String servlet = "ProcesamientoXML";
     String etiquetaBoton = "Procesar";
     int archivosCorrectos;
     int archivosTotales;
-    List<String> archivosErroneos = new ArrayList<>();
-    List<String> comentarios = new ArrayList<>();
+    List<String> archivosErroneos;
     String errores = "0";
     String icono = "<i class='fas fa-check-square'></i>";
     private int empresaEmisora;
     private boolean is894;
 
-    
     /**
      * Muestra el fomulario que procesa los archivos
      *
+     * @param model modelo usado por Spring
      * @return redireccionamiento al formulario
-     * @throws IOException
      */
     @GetMapping("/formulario")
     public String inicio(Model model) {
@@ -62,6 +60,7 @@ public class ProcesamientoXml extends HttpServlet {
         model.addAttribute("servlet", this.servlet);
         model.addAttribute("etiquetaBoton", this.etiquetaBoton);
         model.addAttribute("archivosErroneos", this.archivosErroneos);
+        this.reiniciarVariables();
         return "xml/formulario";
     }
 
@@ -70,7 +69,7 @@ public class ProcesamientoXml extends HttpServlet {
      * recibidos
      *
      * @param files los archivos enviados desde el formulario
-     * @return redireccionamiento al mismo formulario
+     * @return redireccionamiento al formulario
      * @throws IOException
      */
     @PostMapping("/procesar")
@@ -98,7 +97,7 @@ public class ProcesamientoXml extends HttpServlet {
             //Eliminación del archivo temporal
             f.deleteOnExit();
         }
-        mensaje = "Archivos Procesados (" + archivosCorrectos + " de " + archivosTotales + ")";
+        this.mensaje = "Archivos Procesados (" + archivosCorrectos + " de " + archivosTotales + ")";
         return "redirect:/procesamiento/formulario";
     }
 
@@ -173,7 +172,7 @@ public class ProcesamientoXml extends HttpServlet {
                 System.out.println("Procesando en otras facturas");
                 ProcesamientoOtrasFacturas of = new ProcesamientoOtrasFacturas();
                 if (!of.registrar(documento, nombreArchivo).equals("")) {
-                    archivosErroneos.add(of.registrar(documento, nombreArchivo));
+                    this.archivosErroneos.add(of.registrar(documento, nombreArchivo));
                 }
             } else {
                 PeajesHelper pr = new PeajesHelper(documento, contenidoXmlServicePeajes, clienteService);
@@ -183,11 +182,11 @@ public class ProcesamientoXml extends HttpServlet {
             archivosCorrectos++;
 
         } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado e) {
-            archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
-            utileria.ArchivoTexto.escribirError(archivosErroneos.get(archivosErroneos.size() - 1));
+            this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
+            utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         } catch (Exception e) {
-            archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + new ErrorDesconocidoException().getMessage() + " (<Strong>" + e.getMessage() + "</Strong>)");
-            utileria.ArchivoTexto.escribirError(archivosErroneos.get(archivosErroneos.size() - 1));
+            this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + new ErrorDesconocidoException().getMessage() + " (<Strong>" + e.getMessage() + "</Strong>)");
+            utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
             e.printStackTrace(System.out);
         }
 
@@ -238,10 +237,10 @@ public class ProcesamientoXml extends HttpServlet {
     }
 
     private void reiniciarVariables() {
-        this.mensaje = "Procesaremos la información contenida dentro de un XML. (Antes de esto, los archivos debieron haber sido evaluados)";
+        this.mensaje = "Procesaremos la información contenida dentro de un XML. (Antes de esto, los archivos debieron haber sido evaluados).";
         this.archivosCorrectos = 0;
         this.archivosTotales = 0;
-        this.archivosErroneos.clear();
+        this.archivosErroneos = new ArrayList<>();
     }
 
 }

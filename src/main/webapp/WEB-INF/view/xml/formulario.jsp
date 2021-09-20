@@ -4,17 +4,15 @@
 <html>
     <head>
         <jsp:include page="/WEB-INF/paginas/comunes/contenidoHead.jsp"></jsp:include>
-        </head>
-        <body>
+    </head>
+    <body>
         <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp"></jsp:include>
 
         <jsp:include page="/WEB-INF/paginas/cliente/xml/formulario.jsp"></jsp:include>
-
+        
         <c:forEach var="archivoErroneo" items="${archivosErroneos}">
             <div class="alert alert-danger" role="alert">
-                <div class="container">
-                    ${archivoErroneo}
-                </div>
+                <div class="container">${archivoErroneo}</div>
             </div>
         </c:forEach>
 
