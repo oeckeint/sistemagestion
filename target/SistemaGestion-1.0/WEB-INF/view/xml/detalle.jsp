@@ -421,65 +421,67 @@
                 </div>
 
                 <!-- Renglón-->
-                <hr>
-                <h2 class="display-4">Cargos</h2>
-                <hr>
-                <div class="row justify-content-around">
-                    <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Cargos 01</h3>
-                        <div class="row">
-                            <div class="col-5">
-                                <ul class="list-group list-group-flush text-right">
-                                    <dt class="list-group-item px-1">Cargo 1</dt>
-                                    <dt class="list-group-item px-1">Cargo 2</dt>
-                                    <dt class="list-group-item px-1">Cargo 3</dt>
-                                    <dt class="list-group-item px-1">Cargo 4</dt>
-                                    <dt class="list-group-item px-1">Cargo 5</dt>
-                                    <dt class="list-group-item px-1">Cargo 6</dt>
-                                    <dt class="list-group-item px-1">Imp Tot</dt>
-                                </ul>
+                <c:if test="${controller!='facturas'}">
+                    <hr>
+                    <h2 class="display-4">Cargos</h2>
+                    <hr>
+                    <div class="row justify-content-around">
+                        <div class="list-group col-12 col-md-5 col-lg-4 p-2">
+                            <h3 class="list-group-item list-group-item-action active text-center h4">Cargos 01</h3>
+                            <div class="row">
+                                <div class="col-5">
+                                    <ul class="list-group list-group-flush text-right">
+                                        <dt class="list-group-item px-1">Cargo 1</dt>
+                                        <dt class="list-group-item px-1">Cargo 2</dt>
+                                        <dt class="list-group-item px-1">Cargo 3</dt>
+                                        <dt class="list-group-item px-1">Cargo 4</dt>
+                                        <dt class="list-group-item px-1">Cargo 5</dt>
+                                        <dt class="list-group-item px-1">Cargo 6</dt>
+                                        <dt class="list-group-item px-1">Imp Tot</dt>
+                                    </ul>
+                                </div>
+                                <div class="col-7">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item px-1">${documento.car1_01}</li>
+                                        <li class="list-group-item px-1">${documento.car2_01}</li>
+                                        <li class="list-group-item px-1">${documento.car3_01}</li>
+                                        <li class="list-group-item px-1">${documento.car4_01}</li>
+                                        <li class="list-group-item px-1">${documento.car5_01}</li>
+                                        <li class="list-group-item px-1">${documento.car6_01}</li>
+                                        <li class="list-group-item px-1">${documento.carImpTot_01}</li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="col-7">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item px-1">${documento.car1_01}</li>
-                                    <li class="list-group-item px-1">${documento.car2_01}</li>
-                                    <li class="list-group-item px-1">${documento.car3_01}</li>
-                                    <li class="list-group-item px-1">${documento.car4_01}</li>
-                                    <li class="list-group-item px-1">${documento.car5_01}</li>
-                                    <li class="list-group-item px-1">${documento.car6_01}</li>
-                                    <li class="list-group-item px-1">${documento.carImpTot_01}</li>
-                                </ul>
+                        </div>
+                        <div class="list-group col-12 col-md-5 col-lg-4 p-2">
+                            <h3 class="list-group-item list-group-item-action active text-center h4">Cargos 02</h3>
+                            <div class="row">
+                                <div class="col-5">
+                                    <ul class="list-group list-group-flush text-right">
+                                        <dt class="list-group-item px-1">Cargo 1</dt>
+                                        <dt class="list-group-item px-1">Cargo 2</dt>
+                                        <dt class="list-group-item px-1">Cargo 3</dt>
+                                        <dt class="list-group-item px-1">Cargo 4</dt>
+                                        <dt class="list-group-item px-1">Cargo 5</dt>
+                                        <dt class="list-group-item px-1">Cargo 6</dt>
+                                        <dt class="list-group-item px-1">Imp Tot</dt>
+                                    </ul>
+                                </div>
+                                <div class="col-7">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item px-1">${documento.car1_02}</li>
+                                        <li class="list-group-item px-1">${documento.car2_02}</li>
+                                        <li class="list-group-item px-1">${documento.car3_02}</li>
+                                        <li class="list-group-item px-1">${documento.car4_02}</li>
+                                        <li class="list-group-item px-1">${documento.car5_02}</li>
+                                        <li class="list-group-item px-1">${documento.car6_02}</li>
+                                        <li class="list-group-item px-1">${documento.carImpTot_02}</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Cargos 02</h3>
-                        <div class="row">
-                            <div class="col-5">
-                                <ul class="list-group list-group-flush text-right">
-                                    <dt class="list-group-item px-1">Cargo 1</dt>
-                                    <dt class="list-group-item px-1">Cargo 2</dt>
-                                    <dt class="list-group-item px-1">Cargo 3</dt>
-                                    <dt class="list-group-item px-1">Cargo 4</dt>
-                                    <dt class="list-group-item px-1">Cargo 5</dt>
-                                    <dt class="list-group-item px-1">Cargo 6</dt>
-                                    <dt class="list-group-item px-1">Imp Tot</dt>
-                                </ul>
-                            </div>
-                            <div class="col-7">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item px-1">${documento.car1_02}</li>
-                                    <li class="list-group-item px-1">${documento.car2_02}</li>
-                                    <li class="list-group-item px-1">${documento.car3_02}</li>
-                                    <li class="list-group-item px-1">${documento.car4_02}</li>
-                                    <li class="list-group-item px-1">${documento.car5_02}</li>
-                                    <li class="list-group-item px-1">${documento.car6_02}</li>
-                                    <li class="list-group-item px-1">${documento.carImpTot_02}</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </c:if>
 
                 <!-- Renglón-->
                 <hr>

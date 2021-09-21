@@ -1,6 +1,7 @@
 package datos.interfaces;
 
 import datos.entity.Cliente;
+import excepciones.MasDeUnClienteEncontrado;
 import java.util.List;
 
 public interface ClienteService {
@@ -9,7 +10,7 @@ public interface ClienteService {
 
     public Cliente encontrarId(long id);
 
-    public Cliente encontrarCups(String cups);
+    public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado;
 
     public void guardar(Cliente cliente);
 

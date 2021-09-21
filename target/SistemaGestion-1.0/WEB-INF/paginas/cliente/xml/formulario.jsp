@@ -6,7 +6,7 @@
     </div>
 </div>
 
-<form:form method="POST" action="${pageContext.request.contextPath}/procesamiento/procesar" enctype="multipart/form-data">
+<form:form method="POST" action="${pageContext.request.contextPath}/${controller}/procesar" enctype="multipart/form-data">
     <div class="container my-5">
         <div class="input-group mb-3">
             <div class="input-group-prepend">

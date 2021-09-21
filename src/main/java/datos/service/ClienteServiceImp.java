@@ -2,6 +2,7 @@ package datos.service;
 
 import datos.entity.Cliente;
 import datos.interfaces.ClienteDao;
+import excepciones.MasDeUnClienteEncontrado;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class ClienteServiceImp implements datos.interfaces.ClienteService {
 
     @Override
     @Transactional
-    public Cliente encontrarCups(String cups) {
+    public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado{
         return clienteDao.encontrarCups(cups);
     }
 

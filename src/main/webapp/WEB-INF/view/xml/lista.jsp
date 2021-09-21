@@ -34,10 +34,10 @@
 
                 <div class="col-6 row">
                     <div class="col">
-                        <a href="${pageContext.request.contextPath}/EvaluacionXML" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Evaluar</a>
+                        <a href="${pageContext.request.contextPath}/clasificar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Clasificar</a>
                     </div>
                     <div class="col">
-                        <a href="${pageContext.request.contextPath}/procesamiento/formulario" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Procesar</a>
+                        <a href="${pageContext.request.contextPath}/procesar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Procesar</a>
                     </div>
                     <c:choose>
                         <c:when test="${botonVisible == 'no' }">
@@ -45,7 +45,7 @@
                         </c:when>
                         <c:otherwise>
                             <div class="col">
-                                <form action="${pageContext.request.contextPath}/peajes/busqueda" method="post" id="myForm">
+                                <form action="${pageContext.request.contextPath}/${controller}/busqueda" method="post" id="myForm">
                                     <div class="input-group mb-2">
                                         <div class="input-group-prepend">
                                             <button class="btn btn-primary" type="submit" id="btnSubmit"><i class="fas fa-search"></i></button>
@@ -87,7 +87,7 @@
                                 </tr>
                             </c:if>
                             <c:forEach var="documento" items="${documentos}" varStatus="id">
-                                <c:url var="detalles" value="/peajes/detalles">
+                                <c:url var="detalles" value="/${controller}/detalles">
                                     <c:param name="codFisFac" value="${documento.codFisFac}"/>
                                 </c:url>
                                 <tr>

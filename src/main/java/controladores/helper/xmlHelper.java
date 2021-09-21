@@ -1,6 +1,7 @@
 package controladores.helper;
 
 import datos.entity.Cliente;
+import datos.entity.Factura;
 import datos.entity.Peaje;
 import datos.interfaces.ClienteService;
 import dominio.componentesxml.*;
@@ -11,34 +12,17 @@ import java.util.ArrayList;
 import org.w3c.dom.*;
 import utileria.texto.Cadenas;
 import datos.interfaces.DocumentoXmlService;
+import javax.persistence.NonUniqueResultException;
 import utileria.StringHelper;
 
 public class xmlHelper {
 
     private DocumentoXmlService contenidoXmlService;
-
     private ClienteService clienteService;
-
-    //Etiquetas
-    public static String ICONO = "<i class='far fa-address-card'></i></a>";
-    public static String TITULO_PAGINA = "Peajes";
-    public static String ENCABEZADO = ICONO + " " + TITULO_PAGINA;
-
-    public static String DETALLES_TITULO_PAGINA = "Detalle Peaje";
-    public static String DETALLES_ENCABEZADO = ICONO + " " + TITULO_PAGINA;
-
-    public static String ETIQUETA_TABLA_TITULO = "Registros";
-    public static String CONTENIDO_VISIBLE;
-
-    public static String MENSAJE;
-    public static String INSTRUCCION_LISTAR = "Use la herramienta de búsqueda para encontrar fácilmente un registro.";
-
     private ArrayList elementos;
     private Document doc;
     private StringBuilder errores;
     private StringBuilder comentarios;
-
-    //Datos para el control del flujo
     private String cups;
     private String codFactura;
     private int empEmi;
@@ -55,25 +39,89 @@ public class xmlHelper {
         this.iniciarVariables();
     }
 
-    //Si el codigo emisor es 0894 va a facturas
-    public void procesar(String nombreArchivo) throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException {
+    
+    /**
+     * Aplica para todos los archivos que vengan con el nodo identificador "Otras Facturas"
+     * guarda el registro en la tabla denominada "contenido_xml_otras_facturas"
+     * @param nombreArchivo referencia al nombre del archivo actual
+     */
+    public void procesarOtrasFacturas(String nombreArchivo){
+        System.out.println("Procesando otras facturas " + nombreArchivo);
+    }
+    
+    /**
+     * Aplica para todos los registros que tengan 0894 como empresaEmisora
+     * Lee los datos y registra en la tabla denominada "contenido_xml_facturas"
+     * 
+     * @param nombreArchivo referencia al nombre del archivo actual
+     * @throws FacturaYaExisteException
+     * @throws ClienteNoExisteException
+     * @throws PeajeTipoFacturaNoSoportadaException
+     * @throws CodRectNoExisteException 
+     * @throws MasDeUnClienteEncontrado
+     */
+    public void procesarFactura(String nombreArchivo) 
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado {
         //Se verifica que el cliente exista
         this.cliente = this.clienteService.encontrarCups(this.cups);
-        if (this.cliente.getIdCliente() != 0) {
+        if (this.cliente != null) {
             //Se revisa que la factura no exista
             if (this.contenidoXmlService.buscarByCodFiscal(codFactura) == null) {
                 this.nombreArchivo = nombreArchivo;
-                this.comentarios.append("Nombre del archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
+                this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
                 switch (this.tipoFactura) {
                     case "A":
-                        this.registrarA();
+                        this.registrarFacturaA();
                         break;
                     case "N":
                     case "G":
-                        this.registrarN();
+                        this.registrarFacturaN();
                         break;
                     case "R":
-                        this.registrarR(nombreArchivo);
+                        this.registrarFacturaR(nombreArchivo);
+                        break;
+                    default:
+                        throw new PeajeTipoFacturaNoSoportadaException(tipoFactura);
+                }
+                if (this.errores.toString().contains("13")) {
+                    System.out.println("Inconsistencia en tarifa detectada");
+                }
+            } else {
+                throw new FacturaYaExisteException(codFactura);
+            }
+        } else {
+            throw new ClienteNoExisteException(cups);
+        }
+    }
+    
+    /**
+     * Lee los datos y registra en la tabla denominada "contenido_xml"
+     * @param nombreArchivo referencia al nombre del archivo actual
+     * @throws FacturaYaExisteException
+     * @throws ClienteNoExisteException
+     * @throws PeajeTipoFacturaNoSoportadaException
+     * @throws CodRectNoExisteException 
+     * @throws excepciones.MasDeUnClienteEncontrado 
+     */
+    public void procesarPeaje(String nombreArchivo) 
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado {
+        //Se verifica que el cliente exista
+        this.cliente = this.clienteService.encontrarCups(this.cups);
+        if (this.cliente != null) {
+            //Se revisa que la factura no exista
+            if (this.contenidoXmlService.buscarByCodFiscal(codFactura) == null) {
+                this.nombreArchivo = nombreArchivo;
+                this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
+                switch (this.tipoFactura) {
+                    case "A":
+                        this.registrarPeajeA();
+                        break;
+                    case "N":
+                    case "G":
+                        this.registrarPeajeN();
+                        break;
+                    case "R":
+                        this.registrarPeajeR(nombreArchivo);
                         break;
                     default:
                         throw new PeajeTipoFacturaNoSoportadaException(tipoFactura);
@@ -89,25 +137,27 @@ public class xmlHelper {
         }
     }
 
-    /*------------------------Registro de facturas--------------------------------------*/
+    /*------------------------Registro de Peajes--------------------------------------*/
     /**
-     * Registra los el tipos de factura A busca que exista el cod para
-     * rectificar de lo contrario arroja una excepcion
+     * Registra los el tipos de Peajes A busca que exista el cod para rectificar, de lo contrario arroja una excepcion
      *
      * @throws CodRectNoExisteException
      */
-    private void registrarA() throws CodRectNoExisteException {
+    private void registrarPeajeA() throws CodRectNoExisteException, MasDeUnClienteEncontrado {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
         if (peaje != null) {
-            this.registrarN();
+            this.registrarPeajeN();
         } else {
             System.out.println("(Procesar Peaje) No se encontro una factura para rectificar");
             throw new CodRectNoExisteException(codFactura);
         }
     }
 
-    private void registrarN() {
+    /**
+     * Registra el peaje de tipo N
+     */
+    private void registrarPeajeN() throws MasDeUnClienteEncontrado{
         this.contenidoXmlService.guardar(
                 new Peaje(
                         this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
@@ -125,19 +175,84 @@ public class xmlHelper {
         System.out.print("Codigo Errores : " + errores.toString());
     }
 
-    private void registrarR(String nombreArchivo) throws CodRectNoExisteException {
+    /**
+     * Busca que el Peaje a rectificar exista, cuando la factura ya existe arroja una excepcion, de lo contraro hara un proceso de rectificación
+     * y usara el metodo registrarN para guardar en registro en la BD
+     * @param nombreArchivo
+     * @throws CodRectNoExisteException 
+     */
+    private void registrarPeajeR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
         if (peaje != null) {
             String nuevaRemesa = StringHelper.toInteger(this.doc.getElementsByTagName("IdRemesa").item(0).getTextContent()).toString();
             contenidoXmlService.rectificar(peaje, nuevaRemesa, nombreArchivo);
-            this.registrarN();
+            this.registrarPeajeN();
         } else {
             System.out.println("(Procesar Peaje) No se encontro una factura para rectificar");
             throw new CodRectNoExisteException(codFactura);
         }
     }
+    
+    
+    /*------------------------Registro de Facturas--------------------------------------*/
+    /**
+     * Registra los el tipos de Factura A busca que exista el cod para rectificar, de lo contrario arroja una excepcion
+     *
+     * @throws CodRectNoExisteException
+     */
+    private void registrarFacturaA() throws CodRectNoExisteException, MasDeUnClienteEncontrado {
+        String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
+        Factura factura = (Factura) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
+        if (factura != null) {
+            this.registrarFacturaN();
+        } else {
+            System.out.println("(xmlHelper - registrarFacturaA) No se encontró una factura para rectificar");
+            throw new CodRectNoExisteException(codFactura);
+        }
+    }
 
+    /**
+     * Registra el Factura de tipo N
+     */
+    private void registrarFacturaN() throws MasDeUnClienteEncontrado{
+        this.contenidoXmlService.guardar(
+                new Factura(
+                        this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
+                        this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
+                        this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
+                        this.impuestoElectrico(), this.alquileres(), this.iva(),
+                        this.aeConsumo(), this.aeLecturaDesde(), this.aeLecturaHasta(), this.aeProcedenciaDesde(), this.aeProcedenciaHasta(),
+                        this.rConsumo(), this.rLecturaDesde(), this.rLecturaHasta(), this.rImporteTotal(),
+                        this.pmConsumo(), this.pmLecturaHasta(),
+                        this.registroFin(), this.comentarios.toString(), this.errores.toString()
+                )
+        );
+        System.out.print("\n\nComentarios : " + comentarios.toString());
+        System.out.print("Codigo Errores : " + errores.toString());
+    }
+
+    /**
+     * Busca que el Factura a rectificar exista, cuando la factura ya existe arroja una excepcion, de lo contraro hara un proceso de rectificación
+     * y usara el metodo registrarN para guardar en registro en la BD
+     * @param nombreArchivo
+     * @throws CodRectNoExisteException 
+     */
+    private void registrarFacturaR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado {
+        String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
+        Factura factura = (Factura) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
+        if (factura != null) {
+            String nuevaRemesa = StringHelper.toInteger(this.doc.getElementsByTagName("IdRemesa").item(0).getTextContent()).toString();
+            contenidoXmlService.rectificar(factura, nuevaRemesa, nombreArchivo);
+            this.registrarFacturaN();
+        } else {
+            System.out.println("(xml Helper - registrarFacturaR) No se encontro una factura para rectificar");
+            throw new CodRectNoExisteException(codFactura);
+        }
+    }
+
+    
+    
     /*------------------------Obtencion de datos --------------------------------------*/
     private DatosCabecera cabecera() {
         elementos = new ArrayList<String>(7);
@@ -230,7 +345,7 @@ public class xmlHelper {
         return new DatosGeneralesFactura(elementos);
     }
 
-    private DatosFacturaAtr datosFacturaAtr() {
+    private DatosFacturaAtr datosFacturaAtr() throws MasDeUnClienteEncontrado{
         elementos = new ArrayList<String>(7);
         elementos.add(0, "0");
         elementos.add(1, "0");
@@ -2739,7 +2854,7 @@ public class xmlHelper {
         utileria.ArchivoTexto.escribirAdvertencia(this.nombreArchivo, codError);
     }
 
-    private void validarTarifa() {
+    private void validarTarifa() throws MasDeUnClienteEncontrado{
         this.cliente = this.clienteService.encontrarCups(this.cups);
         //Cliente c = new ClienteDao().encontrarCups(new Cliente(this.cups));
         String control = "";
@@ -2779,9 +2894,4 @@ public class xmlHelper {
         }
     }
 
-    public static void reiniciarVariables() {
-        MENSAJE = null;
-        CONTENIDO_VISIBLE = null;
-        ETIQUETA_TABLA_TITULO = null;
-    }
 }

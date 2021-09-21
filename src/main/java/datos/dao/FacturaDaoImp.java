@@ -2,6 +2,7 @@ package datos.dao;
 
 import datos.entity.Factura;
 import java.util.List;
+import javax.persistence.NoResultException;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -34,11 +35,16 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
 
     @Override
     public Factura buscarByCodFiscal(String cod) {
-        return this.sessionFactory.getCurrentSession()
-                .createQuery("from Factura f where f.codFisFac = :cod1 or f.codFisFac = :cod2 order by f.idFactura desc", Factura.class)
-                .setParameter("cod1", cod)
-                .setParameter("cod2", cod + "-A")
-                .getSingleResult();
+        try {
+            return this.sessionFactory.getCurrentSession()
+                    .createQuery("from Factura f where f.codFisFac = :cod1 or f.codFisFac = :cod2 order by f.idFactura desc", Factura.class)
+                    .setParameter("cod1", cod)
+                    .setParameter("cod2", cod + "-A")
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+
     }
 
     @Override

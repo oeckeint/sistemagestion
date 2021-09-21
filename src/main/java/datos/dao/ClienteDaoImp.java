@@ -1,7 +1,10 @@
 package datos.dao;
 
 import datos.entity.Cliente;
+import excepciones.MasDeUnClienteEncontrado;
 import java.util.List;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,8 +28,14 @@ public class ClienteDaoImp implements datos.interfaces.ClienteDao {
     }
 
     @Override
-    public Cliente encontrarCups(String cups) {
-        return (Cliente) sessionFactory.getCurrentSession().createQuery("from Cliente c where c.cups = :cups").setParameter("cups", cups).getSingleResult();
+    public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado{
+        try {
+            return (Cliente) sessionFactory.getCurrentSession().createQuery("from Cliente c where c.cups = :cups").setParameter("cups", cups).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } catch (NonUniqueResultException e){
+            throw new MasDeUnClienteEncontrado(cups);
+        }
     }
 
     @Override

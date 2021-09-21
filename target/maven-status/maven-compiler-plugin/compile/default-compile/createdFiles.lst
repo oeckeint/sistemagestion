@@ -9,6 +9,7 @@ utileria\ArchivoTexto.class
 dominio\componentesxml\DatosAeLecturaHasta.class
 dominio\Lectura.class
 dominio\componentesxml\DatosEnergiaActivaPrecio.class
+excepciones\MasDeUnClienteEncontrado.class
 datos\interfaces\ClienteDao.class
 dominio\componentesxml\DatosAeLecturaDesde.class
 dominio\otrasfactuas\RegistroFin.class
@@ -16,12 +17,14 @@ datos\entity\Cliente.class
 dominio\componentesxml\DatosEnergiaActivaImporteTotal.class
 dominio\otrasfactuas\DocumentoOtraFactura.class
 dominio\otrasfactuas\ConceptoRepercutible.class
+controladores\clasificarXml.class
 dominio\componentesxml\DatosPotenciaMaxDemandada.class
 dominio\Distribuidora.class
 dominio\otrasfactuas\DatosGeneralesFactura.class
 dominio\procesamientoxml\Remesa.class
 datos\dao\ClienteDaoImp.class
 dominio\componentesxml\DatosEnergiaActivaValores.class
+controladores\helper\ProcesarOtrasFacturas.class
 excepciones\PeajeTipoFacturaNoSoportadaException.class
 dominio\procesamientoxml\ResultadoArchivoXML.class
 dominio\componentesxml\DatosPotenciaPrecio.class
@@ -46,8 +49,10 @@ dominio\componentesxml\DatosAlquileres.class
 controladores\helper\xmlHelper.class
 datos\entity\Factura.class
 controladores\ProcesamientoXml.class
+controladores\helper\ProcesarFactura.class
 dominio\componentesxml\DatosPotenciaAFacturar.class
 dominio\componentesxml\DatosPotenciaImporteTotal.class
+controladores\Facturas.class
 dominio\componentesxml\DatosPmLecturaHasta.class
 utileria\texto\Cadenas.class
 excepciones\ClienteNoExisteException.class
@@ -57,12 +62,14 @@ dominio\componentesxml\DatosExcesoPotencia.class
 dominio\componentesxml\DatosAeConsumo.class
 dominio\componentesxml\DatosPmConsumo.class
 controladores\ClientesHelper.class
+controladores\helper\Etiquetas.class
 datos\interfaces\DocumentoXmlService.class
 excepciones\XmlNoSoportado.class
 dominio\componentesxml\Cargos.class
 dominio\componentesxml\DatosAeProcedenciaDesde.class
 excepciones\FacturaYaExisteException.class
 dominio\componentesxml\DatosRLecturaDesde.class
+excepciones\EmpresaEmisoraNoSoportada.class
 controladores\Clientes.class
 datos\dao\DatosFacturaDao.class
 dominio\componentesxml\DatosImpuestoElectrico.class
@@ -70,7 +77,6 @@ datos\dao\PeajesImp.class
 dominio\componentesxml\DatosRLecturaHasta.class
 controladores\helper\ProcesarPeaje.class
 excepciones\ErrorDesconocidoException.class
-controladores\PeajesHelper.class
 dominio\componentesxml\DatosIva.class
 datos\service\ClienteServiceImp.class
 controladores\ControlXmlOtrasFacturas.class
