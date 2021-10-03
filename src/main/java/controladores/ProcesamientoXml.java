@@ -46,6 +46,10 @@ public class ProcesamientoXml {
     @Autowired
     @Qualifier(value = "facturasServiceImp")
     private DocumentoXmlService contenidoXmlServiceFacturas;
+    
+    @Autowired
+    @Qualifier(value = "otrasFacturasServiceImp")
+    private DocumentoXmlService contenidoXmlServiceOtrasFacturas;
 
     @Autowired
     protected ClienteService clienteService;
@@ -118,6 +122,7 @@ public class ProcesamientoXml {
      * @param archivo Archivo xml recibido
      * @param nombreArchivo Nombre del archivo xml recibido
      */
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void procesar(File archivo, String nombreArchivo) {
 
         System.out.println("(Ini)************************-----------------------------" + nombreArchivo);
@@ -132,11 +137,7 @@ public class ProcesamientoXml {
 
             //Revisa el nodo "Otras facturas" y en caso de que el valor sea mayor a 1 ejecutara la clase de Otras facturas
             if (documento.getElementsByTagName("OtrasFacturas").getLength() != 0) {
-                /*ProcesamientoOtrasFacturas of = new ProcesamientoOtrasFacturas();
-                if (!of.registrar(documento, nombreArchivo).equals("")) {
-                    this.archivosErroneos.add(of.registrar(documento, nombreArchivo));
-                }*/
-                new ProcesarOtrasFacturas(documento, contenidoXmlServicePeajes, clienteService, nombreArchivo);
+                new ProcesarOtrasFacturas(documento, contenidoXmlServiceOtrasFacturas, clienteService, nombreArchivo);
             } else if (is894) {
                 new ProcesarFactura(documento, contenidoXmlServiceFacturas, clienteService, nombreArchivo);
             } else {
@@ -164,6 +165,7 @@ public class ProcesamientoXml {
      * @param nombreArchivo nombre del archivo para indentificar el nombre con
      * el que se esta tratando
      * @return el archivo ya formateado y preparado para la lectura
+     * @throws excepciones.ArchivoVacioException
      */
     public Document prepareXml(File archivo, String nombreArchivo) throws ArchivoVacioException{
         Document doc = null;

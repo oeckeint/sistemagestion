@@ -1,6 +1,6 @@
 package controladores;
 
-import datos.dao.OtrasFacturasDao;
+import datos.dao.OtrasFacturasDaoImp;
 import datos.interfaces.ClienteDao;
 import dominio.Cliente;
 import dominio.componentesxml.*;

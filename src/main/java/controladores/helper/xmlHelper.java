@@ -2,6 +2,7 @@ package controladores.helper;
 
 import datos.entity.Cliente;
 import datos.entity.Factura;
+import datos.entity.OtraFactura;
 import datos.entity.Peaje;
 import datos.interfaces.ClienteService;
 import dominio.componentesxml.*;
@@ -39,28 +40,51 @@ public class xmlHelper {
         this.iniciarVariables();
     }
 
-    
     /**
-     * Aplica para todos los archivos que vengan con el nodo identificador "Otras Facturas"
-     * guarda el registro en la tabla denominada "contenido_xml_otras_facturas"
+     * Aplica para todos los archivos que vengan con el nodo identificador
+     * "Otras Facturas" guarda el registro en la tabla denominada
+     * "contenido_xml_otras_facturas"
+     *
      * @param nombreArchivo referencia al nombre del archivo actual
+     * @throws excepciones.FacturaYaExisteException
+     * @throws excepciones.ClienteNoExisteException
+     * @throws excepciones.PeajeTipoFacturaNoSoportadaException
+     * @throws excepciones.CodRectNoExisteException
+     * @throws excepciones.MasDeUnClienteEncontrado
      */
-    public void procesarOtrasFacturas(String nombreArchivo){
-        System.out.println("Procesando otras facturas " + nombreArchivo);
+    public void procesarOtrasFacturas(String nombreArchivo)
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado {
+        //Se verifica que el cliente exista
+        this.cliente = this.clienteService.encontrarCups(this.cups);
+        if (this.cliente != null) {
+            //Se revisa que la factura no exista
+            if (this.contenidoXmlService.buscarByCodFiscal(codFactura) == null) {
+                this.nombreArchivo = nombreArchivo;
+                this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
+                this.registrarOtraFactura();
+                if (this.errores.toString().contains("13")) {
+                    System.out.println("Inconsistencia en tarifa detectada");
+                }
+            } else {
+                throw new FacturaYaExisteException(codFactura);
+            }
+        } else {
+            throw new ClienteNoExisteException(cups);
+        }
     }
-    
+
     /**
-     * Aplica para todos los registros que tengan 0894 como empresaEmisora
-     * Lee los datos y registra en la tabla denominada "contenido_xml_facturas"
-     * 
+     * Aplica para todos los registros que tengan 0894 como empresaEmisora Lee
+     * los datos y registra en la tabla denominada "contenido_xml_facturas"
+     *
      * @param nombreArchivo referencia al nombre del archivo actual
      * @throws FacturaYaExisteException
      * @throws ClienteNoExisteException
      * @throws PeajeTipoFacturaNoSoportadaException
-     * @throws CodRectNoExisteException 
+     * @throws CodRectNoExisteException
      * @throws MasDeUnClienteEncontrado
      */
-    public void procesarFactura(String nombreArchivo) 
+    public void procesarFactura(String nombreArchivo)
             throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado {
         //Se verifica que el cliente exista
         this.cliente = this.clienteService.encontrarCups(this.cups);
@@ -93,17 +117,18 @@ public class xmlHelper {
             throw new ClienteNoExisteException(cups);
         }
     }
-    
+
     /**
      * Lee los datos y registra en la tabla denominada "contenido_xml"
+     *
      * @param nombreArchivo referencia al nombre del archivo actual
      * @throws FacturaYaExisteException
      * @throws ClienteNoExisteException
      * @throws PeajeTipoFacturaNoSoportadaException
-     * @throws CodRectNoExisteException 
-     * @throws excepciones.MasDeUnClienteEncontrado 
+     * @throws CodRectNoExisteException
+     * @throws excepciones.MasDeUnClienteEncontrado
      */
-    public void procesarPeaje(String nombreArchivo) 
+    public void procesarPeaje(String nombreArchivo)
             throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado {
         //Se verifica que el cliente exista
         this.cliente = this.clienteService.encontrarCups(this.cups);
@@ -139,7 +164,8 @@ public class xmlHelper {
 
     /*------------------------Registro de Peajes--------------------------------------*/
     /**
-     * Registra los el tipos de Peajes A busca que exista el cod para rectificar, de lo contrario arroja una excepcion
+     * Registra los el tipos de Peajes A busca que exista el cod para
+     * rectificar, de lo contrario arroja una excepcion
      *
      * @throws CodRectNoExisteException
      */
@@ -157,7 +183,7 @@ public class xmlHelper {
     /**
      * Registra el peaje de tipo N
      */
-    private void registrarPeajeN() throws MasDeUnClienteEncontrado{
+    private void registrarPeajeN() throws MasDeUnClienteEncontrado {
         this.contenidoXmlService.guardar(
                 new Peaje(
                         this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
@@ -176,10 +202,12 @@ public class xmlHelper {
     }
 
     /**
-     * Busca que el Peaje a rectificar exista, cuando la factura ya existe arroja una excepcion, de lo contraro hara un proceso de rectificación
-     * y usara el metodo registrarN para guardar en registro en la BD
+     * Busca que el Peaje a rectificar exista, cuando la factura ya existe
+     * arroja una excepcion, de lo contraro hara un proceso de rectificación y
+     * usara el metodo registrarN para guardar en registro en la BD
+     *
      * @param nombreArchivo
-     * @throws CodRectNoExisteException 
+     * @throws CodRectNoExisteException
      */
     private void registrarPeajeR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
@@ -193,11 +221,11 @@ public class xmlHelper {
             throw new CodRectNoExisteException(codFactura);
         }
     }
-    
-    
+
     /*------------------------Registro de Facturas--------------------------------------*/
     /**
-     * Registra los el tipos de Factura A busca que exista el cod para rectificar, de lo contrario arroja una excepcion
+     * Registra los el tipos de Factura A busca que exista el cod para
+     * rectificar, de lo contrario arroja una excepcion
      *
      * @throws CodRectNoExisteException
      */
@@ -215,7 +243,7 @@ public class xmlHelper {
     /**
      * Registra el Factura de tipo N
      */
-    private void registrarFacturaN() throws MasDeUnClienteEncontrado{
+    private void registrarFacturaN() throws MasDeUnClienteEncontrado {
         this.contenidoXmlService.guardar(
                 new Factura(
                         this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
@@ -233,10 +261,12 @@ public class xmlHelper {
     }
 
     /**
-     * Busca que el Factura a rectificar exista, cuando la factura ya existe arroja una excepcion, de lo contraro hara un proceso de rectificación
-     * y usara el metodo registrarN para guardar en registro en la BD
+     * Busca que el Factura a rectificar exista, cuando la factura ya existe
+     * arroja una excepcion, de lo contraro hara un proceso de rectificación y
+     * usara el metodo registrarN para guardar en registro en la BD
+     *
      * @param nombreArchivo
-     * @throws CodRectNoExisteException 
+     * @throws CodRectNoExisteException
      */
     private void registrarFacturaR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
@@ -251,7 +281,22 @@ public class xmlHelper {
         }
     }
 
+    /*------------------------Registro de Otras Facturas--------------------------------------*/
     
+    /**
+     * Registra OtrasFacturas
+     */
+    private void registrarOtraFactura() throws MasDeUnClienteEncontrado {
+        this.contenidoXmlService.guardar(
+                new OtraFactura(
+                        this.cliente, this.cabecera(), this.datosGenerales(),
+                        this.conceptoRepercutible(), this.registroFin(),
+                        this.comentarios.toString(), this.errores.toString()
+                )
+        );
+        System.out.print("\n\nComentarios : " + comentarios.toString());
+        System.out.print("Codigo Errores : " + errores.toString());
+    }
     
     /*------------------------Obtencion de datos --------------------------------------*/
     private DatosCabecera cabecera() {
@@ -345,7 +390,7 @@ public class xmlHelper {
         return new DatosGeneralesFactura(elementos);
     }
 
-    private DatosFacturaAtr datosFacturaAtr() throws MasDeUnClienteEncontrado{
+    private DatosFacturaAtr datosFacturaAtr() throws MasDeUnClienteEncontrado {
         elementos = new ArrayList<String>(7);
         elementos.add(0, "0");
         elementos.add(1, "0");
@@ -2810,6 +2855,36 @@ public class xmlHelper {
         this.imprimirResultado("registroFin", elementos);
         return new DatosFinDeRegistro(elementos);
     }
+    
+    //Concepto Repercutible
+    private ConceptoRepercutible conceptoRepercutible(){
+        
+        elementos = new ArrayList<String>(2);
+        elementos.add("");
+        elementos.add("");
+        
+        NodeList flowList = this.doc.getElementsByTagName("ConceptoRepercutible");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "ConceptoRepercutible":
+                            elementos.set(0, childList.item(j).getTextContent().trim());
+                            break;
+                        case "ImporteTotalConceptoRepercutible":
+                            elementos.set(1, Double.parseDouble(childList.item(j).getTextContent().trim()) + ((Double) elementos.get(1)));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        this.imprimirResultado("conceptoRepercutible", elementos);
+        return new ConceptoRepercutible(elementos);
+    }
 
     /*-----------------------------Otros Metodos-------------------------*/
     private void verificarPotenciaAFacturar(double suma) {
@@ -2854,7 +2929,7 @@ public class xmlHelper {
         utileria.ArchivoTexto.escribirAdvertencia(this.nombreArchivo, codError);
     }
 
-    private void validarTarifa() throws MasDeUnClienteEncontrado{
+    private void validarTarifa() throws MasDeUnClienteEncontrado {
         this.cliente = this.clienteService.encontrarCups(this.cups);
         //Cliente c = new ClienteDao().encontrarCups(new Cliente(this.cups));
         String control = "";

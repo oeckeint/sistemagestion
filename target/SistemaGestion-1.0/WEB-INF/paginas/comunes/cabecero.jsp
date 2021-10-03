@@ -19,7 +19,7 @@
                                 <a class="nav-link text-white p-0" href="${pageContext.request.contextPath}/facturas"><i class="fas fa-address-card"></i> Facturas</a>
                             </div>
                             <div class="col p-0">
-                                <a class="nav-link text-white p-0" href="${pageContext.request.contextPath}/ControlXMLOtrasFacturas"><i class="fas fa-address-card"></i> Otras</a>
+                                <a class="nav-link text-white p-0" href="${pageContext.request.contextPath}/otrasfacturas"><i class="fas fa-address-card"></i> Otras</a>
                             </div>
                         </div>
                     </div>

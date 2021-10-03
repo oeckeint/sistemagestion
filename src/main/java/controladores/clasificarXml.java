@@ -2,6 +2,7 @@ package controladores;
 
 import controladores.helper.Etiquetas;
 import datos.entity.Cliente;
+import datos.interfaces.ClienteService;
 import excepciones.ArchivoNoCumpleParaSerClasificado;
 import excepciones.ArchivoVacioException;
 import excepciones.ErrorDesconocidoException;
@@ -19,6 +20,10 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -34,7 +40,10 @@ import org.w3c.dom.Document;
  */
 @Controller
 @RequestMapping("/clasificar")
-public class clasificarXml extends ProcesamientoXml {
+public class ClasificarXml {
+    
+    @Autowired
+    ClienteService clienteService;
 
     private int archivosCorrectos;
     private int archivosTotales;
@@ -87,9 +96,9 @@ public class clasificarXml extends ProcesamientoXml {
 
     private void procesar(File archivo, String ruta) {
         try {
-            Document doc = super.prepareXml(archivo, nombreArchivo);
+            Document doc = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(doc);
-            this.cliente = super.clienteService.encontrarCups(elementosXml.get("cups"));
+            this.cliente = this.clienteService.encontrarCups(elementosXml.get("cups"));
             if (this.cliente != null) {
                 this.generarXML(this.nombreArchivo, ruta);
             }
@@ -243,6 +252,33 @@ public class clasificarXml extends ProcesamientoXml {
 
             }
         }
+    }
+    
+    /**
+     * Lectura y formateo del archivo xml recibido
+     *
+     * @param archivo archivo xml enviado desde el front
+     * @param nombreArchivo nombre del archivo para indentificar el nombre con
+     * el que se esta tratando
+     * @return el archivo ya formateado y preparado para la lectura
+     */
+    public Document prepareXml(File archivo, String nombreArchivo) throws ArchivoVacioException{
+        Document doc = null;
+        try {
+            if (archivo.length() != 0) {
+                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = dbFactory.newDocumentBuilder();
+                doc = builder.parse(archivo);
+                doc.getDocumentElement().normalize();
+            } else {
+                throw new ArchivoVacioException();
+            }
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + new ErrorDesconocidoException().getMessage() + " (<Strong>" + e.getMessage() + "</Strong>)");
+            utileria.ArchivoTexto.escribirError(archivosErroneos.get(archivosErroneos.size() - 1));
+            e.printStackTrace(System.out);
+        }
+        return doc;
     }
 
     /**

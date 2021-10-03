@@ -87,6 +87,7 @@ public class Peajes {
                     break;
             }
             if (peajes.isEmpty()) {
+                Etiquetas.PEAJES_MENSAJE = "No se encontro coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>";
                 return "redirect:/peajes";
             }
         } catch (Exception e) {

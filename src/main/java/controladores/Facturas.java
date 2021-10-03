@@ -2,7 +2,6 @@ package controladores;
 
 import controladores.helper.Etiquetas;
 import datos.entity.Factura;
-import datos.entity.Peaje;
 import datos.interfaces.ClienteService;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.MasDeUnClienteEncontrado;
@@ -94,6 +93,7 @@ public class Facturas {
                     break;
             }
             if (facturas.isEmpty()) {
+                Etiquetas.FACTURAS_MENSAJE = "No se encontro coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>";
                 return "redirect:/facturas";
             }
         } catch (Exception e) {
@@ -116,11 +116,11 @@ public class Facturas {
         return "xml/lista";
     }
     
-    private Peaje resumen(List<Factura> facturas) throws MasDeUnClienteEncontrado {
+    private Factura resumen(List<Factura> facturas) throws MasDeUnClienteEncontrado {
         if (facturas.isEmpty()) {
             return null;
         }
-        Peaje peaje = new Peaje();
+        Factura factura = new Factura();
         double impPot = 0.0;
         double impEneAct = 0.0;
         double impFac = 0.0;
@@ -131,12 +131,12 @@ public class Facturas {
             impFac += p.getRfImpTot();
         }
 
-        peaje.setIdCliente(this.clienteService.encontrarCups(facturas.get(0).getCups()).getIdCliente());
-        peaje.setPotImpTot(impPot);
-        peaje.setEaImpTot(impEneAct);
-        peaje.setRfImpTot(impFac);
+        factura.setIdCliente(this.clienteService.encontrarCups(facturas.get(0).getCups()).getIdCliente());
+        factura.setPotImpTot(impPot);
+        factura.setEaImpTot(impEneAct);
+        factura.setRfImpTot(impFac);
 
-        return peaje;
+        return factura;
     }
     
     private void reiniciarVariables(){

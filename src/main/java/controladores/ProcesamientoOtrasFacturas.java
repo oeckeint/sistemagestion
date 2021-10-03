@@ -1,6 +1,6 @@
 package controladores;
 
-import datos.dao.OtrasFacturasDao;
+import datos.dao.OtrasFacturasDaoImp;
 import dominio.otrasfactuas.*;
 import java.util.*;
 import org.w3c.dom.*;

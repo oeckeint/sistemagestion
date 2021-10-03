@@ -30,6 +30,18 @@ public class Etiquetas {
     public static String FACTURAS_INSTRUCCION_LISTAR = "Use la herramienta de búsqueda para encontrar fácilmente un registro.";
     public static String FACTURAS_CONTROLLER = "facturas";
     
+    //OtrasFacturas
+    public static String OTRAS_FACTURAS_ICONO = "<i class=\"fas fa-address-card\"></i>";
+    public static String OTRAS_FACTURAS_TITULO_PAGINA = "Otras Facturas";
+    public static String OTRAS_FACTURAS_ENCABEZADO = OTRAS_FACTURAS_ICONO + " " + OTRAS_FACTURAS_TITULO_PAGINA;
+    public static String OTRAS_FACTURAS_DETALLES_TITULO_PAGINA = "Detalle factura";
+    public static String OTRAS_FACTURAS_DETALLES_ENCABEZADO = OTRAS_FACTURAS_ICONO + " " + OTRAS_FACTURAS_TITULO_PAGINA;
+    public static String OTRAS_FACTURAS_ETIQUETA_TABLA_TITULO = "Registros";
+    public static String OTRAS_FACTURAS_CONTENIDO_VISIBLE;
+    public static String OTRAS_FACTURAS_MENSAJE;
+    public static String OTRAS_FACTURAS_INSTRUCCION_LISTAR = "Use la herramienta de búsqueda para encontrar fácilmente un registro.";
+    public static String OTRAS_FACTURAS_CONTROLLER = "otrasfacturas";
+    
     //procesamiento/formulario
     public static String PROCESAMIENTO_FORMULARIO_ICONO = "<i class='fas fa-check-square'></i>";
     public static String PROCESAMIENTO_FORMULARIO_TITULO_PAGINA = "Procesamiento XML";
@@ -40,7 +52,7 @@ public class Etiquetas {
     
     //clasificar
     public static String CLASIFICAR_FORMULARIO_ICONO = "<i class='fas fa-check-square'></i>";
-    public static String CLASIFICAR_FORMULARIO_TITULO_PAGINA = "Clasificación XML";
+    public static String CLASIFICAR_FORMULARIO_TITULO_PAGINA = "Clasificación";
     public static String CLASIFICAR_FORMULARIO_ENCABEZADO = CLASIFICAR_FORMULARIO_ICONO + " " + CLASIFICAR_FORMULARIO_TITULO_PAGINA;
     public static String CLASIFICAR_FORMULARIO_MENSAJE = "Clasificación de archivos xml en sus carpetas correspondientes.";
     public static String CLASIFICAR_FORMULARIO_CONTROLLER = "clasificar";
