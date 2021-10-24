@@ -1,5 +1,6 @@
 package datos.interfaces;
 
+import excepciones.NoEsUnNumeroException;
 import java.util.List;
 
 public interface DocumentoXmlService<T> {
@@ -12,7 +13,7 @@ public interface DocumentoXmlService<T> {
     
     public T buscarByCodFiscal(String cod);
     
-    public List<T> buscarByIdCliente(String idCliente);
+    public List<T> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException;
     
     public List<T> buscarByRemesa(String remesa);
     

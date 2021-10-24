@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.MasDeUnClienteEncontrado;
+import excepciones.NoEsUnNumeroException;
+import excepciones.RegistroVacioException;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 @Controller
@@ -58,6 +61,7 @@ public class Peajes {
             model.addAttribute("documento", peaje);
             model.addAttribute("cliente", this.clienteService.encontrarCups(peaje.getCups()));
             model.addAttribute("mensaje", "Se muestra el registro con el cod factura <Strong>" + codFisFac + "</Strong>");
+            model.addAttribute("controller", "peajes");
             this.reiniciarVariables();
             return "xml/detalle";
         } catch (Exception e) {
@@ -73,7 +77,7 @@ public class Peajes {
             return "redirect:/peajes";
         }
 
-        List<Peaje> peajes = null;
+        List<Peaje> peajes = new ArrayList<>();
         try {
             switch (filtro) {
                 case "cliente":
@@ -82,35 +86,48 @@ public class Peajes {
                 case "remesa":
                     peajes = this.documentoXmlService.buscarByRemesa(valor);
                     break;
+                case "codFisFac":
+                    peajes.add((Peaje) this.documentoXmlService.buscarByCodFiscal(valor));
+                    break;
                 default:
                     Etiquetas.PEAJES_MENSAJE = "El filtro <Strong>" + filtro + "</Strong> no es válido";
                     break;
             }
-            if (peajes.isEmpty()) {
-                Etiquetas.PEAJES_MENSAJE = "No se encontro coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>";
+            
+            if (peajes.isEmpty() || peajes == null) {
+                Etiquetas.PEAJES_MENSAJE = "No se encontró coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>.";
                 return "redirect:/peajes";
             }
-        } catch (Exception e) {
-            System.out.println("(Peajes)" + e.getMessage());
-            Etiquetas.PEAJES_MENSAJE = "No se encontro coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>";
+            
+            model.addAttribute("tituloPagina", Etiquetas.PEAJES_TITULO_PAGINA);
+            model.addAttribute("titulo", Etiquetas.PEAJES_ENCABEZADO);
+            model.addAttribute("tablaTitulo", "Resultados");
+            model.addAttribute("mensaje", "Estos son los resultados que se encontraron con el valor de <Strong>" + valor + "</Strong> y el filtro de <Strong>" + filtro + "</Strong>.");
+            model.addAttribute("documentos", peajes);
+            model.addAttribute("documentoResumen", this.resumen(peajes));
+            model.addAttribute("totalRegistros", peajes.size());
+            model.addAttribute("ultimaBusqueda", valor);
+            model.addAttribute("controller", Etiquetas.PEAJES_CONTROLLER);
             this.reiniciarVariables();
+            
+        } catch(NoEsUnNumeroException e){
+            Etiquetas.PEAJES_MENSAJE = "El filtro de <Strong>Cliente</Strong> solo acepta valores numericos, revisar el valor ingresado <Strong>" + valor + "</Strong>";
+            return "redirect:/peajes";
+        } catch(RegistroVacioException e){
+            Etiquetas.FACTURAS_MENSAJE = "No se encontró coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>.";
+            return "redirect:/facturas";
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+            System.out.println("(Peajes-controlador)" + e.getMessage());
+            Etiquetas.PEAJES_MENSAJE = "Algo ah salido mal :( por favor reporte el bug o revise el log.";
             return "redirect:/peajes";
         }
-
-        model.addAttribute("tituloPagina", Etiquetas.PEAJES_TITULO_PAGINA);
-        model.addAttribute("titulo", Etiquetas.PEAJES_ENCABEZADO);
-        model.addAttribute("tablaTitulo", "Resultados");
-        model.addAttribute("mensaje", "Estos son los resultados que se encontraron con el valor de " + valor + " y el filtro de " + filtro);
-        model.addAttribute("documentos", peajes);
-        model.addAttribute("documentoResumen", this.resumen(peajes));
-        model.addAttribute("totalRegistros", peajes.size());
-        model.addAttribute("ultimaBusqueda", valor);
-        model.addAttribute("controller", Etiquetas.PEAJES_CONTROLLER);
-        this.reiniciarVariables();
+        
         return "xml/lista";
+        
     }
 
-    private Peaje resumen(List<Peaje> peajes) throws MasDeUnClienteEncontrado {
+    private Peaje resumen(List<Peaje> peajes) throws MasDeUnClienteEncontrado, RegistroVacioException {
         if (peajes.isEmpty()) {
             return null;
         }
@@ -120,6 +137,9 @@ public class Peajes {
         double impFac = 0.0;
 
         for (Peaje p : peajes) {
+            if (p == null) {
+                throw new RegistroVacioException();
+            }
             impPot += p.getPotImpTot();
             impEneAct += p.getEaImpTot();
             impFac += p.getRfImpTot();

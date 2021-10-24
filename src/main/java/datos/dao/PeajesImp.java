@@ -1,6 +1,7 @@
 package datos.dao;
 
 import datos.entity.Peaje;
+import excepciones.NoEsUnNumeroException;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +48,16 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
     }
 
     @Override
-    public List<Peaje> buscarByIdCliente(String idCliente) {
-        return this.sessionFactory.getCurrentSession()
-                .createQuery("from Peaje p where p.idCliente = :id", Peaje.class)
-                .setParameter("id", Long.parseLong(idCliente))
-                .getResultList();
+    public List<Peaje> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException{
+        try {
+            return this.sessionFactory.getCurrentSession()
+                    .createQuery("from Peaje p where p.idCliente = :id", Peaje.class)
+                    .setParameter("id", Long.parseLong(idCliente))
+                    .getResultList();
+        } catch (NumberFormatException e) {
+            System.out.println("(PeajesDAOImp) no se inserto un numero");
+            throw new NoEsUnNumeroException();
+        }
     }
 
     @Override

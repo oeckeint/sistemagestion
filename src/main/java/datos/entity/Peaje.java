@@ -454,6 +454,12 @@ public class Peaje {
 
     @Column(name = "id_error")
     private String idError;
+    
+    @Column(name = "remesa_pago")
+    private String remesaPago;
+    
+    @Column(name = "estado_pago")
+    private int estadoPago;
 
     public Peaje() {
     }
@@ -1828,4 +1834,20 @@ public class Peaje {
         this.idError = idError;
     }
 
+    public String getRemesaPago() {
+        return remesaPago;
+    }
+
+    public void setRemesaPago(String remesaPago) {
+        this.remesaPago = remesaPago;
+    }
+
+    public int getEstadoPago() {
+        return estadoPago;
+    }
+
+    public void setEstadoPago(int estadoPago) {
+        this.estadoPago = estadoPago;
+    }
+    
 }

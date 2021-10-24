@@ -5,6 +5,9 @@ import datos.entity.OtraFactura;
 import datos.interfaces.ClienteService;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.MasDeUnClienteEncontrado;
+import excepciones.NoEsUnNumeroException;
+import excepciones.RegistroVacioException;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -79,7 +82,7 @@ public class OtrasFacturas {
             return "redirect:/otrasfacturas";
         }
 
-        List<OtraFactura> facturas = null;
+        List<OtraFactura> facturas = new ArrayList<>();
         try {
             switch (filtro) {
                 case "cliente":
@@ -88,35 +91,46 @@ public class OtrasFacturas {
                 case "remesa":
                     facturas = this.documentoXmlService.buscarByRemesa(valor);
                     break;
+                case "codFisFac":
+                    facturas.add((OtraFactura) this.documentoXmlService.buscarByCodFiscal(valor));
+                    break;
                 default:
                     Etiquetas.OTRAS_FACTURAS_MENSAJE = "El filtro <Strong>" + filtro + "</Strong> no es válido";
                     break;
             }
-            if (facturas.isEmpty()) {
+            if (facturas.isEmpty() || facturas == null) {
                 Etiquetas.OTRAS_FACTURAS_MENSAJE = "No se encontro coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>";
                 return "redirect:/otrasfacturas";
             }
-        } catch (Exception e) {
-            System.out.println("(otrasfacturas)" + e.getMessage());
-            Etiquetas.OTRAS_FACTURAS_MENSAJE = "No se encontro coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>";
+            
+            model.addAttribute("tituloPagina", Etiquetas.OTRAS_FACTURAS_TITULO_PAGINA);
+            model.addAttribute("titulo", Etiquetas.OTRAS_FACTURAS_ENCABEZADO);
+            model.addAttribute("tablaTitulo", "Resultados");
+            model.addAttribute("mensaje", "Estos son los resultados que se encontraron con el valor de " + valor + " y el filtro de " + filtro);
+            model.addAttribute("documentos", facturas);
+            model.addAttribute("documentoResumen", this.resumen(facturas));
+            model.addAttribute("totalRegistros", facturas.size());
+            model.addAttribute("ultimaBusqueda", valor);
+            model.addAttribute("controller", Etiquetas.OTRAS_FACTURAS_CONTROLLER);
             this.reiniciarVariables();
+            
+        } catch(NoEsUnNumeroException e){
+            Etiquetas.OTRAS_FACTURAS_MENSAJE = "El filtro de <Strong>Cliente</Strong> solo acepta valores numericos, revisar el valor ingresado <Strong>" + valor + "</Strong>";
+            return "redirect:/otrasfacturas";
+        } catch(RegistroVacioException e){
+            Etiquetas.OTRAS_FACTURAS_MENSAJE = "No se encontró coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>.";
+            return "redirect:/otrasfacturas";
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+            System.out.println("(Peajes-controlador)" + e.getMessage());
+            Etiquetas.OTRAS_FACTURAS_MENSAJE = "Algo ah salido mal :( por favor reporte el bug o revise el log.";
             return "redirect:/otrasfacturas";
         }
-
-        model.addAttribute("tituloPagina", Etiquetas.OTRAS_FACTURAS_TITULO_PAGINA);
-        model.addAttribute("titulo", Etiquetas.OTRAS_FACTURAS_ENCABEZADO);
-        model.addAttribute("tablaTitulo", "Resultados");
-        model.addAttribute("mensaje", "Estos son los resultados que se encontraron con el valor de " + valor + " y el filtro de " + filtro);
-        model.addAttribute("documentos", facturas);
-        //model.addAttribute("documentoResumen", this.resumen(facturas));
-        model.addAttribute("totalRegistros", facturas.size());
-        model.addAttribute("ultimaBusqueda", valor);
-        model.addAttribute("controller", Etiquetas.OTRAS_FACTURAS_CONTROLLER);
-        this.reiniciarVariables();
-        return "xml/lista";
+        
+        return "xml/lista_otras_facturas";
     }
     
-    private OtraFactura resumen(List<OtraFactura> facturas) throws MasDeUnClienteEncontrado {
+    private OtraFactura resumen(List<OtraFactura> facturas) throws MasDeUnClienteEncontrado, RegistroVacioException {
         if (facturas.isEmpty()) {
             return null;
         }
@@ -126,6 +140,9 @@ public class OtrasFacturas {
         double impFac = 0.0;
 
         for (OtraFactura p : facturas) {
+            if (p == null) {
+                throw new RegistroVacioException();
+            }
             //impPot += p.getPotImpTot();
             //impEneAct += p.getEaImpTot();
             //impFac += p.getRfImpTot();

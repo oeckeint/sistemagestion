@@ -412,7 +412,13 @@ public class Factura {
 
     @Column(name = "id_error")
     private String idError;
-
+    
+    @Column(name = "remesa_pago")
+    private String remesaPago;
+    
+    @Column(name = "estado_pago")
+    private int estadoPago;
+    
     public Factura() {
     }
 
@@ -1654,6 +1660,22 @@ public class Factura {
 
     public void setIdError(String idError) {
         this.idError = idError;
+    }
+
+    public String getRemesaPago() {
+        return remesaPago;
+    }
+
+    public void setRemesaPago(String remesaPago) {
+        this.remesaPago = remesaPago;
+    }
+
+    public int getEstadoPago() {
+        return estadoPago;
+    }
+
+    public void setEstadoPago(int estadoPago) {
+        this.estadoPago = estadoPago;
     }
 
 }

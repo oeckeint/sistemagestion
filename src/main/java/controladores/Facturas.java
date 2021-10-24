@@ -5,6 +5,9 @@ import datos.entity.Factura;
 import datos.interfaces.ClienteService;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.MasDeUnClienteEncontrado;
+import excepciones.NoEsUnNumeroException;
+import excepciones.RegistroVacioException;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,14 +25,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/facturas")
 public class Facturas {
-    
+
     @Autowired
     @Qualifier(value = "facturasServiceImp")
     private DocumentoXmlService documentoXmlService;
 
     @Autowired
     private ClienteService clienteService;
-    
+
     @GetMapping("")
     public String listar(Model model) {
         model.addAttribute("tituloPagina", Etiquetas.FACTURAS_TITULO_PAGINA);
@@ -49,7 +52,7 @@ public class Facturas {
         this.reiniciarVariables();
         return "xml/lista";
     }
-    
+
     @GetMapping("/detalles")
     public String verDetalles(@RequestParam("codFisFac") String codFisFac, Model model) {
         try {
@@ -71,7 +74,7 @@ public class Facturas {
         }
         return "redirect:/facturas";
     }
-    
+
     @PostMapping("/busqueda")
     public String buscarRegistros(@RequestParam("filtro") String filtro, @RequestParam("valor") String valor, Model model) throws MasDeUnClienteEncontrado {
         if (valor.isEmpty()) {
@@ -79,7 +82,7 @@ public class Facturas {
             return "redirect:/facturas";
         }
 
-        List<Factura> facturas = null;
+        List<Factura> facturas = new ArrayList<>();
         try {
             switch (filtro) {
                 case "cliente":
@@ -88,35 +91,47 @@ public class Facturas {
                 case "remesa":
                     facturas = this.documentoXmlService.buscarByRemesa(valor);
                     break;
+                case "codFisFac":
+                    facturas.add((Factura) this.documentoXmlService.buscarByCodFiscal(valor));
+                    break;
                 default:
                     Etiquetas.FACTURAS_MENSAJE = "El filtro <Strong>" + filtro + "</Strong> no es válido";
                     break;
             }
-            if (facturas.isEmpty()) {
-                Etiquetas.FACTURAS_MENSAJE = "No se encontro coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>";
+            
+            if (facturas.isEmpty() || facturas == null) {
+                Etiquetas.FACTURAS_MENSAJE = "No se encontró coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>.";
+                model.addAttribute("ultimaBusqueda", valor);
                 return "redirect:/facturas";
             }
-        } catch (Exception e) {
-            System.out.println("(facturas)" + e.getMessage());
-            Etiquetas.FACTURAS_MENSAJE = "No se encontro coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>";
+
+            model.addAttribute("tituloPagina", Etiquetas.FACTURAS_TITULO_PAGINA);
+            model.addAttribute("titulo", Etiquetas.FACTURAS_ENCABEZADO);
+            model.addAttribute("tablaTitulo", "Resultados");
+            model.addAttribute("mensaje", "Estos son los resultados que se encontraron con el valor de <Strong>" + valor + "</Strong> y el filtro de <Strong>" + filtro + "</Strong>.");
+            model.addAttribute("documentos", facturas);
+            model.addAttribute("documentoResumen", this.resumen(facturas));
+            model.addAttribute("totalRegistros", facturas.size());
+            model.addAttribute("ultimaBusqueda", valor);
+            model.addAttribute("controller", Etiquetas.FACTURAS_CONTROLLER);
             this.reiniciarVariables();
+            
+        } catch(NoEsUnNumeroException e){
+            Etiquetas.FACTURAS_MENSAJE = "El filtro de <Strong>Cliente</Strong> solo acepta valores numericos, revisar el valor ingresado <Strong>" + valor + "</Strong>";
+            return "redirect:/facturas";
+        } catch(RegistroVacioException e){
+            Etiquetas.FACTURAS_MENSAJE = "No se encontró coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>.";
+            return "redirect:/facturas";
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+            System.out.println("(facturas)" + e.getMessage());
+            Etiquetas.FACTURAS_MENSAJE = "Algo ah salido mal :( por favor reporte el bug o revise el log.";
             return "redirect:/facturas";
         }
-
-        model.addAttribute("tituloPagina", Etiquetas.PEAJES_TITULO_PAGINA);
-        model.addAttribute("titulo", Etiquetas.PEAJES_ENCABEZADO);
-        model.addAttribute("tablaTitulo", "Resultados");
-        model.addAttribute("mensaje", "Estos son los resultados que se encontraron con el valor de " + valor + " y el filtro de " + filtro);
-        model.addAttribute("documentos", facturas);
-        model.addAttribute("documentoResumen", this.resumen(facturas));
-        model.addAttribute("totalRegistros", facturas.size());
-        model.addAttribute("ultimaBusqueda", valor);
-        model.addAttribute("controller", Etiquetas.FACTURAS_CONTROLLER);
-        this.reiniciarVariables();
         return "xml/lista";
     }
-    
-    private Factura resumen(List<Factura> facturas) throws MasDeUnClienteEncontrado {
+
+    private Factura resumen(List<Factura> facturas) throws MasDeUnClienteEncontrado, RegistroVacioException {
         if (facturas.isEmpty()) {
             return null;
         }
@@ -126,6 +141,9 @@ public class Facturas {
         double impFac = 0.0;
 
         for (Factura p : facturas) {
+            if (p == null) {
+                throw new RegistroVacioException();
+            }
             impPot += p.getPotImpTot();
             impEneAct += p.getEaImpTot();
             impFac += p.getRfImpTot();
@@ -138,11 +156,11 @@ public class Facturas {
 
         return factura;
     }
-    
-    private void reiniciarVariables(){
+
+    private void reiniciarVariables() {
         Etiquetas.FACTURAS_MENSAJE = null;
         Etiquetas.FACTURAS_CONTENIDO_VISIBLE = null;
         Etiquetas.FACTURAS_ETIQUETA_TABLA_TITULO = null;
     }
-    
+
 }

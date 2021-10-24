@@ -1,6 +1,7 @@
 package datos.dao;
 
 import datos.entity.Factura;
+import excepciones.NoEsUnNumeroException;
 import java.util.List;
 import javax.persistence.NoResultException;
 import org.hibernate.SessionFactory;
@@ -48,11 +49,16 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
     }
 
     @Override
-    public List<Factura> buscarByIdCliente(String idCliente) {
-        return this.sessionFactory.getCurrentSession()
-                .createQuery("from Factura f where f.idCliente = :id order by f.idFactura desc", Factura.class)
-                .setParameter("id", Long.parseLong(idCliente))
-                .getResultList();
+    public List<Factura> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException {
+        try {
+            return this.sessionFactory.getCurrentSession()
+                    .createQuery("from Factura f where f.idCliente = :id order by f.idFactura desc", Factura.class)
+                    .setParameter("id", Long.parseLong(idCliente))
+                    .getResultList();
+        } catch (NumberFormatException e) {
+            System.out.println("(FacturasDAOImp) no se inserto un numero");
+            throw new NoEsUnNumeroException();
+        }
     }
 
     @Override

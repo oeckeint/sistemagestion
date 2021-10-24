@@ -2,6 +2,7 @@ package datos.service;
 
 import datos.entity.OtraFactura;
 import datos.interfaces.DocumentoXmlDao;
+import excepciones.NoEsUnNumeroException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,7 +46,7 @@ public class OtrasFacturasServiceImp implements datos.interfaces.DocumentoXmlSer
 
     @Override
     @Transactional
-    public List<OtraFactura> buscarByIdCliente(String idCliente) {
+    public List<OtraFactura> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException{
         return this.documentoXmlDao.buscarByIdCliente(idCliente);
     }
 

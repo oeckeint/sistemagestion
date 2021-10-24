@@ -12,6 +12,7 @@ import excepciones.CodRectNoExisteException;
 import excepciones.ErrorDesconocidoException;
 import excepciones.FacturaYaExisteException;
 import excepciones.MasDeUnClienteEncontrado;
+import excepciones.PeajeCodRectNoExisteException;
 import excepciones.PeajeTipoFacturaNoSoportadaException;
 import excepciones.XmlNoSoportado;
 import java.io.File;
@@ -42,11 +43,11 @@ public class ProcesamientoXml {
     @Autowired
     @Qualifier(value = "peajesServiceImp")
     private DocumentoXmlService contenidoXmlServicePeajes;
-    
+
     @Autowired
     @Qualifier(value = "facturasServiceImp")
     private DocumentoXmlService contenidoXmlServiceFacturas;
-    
+
     @Autowired
     @Qualifier(value = "otrasFacturasServiceImp")
     private DocumentoXmlService contenidoXmlServiceOtrasFacturas;
@@ -117,8 +118,9 @@ public class ProcesamientoXml {
     }
 
     /**
-     * Procesamiento de cada archivo individualmente y definición del flujo a seguir para insertar en la base de datos
-     * 
+     * Procesamiento de cada archivo individualmente y definición del flujo a
+     * seguir para insertar en la base de datos
+     *
      * @param archivo Archivo xml recibido
      * @param nombreArchivo Nombre del archivo xml recibido
      */
@@ -131,13 +133,15 @@ public class ProcesamientoXml {
             Document documento = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(documento);
             //Revision de la compatiblidad
-            if (documento.getElementsByTagName("MensajeFacturacion").getLength() == 0) {
+            if (documento.getElementsByTagName("MensajeFacturacion").getLength() == 0 || documento.getElementsByTagName("RemesaPago").getLength() == 0) {
                 throw new XmlNoSoportado();
             }
 
             //Revisa el nodo "Otras facturas" y en caso de que el valor sea mayor a 1 ejecutara la clase de Otras facturas
             if (documento.getElementsByTagName("OtrasFacturas").getLength() != 0) {
                 new ProcesarOtrasFacturas(documento, contenidoXmlServiceOtrasFacturas, clienteService, nombreArchivo);
+            } else if (documento.getElementsByTagName("RemesaPago").getLength() != 0) {
+                System.out.println("Procesar Remesa de pago...");
             } else if (is894) {
                 new ProcesarFactura(documento, contenidoXmlServiceFacturas, clienteService, nombreArchivo);
             } else {
@@ -145,8 +149,8 @@ public class ProcesamientoXml {
             }
             archivosCorrectos++;
 
-        } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado | 
-                MasDeUnClienteEncontrado | ArchivoVacioException e) {
+        } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado
+                | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException e) {
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
             utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         } catch (Exception e) {
@@ -167,7 +171,7 @@ public class ProcesamientoXml {
      * @return el archivo ya formateado y preparado para la lectura
      * @throws excepciones.ArchivoVacioException
      */
-    public Document prepareXml(File archivo, String nombreArchivo) throws ArchivoVacioException{
+    public Document prepareXml(File archivo, String nombreArchivo) throws ArchivoVacioException {
         Document doc = null;
         try {
             if (archivo.length() != 0) {
@@ -193,9 +197,13 @@ public class ProcesamientoXml {
      * @param doc es el archivo xml a tratar
      */
     private void initializarVariables(Document doc) {
-        this.empresaEmisora = Integer.parseInt(doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
-        if (this.empresaEmisora == 894) {
-            is894 = true;
+        try {
+            this.empresaEmisora = Integer.parseInt(doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
+            if (this.empresaEmisora == 894) {
+                is894 = true;
+            }
+        } catch (Exception e) {
+            System.out.println("No se encontro empresa Emisora en el archivo");
         }
     }
 

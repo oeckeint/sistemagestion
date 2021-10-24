@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import datos.interfaces.DocumentoXmlDao;
+import excepciones.NoEsUnNumeroException;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service
@@ -41,7 +42,7 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
 
     @Override
     @Transactional
-    public List<Peaje> buscarByIdCliente(String idCliente) {
+    public List<Peaje> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException{
         return this.documentoXmlDao.buscarByIdCliente(idCliente);
     }
 
@@ -163,6 +164,7 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
         
         peaje.setRfImpTot(peaje.getRfImpTot() * -1);
         peaje.setRfSalTotFac(peaje.getRfSalTotFac() * -1);
+        peaje.setEstadoPago(2);
         
         peaje.setComentarios(peaje.getComentarios() + "El archivo ha sido rectificado por la factura <Strong>" + nuevoNombreArchivo + "</Strong><br/>"
                 + "Se cambio la remensa <Strong>" + peaje.getRfIdRem() + "</Strong> por <Strong>" + nuevaRemesa + "</Strong>.");

@@ -7,14 +7,13 @@
         </head>
         <body>
         <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp"></jsp:include>
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <div class="container">
-                    <strong>${mensaje}</strong>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <div class="container">
+                <strong>${mensaje}</strong>
             </div>
         </div>
         <c:if test="${ documento != null }">
             <div class="container">
-
                 <div class="card row">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item"><h3>Comentarios</h3> ${documento.comentarios}</li>
@@ -28,7 +27,8 @@
 
                 <!--Primer Renglón-->
                 <hr>
-                <h2 class="display-4">Factura</h2>
+                <c:url var="lista" value="/${controller}"/>
+                <h2 class="display-4"><a href="${lista}"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura</h2>
                 <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
@@ -799,6 +799,8 @@
                                     <dt class="list-group-item px-1">FechaValor</dt>
                                     <dt class="list-group-item px-1">FechaLimite</dt>
                                     <dt class="list-group-item px-1">Remesa</dt>
+                                    <dt class="list-group-item px-1">Remesa pago</dt>
+                                    <dt class="list-group-item px-1">Estado pago</dt>
                                 </ul>
                             </div>
                             <div class="col-7">
@@ -809,12 +811,17 @@
                                     <li class="list-group-item px-1">${documento.rfFecVal}</li>
                                     <li class="list-group-item px-1">${documento.rfFecLimPag}</li>
                                     <li class="list-group-item px-1">${documento.rfIdRem}</li>
+                                    <li class="list-group-item px-1">${documento.remesaPago}</li>
+                                    <li class="list-group-item px-1">${documento.estadoPago}</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
+                    <c:url var="detalles" value="/clientes/detalles">
+                            <c:param name="idCliente" value="${cliente.idCliente}"/>
+                    </c:url>
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Cliente</h3>
+                        <h3 class="list-group-item list-group-item-action active text-center h4">Cliente <a href="${detalles}" class="btn btn-danger"><i class="fas fa-eye"></i></a></h3>
                         <div class="row">
                             <div class="col-5">
                                 <ul class="list-group list-group-flush text-right">

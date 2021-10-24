@@ -6,7 +6,9 @@ import excepciones.ClienteNoExisteException;
 import excepciones.CodRectNoExisteException;
 import excepciones.FacturaYaExisteException;
 import excepciones.MasDeUnClienteEncontrado;
+import excepciones.PeajeCodRectNoExisteException;
 import excepciones.PeajeTipoFacturaNoSoportadaException;
+import javax.persistence.NonUniqueResultException;
 import org.w3c.dom.Document;
 
 /**
@@ -16,7 +18,7 @@ import org.w3c.dom.Document;
 public class ProcesarPeaje extends xmlHelper {
 
     public ProcesarPeaje(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService, String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado {
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, NonUniqueResultException, PeajeCodRectNoExisteException {
         super(doc, contenidoXmlService, clienteService);
         super.procesarPeaje(nombreArchivo);
     }

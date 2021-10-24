@@ -80,6 +80,16 @@ public class Clientes {
         ClientesHelper.mensaje = ClientesHelper.FORMULARIO_EXITO_ELIMINAR + cups;
         return "redirect:/clientes";
     }
+    
+    @GetMapping("/detalles")
+    public String detalles(Model model, @RequestParam("idCliente") long idCliente) {
+        Cliente cliente = this.clienteService.encontrarId(idCliente);
+        model.addAttribute("tituloPagina", "Detalles cliente");
+        model.addAttribute("titulo", "Detalles Cliente");
+        model.addAttribute("mensaje", "Estos son los datos que se encontraron con el id de cliente " + idCliente);
+        model.addAttribute("cliente", cliente);
+        return "cliente/detalle_cliente";
+    }
 
 
 }

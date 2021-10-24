@@ -80,6 +80,12 @@ public class OtraFactura {
     
     @Column(name = "id_err")
     private String idErr;
+    
+    @Column(name = "remesa_pago")
+    private String remesaPago;
+    
+    @Column(name = "estado_pago")
+    private int estadoPago;
 
     public OtraFactura() {
     }
@@ -268,6 +274,22 @@ public class OtraFactura {
         this.idErr = idErr;
     }
 
+    public String getRemesaPago() {
+        return remesaPago;
+    }
+
+    public void setRemesaPago(String remesaPago) {
+        this.remesaPago = remesaPago;
+    }
+
+    public int getEstadoPago() {
+        return estadoPago;
+    }
+
+    public void setEstadoPago(int estadoPago) {
+        this.estadoPago = estadoPago;
+    }
+    
     @Override
     public String toString() {
         return "OtraFactura{" + "idOtraFactura=" + idOtraFactura + ", isDeleted=" + isDeleted + ", codEmpEmi=" + codEmpEmi + ", codEmpDes=" + codEmpDes + ", codPro=" + codPro + ", codPas=" + codPas + ", codSol=" + codSol + ", idCliente=" + idCliente + ", cups=" + cups + ", codFisFac=" + codFisFac + ", tipFac=" + tipFac + ", motFac=" + motFac + ", fecFac=" + fecFac + ", com=" + com + ", impTotFac=" + impTotFac + ", conRep=" + conRep + ", impTotConRep=" + impTotConRep + ", idRem=" + idRem + ", comDev=" + comDev + ", idErr=" + idErr + '}';

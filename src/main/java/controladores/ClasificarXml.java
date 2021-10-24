@@ -140,6 +140,8 @@ public class ClasificarXml {
                     //elementos[5] = this.LeerCodigoFactura(ruta); //CodigoFiscalFactura
 
                     switch (elementosXml.get("TipFac")) {
+                        case "A":
+                            subCarpeta += "\\A";
                         case "N":
                             switch (elementosXml.get("MotFac")) {
                                 case "01":
