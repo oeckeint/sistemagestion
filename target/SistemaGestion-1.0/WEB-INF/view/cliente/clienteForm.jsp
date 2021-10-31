@@ -35,25 +35,22 @@
                                 <div class="card-header">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <h4>${tablaTitulo} <strong>${cliente.cups}</strong></h4>
+                                            <h3><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> ${tablaTitulo} <strong>${cliente.cups}</strong></h3>
                                         </div>
                                         <div class="col-md-6"> 
-                                            <div class="row">
-                                                <div class="col">
-                                                    <a href="${pageContext.request.contextPath}/clientes" class="btn btn-primary btn-block"><i class="fas fa-arrow-left"></i> Regresar</a>                
-                                                </div>
-                                                <div class="col">
-                                                    <button type="submit" class="btn btn-success btn-block"><i class="fas fa-check"></i> Guardar</button>
-                                                </div>
+                                            <div class="row justify-content-end">
                                                 <c:if test="${showDelete.equals('y')}">
                                                     <c:url var="deleteLink" value="/clientes/eliminar">
                                                         <c:param name="idCliente" value="${cliente.idCliente}"/>
                                                         <c:param name="cups" value="${cliente.cups}"/>
                                                     </c:url>
-                                                    <div class="col">
+                                                    <div class="col-4">
                                                         <a href="${deleteLink}" class="btn btn-danger btn-block" onclick="return confirm('¿Eliminar registro?')"><i class="fas fa-times"></i> Eliminar</a>
                                                     </div>
                                                 </c:if>
+                                                <div class="col-4">
+                                                    <button type="submit" class="btn btn-success btn-block"><i class="fas fa-check"></i> Guardar</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -70,7 +67,9 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="tarifa">Tarifa</label>
-                                        <form:input path="tarifa" cssClass="form-control" required="true"></form:input>
+                                            <form:select path="tarifa" cssClass="custom-select" required="true">
+                                                <form:options items="${tarifas}" itemValue="nombreTarifa" itemLabel="nombreTarifa"></form:options>
+                                            </form:select>
                                         </div>
                                     </div>
                                 </div>

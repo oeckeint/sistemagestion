@@ -68,5 +68,10 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
                 .setParameter("remesa", remesa)
                 .getResultList();
     }
+    
+    @Override
+    public void actualizar(Factura documento) {
+        this.sessionFactory.getCurrentSession().update(documento);
+    }
 
 }

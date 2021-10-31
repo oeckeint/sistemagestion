@@ -62,6 +62,7 @@ public class Peajes {
             model.addAttribute("cliente", this.clienteService.encontrarCups(peaje.getCups()));
             model.addAttribute("mensaje", "Se muestra el registro con el cod factura <Strong>" + codFisFac + "</Strong>");
             model.addAttribute("controller", "peajes");
+            model.addAttribute("ultimaBusqueda", codFisFac);
             this.reiniciarVariables();
             return "xml/detalle";
         } catch (Exception e) {
@@ -87,18 +88,17 @@ public class Peajes {
                     peajes = this.documentoXmlService.buscarByRemesa(valor);
                     break;
                 case "codFisFac":
-                    peajes.add((Peaje) this.documentoXmlService.buscarByCodFiscal(valor));
-                    break;
+                    return "redirect:/peajes/detalles?codFisFac=" + valor;
                 default:
                     Etiquetas.PEAJES_MENSAJE = "El filtro <Strong>" + filtro + "</Strong> no es válido";
                     break;
             }
-            
+
             if (peajes.isEmpty() || peajes == null) {
                 Etiquetas.PEAJES_MENSAJE = "No se encontró coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>.";
                 return "redirect:/peajes";
             }
-            
+
             model.addAttribute("tituloPagina", Etiquetas.PEAJES_TITULO_PAGINA);
             model.addAttribute("titulo", Etiquetas.PEAJES_ENCABEZADO);
             model.addAttribute("tablaTitulo", "Resultados");
@@ -109,11 +109,11 @@ public class Peajes {
             model.addAttribute("ultimaBusqueda", valor);
             model.addAttribute("controller", Etiquetas.PEAJES_CONTROLLER);
             this.reiniciarVariables();
-            
-        } catch(NoEsUnNumeroException e){
-            Etiquetas.PEAJES_MENSAJE = "El filtro de <Strong>Cliente</Strong> solo acepta valores numericos, revisar el valor ingresado <Strong>" + valor + "</Strong>";
+
+        } catch (NoEsUnNumeroException e) {
+            Etiquetas.PEAJES_MENSAJE = "El filtro de <Strong>Cliente</Strong> solo acepta valores enteros, revisar el valor ingresado <Strong>" + valor + "</Strong>";
             return "redirect:/peajes";
-        } catch(RegistroVacioException e){
+        } catch (RegistroVacioException e) {
             Etiquetas.FACTURAS_MENSAJE = "No se encontró coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>.";
             return "redirect:/facturas";
         } catch (Exception e) {
@@ -122,9 +122,9 @@ public class Peajes {
             Etiquetas.PEAJES_MENSAJE = "Algo ah salido mal :( por favor reporte el bug o revise el log.";
             return "redirect:/peajes";
         }
-        
+
         return "xml/lista";
-        
+
     }
 
     private Peaje resumen(List<Peaje> peajes) throws MasDeUnClienteEncontrado, RegistroVacioException {
@@ -152,8 +152,8 @@ public class Peajes {
 
         return peaje;
     }
-    
-    private void reiniciarVariables(){
+
+    private void reiniciarVariables() {
         Etiquetas.PEAJES_MENSAJE = null;
         Etiquetas.PEAJES_CONTENIDO_VISIBLE = null;
         Etiquetas.PEAJES_ETIQUETA_TABLA_TITULO = null;

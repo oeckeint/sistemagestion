@@ -173,4 +173,10 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
         this.documentoXmlDao.guardar(peaje);
     }
 
+    @Override
+    @Transactional
+    public void actualizar(Peaje documento) {
+        this.documentoXmlDao.actualizar(documento);
+    }
+
 }

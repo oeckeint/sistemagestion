@@ -24,6 +24,11 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
     public void guardar(Peaje documento) {
         this.sessionFactory.getCurrentSession().save(documento);
     }
+    
+    @Override
+    public void actualizar(Peaje documento) {
+        this.sessionFactory.getCurrentSession().update(documento);
+    }
 
     @Override
     public void eliminar(long id) {

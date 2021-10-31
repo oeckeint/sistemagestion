@@ -4,6 +4,7 @@ import controladores.helper.Etiquetas;
 import controladores.helper.ProcesarFactura;
 import controladores.helper.ProcesarOtrasFacturas;
 import controladores.helper.ProcesarPeaje;
+import controladores.helper.ProcesarRemesaPago;
 import datos.interfaces.ClienteService;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.ArchivoVacioException;
@@ -60,6 +61,7 @@ public class ProcesamientoXml {
     List<String> archivosErroneos;
     private int empresaEmisora;
     private boolean is894;
+    private boolean isRemesaPago;
 
     /**
      * Muestra el fomulario que procesa los archivos
@@ -133,15 +135,17 @@ public class ProcesamientoXml {
             Document documento = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(documento);
             //Revision de la compatiblidad
-            if (documento.getElementsByTagName("MensajeFacturacion").getLength() == 0 || documento.getElementsByTagName("RemesaPago").getLength() == 0) {
-                throw new XmlNoSoportado();
+            if (!isRemesaPago) {
+                if (documento.getElementsByTagName("MensajeFacturacion").getLength() == 0) {
+                    throw new XmlNoSoportado();
+                }
             }
 
             //Revisa el nodo "Otras facturas" y en caso de que el valor sea mayor a 1 ejecutara la clase de Otras facturas
             if (documento.getElementsByTagName("OtrasFacturas").getLength() != 0) {
                 new ProcesarOtrasFacturas(documento, contenidoXmlServiceOtrasFacturas, clienteService, nombreArchivo);
-            } else if (documento.getElementsByTagName("RemesaPago").getLength() != 0) {
-                System.out.println("Procesar Remesa de pago...");
+            } else if (isRemesaPago) {
+                new ProcesarRemesaPago(documento, contenidoXmlServicePeajes);
             } else if (is894) {
                 new ProcesarFactura(documento, contenidoXmlServiceFacturas, clienteService, nombreArchivo);
             } else {
@@ -203,7 +207,7 @@ public class ProcesamientoXml {
                 is894 = true;
             }
         } catch (Exception e) {
-            System.out.println("No se encontro empresa Emisora en el archivo");
+            this.isRemesaPago = doc.getElementsByTagName("RemesaPago").item(0).getTextContent().length() != 0;
         }
     }
 

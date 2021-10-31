@@ -1,4 +1,5 @@
 datos\dao\FacturaDaoImp.class
+datos\dao\TarifaDaoImp.class
 dominio\componentesxml\DocumentoXml.class
 dominio\componentesxml\DatosEnergiaActiva.class
 dominio\componentesxml\CargoImporteTotal.class
@@ -6,6 +7,7 @@ dominio\componentesxml\DatosAeLecturaHasta.class
 dominio\Lectura.class
 controladores\OtrasFacturas.class
 excepciones\MasDeUnClienteEncontrado.class
+datos\interfaces\CrudDao.class
 dominio\otrasfactuas\DocumentoOtraFactura.class
 dominio\Distribuidora.class
 dominio\otrasfactuas\DatosGeneralesFactura.class
@@ -24,6 +26,7 @@ dominio\componentesxml\ReactivaImporteTotal.class
 dominio\procesamientoxml\PotenciaAFacturar.class
 controladores\ControlXmlFacturas.class
 excepciones\CodRectNoExisteException.class
+datos\service\TarifasServiceImp.class
 controladores\Inicio.class
 dominio\componentesxml\DatosGeneralesFactura.class
 datos\entity\ClienteContrato.class
@@ -49,6 +52,7 @@ datos\dao\OtrasFacturasDaoImp.class
 excepciones\FacturaYaExisteException.class
 dominio\componentesxml\DatosRLecturaDesde.class
 datos\dao\DatosFacturaDao.class
+datos\entity\Tarifa.class
 datos\dao\PeajesImp.class
 dominio\componentesxml\DatosIva.class
 datos\service\ClienteServiceImp.class
@@ -83,6 +87,7 @@ controladores\Facturas.class
 utileria\texto\Cadenas.class
 excepciones\ClienteNoExisteException.class
 datos\service\FacturasServiceImp.class
+controladores\helper\ProcesarRemesaPago.class
 dominio\componentesxml\DatosExcesoPotencia.class
 dominio\componentesxml\DatosPmConsumo.class
 controladores\helper\Etiquetas.class

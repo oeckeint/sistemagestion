@@ -5,6 +5,7 @@ import datos.entity.Cliente;
 import datos.interfaces.ClienteService;
 import excepciones.ArchivoNoCumpleParaSerClasificado;
 import excepciones.ArchivoVacioException;
+import excepciones.ClienteNoExisteException;
 import excepciones.ErrorDesconocidoException;
 import excepciones.MasDeUnClienteEncontrado;
 import java.io.BufferedReader;
@@ -96,13 +97,16 @@ public class ClasificarXml {
 
     private void procesar(File archivo, String ruta) {
         try {
+            elementosXml.clear();
             Document doc = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(doc);
             this.cliente = this.clienteService.encontrarCups(elementosXml.get("cups"));
             if (this.cliente != null) {
                 this.generarXML(this.nombreArchivo, ruta);
+            } else {
+                throw new ClienteNoExisteException(elementosXml.get("cups"));
             }
-        } catch (MasDeUnClienteEncontrado | ArchivoNoCumpleParaSerClasificado | ArchivoVacioException e) {
+        } catch (MasDeUnClienteEncontrado | ArchivoNoCumpleParaSerClasificado | ArchivoVacioException | ClienteNoExisteException e) {
             this.archivosErroneos.add("El archivo <Strong>" + this.nombreArchivo + "</Strong> no se clasificó porque " + e.getMessage());
             utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         } catch (Exception e) {
@@ -125,8 +129,23 @@ public class ClasificarXml {
             elementosXml.put("codSol", doc.getElementsByTagName("CodigoDeSolicitud").item(0).getTextContent());
             elementosXml.put("codPas", doc.getElementsByTagName("CodigoDePaso").item(0).getTextContent());
         } catch (NullPointerException e) {
-            throw new ArchivoNoCumpleParaSerClasificado(); 
+            elementosXml.clear();
+            System.out.println("Parece no ser un archivo de peaje, se intentará revisar si es MensajeAceptacionModificacionDeATR");
+            this.inicializarVariables2(doc);
        }
+    }
+    
+    private void inicializarVariables2(Document doc) throws ArchivoNoCumpleParaSerClasificado{
+        try {
+            elementosXml.put("cups", doc.getElementsByTagName("CUPS").item(0).getTextContent());
+            elementosXml.put("empEmi", doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
+            elementosXml.put("empDes", doc.getElementsByTagName("CodigoREEEmpresaDestino").item(0).getTextContent());
+            elementosXml.put("codPro", doc.getElementsByTagName("CodigoDelProceso").item(0).getTextContent());
+            elementosXml.put("codSol", doc.getElementsByTagName("CodigoDeSolicitud").item(0).getTextContent());
+            elementosXml.put("codPas", doc.getElementsByTagName("CodigoDePaso").item(0).getTextContent());
+        } catch (NullPointerException e) {
+            throw new ArchivoNoCumpleParaSerClasificado();
+        }
     }
 
     private void generarXML(String nombreArchivoOriginal, String ruta) {
@@ -183,8 +202,10 @@ public class ClasificarXml {
                 case "C2":
                 case "A3":
                 case "B1":
-                case "R1":
                     subCarpeta = "X";
+                    break;
+                case "R1":
+                    subCarpeta = "R1";
                     break;
                 default:
                     subCarpeta = "Otros";

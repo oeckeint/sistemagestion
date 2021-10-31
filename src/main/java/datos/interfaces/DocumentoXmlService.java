@@ -19,4 +19,6 @@ public interface DocumentoXmlService<T> {
     
     public void rectificar(T documento, String nuevaRemesa, String nuevoNombreArchivo);
     
+    public void actualizar(T documento);
+    
 }

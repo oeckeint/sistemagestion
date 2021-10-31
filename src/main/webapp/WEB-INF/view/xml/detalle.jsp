@@ -14,11 +14,41 @@
         </div>
         <c:if test="${ documento != null }">
             <div class="container">
+                <hr>
+                <div class="row justify-content-between p-0">
+                    <div class="col-6">
+                        <h2 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura</h2>
+                    </div>
+                    <div class="col-6 row justify-content-end">
+                        <div class="col-3">
+                            <a href="${pageContext.request.contextPath}/clasificar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Clasificar</a>
+                        </div>
+                        <div class="col-3">
+                            <a href="${pageContext.request.contextPath}/procesar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Procesar</a>
+                        </div>
+                        <div class="col-5">
+                            <form action="${pageContext.request.contextPath}/${controller}/busqueda" method="post" id="myForm">
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <button class="btn btn-primary" type="submit" id="btnSubmit"><i class="fas fa-search"></i></button>
+                                    </div>
+                                    <input type="text"  name="valor" class="form-control" id="inlineFormInputGroup" placeholder="Buscar" value="${ultimaBusqueda}" required>
+                                    <select class="form-select fa" name="filtro">
+                                        <option class="fa" value="cliente">&#xf007;</option>
+                                        <option class="fa" value="remesa">&#xf621;</option>
+                                        <option class="fa" value="codFisFac" selected="true">&#xf15c;</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <hr>
                 <div class="card row">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item"><h3>Comentarios</h3> ${documento.comentarios}</li>
                             <c:choose>
-                                <c:when test="${ documento.idError != 0}">
+                                <c:when test="${ documento.idError != '0'}">
                                 <li class="list-group-item"><h5>Se encontraron errores importantes</h5> Revisar codigos:  <Strong>${documento.idError}</strong></li>
                                     </c:when>
                                 </c:choose>
@@ -26,9 +56,6 @@
                 </div>
 
                 <!--Primer Renglón-->
-                <hr>
-                <c:url var="lista" value="/${controller}"/>
-                <h2 class="display-4"><a href="${lista}"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura</h2>
                 <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">

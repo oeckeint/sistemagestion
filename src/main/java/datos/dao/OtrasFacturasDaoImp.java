@@ -67,5 +67,10 @@ public class OtrasFacturasDaoImp implements datos.interfaces.DocumentoXmlDao<Otr
                 .setParameter("remesa", remesa)
                 .getResultList();
     }
+
+    @Override
+    public void actualizar(OtraFactura documento) {
+        this.sessionFactory.getCurrentSession().update(documento);
+    }
     
 }

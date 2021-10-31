@@ -9,6 +9,8 @@ public interface DocumentoXmlDao<T> {
     
     public void guardar(T documento);
     
+    public void actualizar(T documento);
+    
     public void eliminar(long id);
     
     public T buscarByCodFiscal(String cod);

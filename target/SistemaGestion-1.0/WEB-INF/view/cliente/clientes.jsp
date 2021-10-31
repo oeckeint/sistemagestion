@@ -25,18 +25,32 @@
         </div>
 
         <div class="container">
+            <hr>
             <div class="row">
-                <div class="col-md-12">
-                    <div class="row py-4 align-items-center">
+                <div class="col-12">
+                    <div class="row justify-content-between p-0">
                         <div class="col-md-12 col-lg-5">
-                            <h2>Listado de clientes <span class="badge badge-success">${totalClientes}</span></h2>
+                            <h2 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> Listado de clientes <span class="badge badge-success">${totalClientes}</span></h2>
                         </div>
-                        <div class="col col-lg-3">
-                            <a href="${pageContext.request.contextPath}/clientes/formulario" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Agregar</a>
+                        <div class="col-6 row  justify-content-end">
+                            <div class="col-3">
+                                <a href="${pageContext.request.contextPath}/clientes/formulario" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Agregar</a>
+                            </div>
+                            <div class="col-5">
+                                <form action="${pageContext.request.contextPath}/clientes/busqueda" method="post" id="myForm">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-primary" type="submit" id="btnSubmit"><i class="fas fa-search"></i></button>
+                                        </div>
+                                        <input type="text"  name="valor" class="form-control" id="inlineFormInputGroup" placeholder="Buscar id cliente" value="${ultimaBusqueda}" required>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <hr>
 
             <table class="table table-bordered text-center table-fluid" id="myTable">
                 <thead class="thead-dark">

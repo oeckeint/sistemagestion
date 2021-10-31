@@ -13,6 +13,12 @@ import java.util.ArrayList;
 import org.w3c.dom.*;
 import utileria.texto.Cadenas;
 import datos.interfaces.DocumentoXmlService;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.NonUniqueResultException;
 import utileria.StringHelper;
 
@@ -32,12 +38,80 @@ public class xmlHelper {
     private String EmpresaEmisora;
     private String tarifaAtrFac;
     private String nombreArchivo;
+    private String codigoRemesa;
 
     public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService) {
         this.doc = doc;
         this.contenidoXmlService = contenidoXmlService;
         this.clienteService = clienteService;
         this.iniciarVariables();
+    }
+
+    public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService) {
+        this.doc = doc;
+        this.contenidoXmlService = contenidoXmlService;
+        this.iniciarVariablesPagoRemesa();
+    }
+
+    /**
+     * Busca la remesa con c
+     */
+    public void procesarRemesaPago() {
+        try {
+            datosRemesaPago();
+        } catch (ParseException ex) {
+            System.out.println("Exception");
+        }
+    }
+
+    public void datosRemesaPago() throws ParseException {
+        HashMap<String, String> elementos = new HashMap<String, String>();
+
+        NodeList flowList = doc.getElementsByTagName("Factura");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "CodigoFiscalFactura":
+                            elementos.put("codFisFac", childList.item(j).getTextContent().trim());
+                            this.EmpresaEmisora = childList.item(j).getTextContent().trim();
+                            break;
+                        case "Importe":
+                            elementos.put("Importe", childList.item(j).getTextContent().trim());
+                            break;
+                        case "Estado":
+                            elementos.put("Estado", childList.item(j).getTextContent().trim());
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            
+            Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(elementos.get("codFisFac"));
+            if (peaje != null) {
+                if (peaje.getEstadoPago() == 0) {
+                    NumberFormat nf = NumberFormat.getInstance(Locale.FRANCE);
+                    double importe = (double) nf.parse(elementos.get("Importe"));
+                    System.out.println(importe);
+                    System.out.println(peaje.getRfImpTot());
+                    if (importe != peaje.getRfImpTot()) {
+                        peaje.setRemesaPago(this.codigoRemesa);
+                        peaje.setEstadoPago(1);
+                        this.contenidoXmlService.actualizar(peaje);
+                        System.out.println("Se encontro un registro con la factura de " + elementos.get("codFisFac"));
+                    } else {
+                        System.out.println("El importe total del peaje " + peaje.getRfImpTot() + " no coincide con el indicado en el archivo "  + elementos.get("Importe"));
+                    }
+                } else {
+                    System.out.println("El peaje tiene el estado de " + peaje.getEstadoPago() + " por lo que no se pudo procesar");
+                }
+            } else {
+                System.out.println("No se encontró una factura con el codFisFac " + elementos.get("codFisFac"));
+            }
+        }
     }
 
     /**
@@ -240,9 +314,10 @@ public class xmlHelper {
             throw new CodRectNoExisteException(codFactura);
         }
     }
-    
+
     /**
-     * Registra el Peaje de tipo A poniendo en negativo los valores de AE, R, PM y los importes totales
+     * Registra el Peaje de tipo A poniendo en negativo los valores de AE, R, PM
+     * y los importes totales
      */
     private void registrarPeajeNA() throws MasDeUnClienteEncontrado {
         this.contenidoXmlService.guardar(
@@ -304,7 +379,6 @@ public class xmlHelper {
     }
 
     /*------------------------Registro de Otras Facturas--------------------------------------*/
-    
     /**
      * Registra OtrasFacturas
      */
@@ -319,7 +393,7 @@ public class xmlHelper {
         System.out.print("\n\nComentarios : " + comentarios.toString());
         System.out.print("Codigo Errores : " + errores.toString());
     }
-    
+
     /*------------------------Obtencion de datos --------------------------------------*/
     private DatosCabecera cabecera() {
         elementos = new ArrayList<String>(7);
@@ -695,7 +769,7 @@ public class xmlHelper {
         this.imprimirResultado("potenciaImporteTotal", elementos);
         return new DatosPotenciaImporteTotal(elementos);
     }
-    
+
     private DatosPotenciaImporteTotal potenciaImporteTotal_A() {
 
         //Obtiene 1 elemento denomidado ImporteTotalTerminoPotencia en el nodo Potencia
@@ -715,7 +789,7 @@ public class xmlHelper {
                         continuar = false;
                         break;
                     } else {
-                        elementos.add(indicePeriodo++, - Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                        elementos.add(indicePeriodo++, -Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -933,7 +1007,7 @@ public class xmlHelper {
         this.imprimirResultado("energiaActivaImporteTotal", elementos);
         return new DatosEnergiaActivaImporteTotal(elementos);
     }
-    
+
     private DatosEnergiaActivaImporteTotal energiaActivaImporteTotal_A() {
         //Obtiene 1 elemento denomidado ImporteTotalEnergiaActiva en el nodo EnergiaActiva
         elementos = new ArrayList<Double>(1);
@@ -953,7 +1027,7 @@ public class xmlHelper {
                         this.agregarError("9");
                         break;
                     } else {
-                        elementos.set(indice++, - Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                        elementos.set(indice++, -Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -1134,7 +1208,7 @@ public class xmlHelper {
         this.imprimirResultado("TotalImporteTipoCargo02", elementos);
         return new CargoImporteTotal(elementos);
     }
-    
+
     //Cargos - A
     private Cargos Cargos01_A() {
 
@@ -1166,7 +1240,7 @@ public class xmlHelper {
                         tipoCargo = tipoCargo.getPreviousSibling();
                     }
                     if (tipoCargo.getTextContent().equals("01")) {
-                        elementos.set(indice++, - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                        elementos.set(indice++, -Double.parseDouble(childList.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -1208,7 +1282,7 @@ public class xmlHelper {
                     }
 
                     if (tipoCargo.getTextContent().equals("01")) {
-                        elementos.set(indice++, - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                        elementos.set(indice++, -Double.parseDouble(childList.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -1250,7 +1324,7 @@ public class xmlHelper {
                         tipoCargo = tipoCargo.getPreviousSibling();
                     }
                     if (tipoCargo.getTextContent().equals("02")) {
-                        elementos.set(indice++, - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                        elementos.set(indice++, -Double.parseDouble(childList.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -1292,7 +1366,7 @@ public class xmlHelper {
                     }
 
                     if (tipoCargo.getTextContent().equals("02")) {
-                        elementos.set(indice++, - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                        elementos.set(indice++, -Double.parseDouble(childList.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -3058,7 +3132,6 @@ public class xmlHelper {
         return new DatosPmLecturaHasta(elementos);
     }
 
-    
     //AE - A (Negactivos)
     private DatosAeConsumo aeConsumo_A() {
 
@@ -3643,7 +3716,7 @@ public class xmlHelper {
                             case "14":
                                 if (!"0".equals(defPeriodo)) {
                                     continuar = false;
-                                    elementos.set(0, - Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                    elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
                                 }
                                 break;
                             //Tarifas del tipo 4,6
@@ -3656,11 +3729,11 @@ public class xmlHelper {
                                     String periodo = sibling4.getTextContent().substring(0, 1);
                                     switch (periodo) {
                                         case "1":
-                                            elementos.set(0, - Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
                                             continuar = false;
                                             break;
                                         case "3":
-                                            elementos.set(0, - Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
                                             continuar = false;
                                             break;
                                     }
@@ -3671,7 +3744,7 @@ public class xmlHelper {
                                     //En caso de que no coincida, buscará un elemento con la terminación de con una terminacion diferente de cero y termina el proceso
                                     if (!"0".equals(defPeriodo)) {
                                         continuar = false;
-                                        elementos.set(0, - Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                        elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
                                     }
                                 }
                                 break;
@@ -3680,7 +3753,7 @@ public class xmlHelper {
                             case "5":
                                 if ("0".equals(defPeriodo)) {
                                     continuar = false;
-                                    elementos.set(0, - Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                    elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
                                 }
                                 break;
                             default:
@@ -3777,7 +3850,7 @@ public class xmlHelper {
                             case "14":
                                 if (!"0".equals(defPeriodo)) {
                                     continuar = false;
-                                    elementos.set(0, - Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                    elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
                                 }
                                 break;
                             //Tarifas del tipo 4,6
@@ -3790,11 +3863,11 @@ public class xmlHelper {
                                     String periodo = sibling4.getTextContent().substring(0, 1);
                                     switch (periodo) {
                                         case "1":
-                                            elementos.set(0, - Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
                                             continuar = false;
                                             break;
                                         case "3":
-                                            elementos.set(0, - Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                            elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
                                             continuar = false;
                                             break;
                                     }
@@ -3805,7 +3878,7 @@ public class xmlHelper {
                                     //En caso de que no coincida, buscará un elemento con la terminación de con una terminacion diferente de cero y termina el proceso
                                     if (!"0".equals(defPeriodo)) {
                                         continuar = false;
-                                        elementos.set(0, - Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                        elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
                                     }
                                 }
                                 break;
@@ -3814,7 +3887,7 @@ public class xmlHelper {
                             case "5":
                                 if ("0".equals(defPeriodo)) {
                                     continuar = false;
-                                    elementos.set(0, - Integer.parseInt(childList.item(j).getTextContent().trim()));
+                                    elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
                                 }
                                 break;
                             default:
@@ -4354,7 +4427,7 @@ public class xmlHelper {
         if (this.doc.getElementsByTagName("ImporteTotalEnergiaReactiva").getLength() != 0) {
             elementos.add(
                     String.valueOf(
-                            - Double.parseDouble(
+                            -Double.parseDouble(
                                     this.doc.getElementsByTagName("ImporteTotalEnergiaReactiva").item(0).getTextContent()
                             )
                     )
@@ -4712,7 +4785,7 @@ public class xmlHelper {
         this.imprimirResultado("pmLecturaHasta_A", elementos);
         return new DatosPmLecturaHasta(elementos);
     }
-    
+
     //RegistroFin
     private DatosFinDeRegistro registroFin() {
 
@@ -4764,14 +4837,14 @@ public class xmlHelper {
         this.imprimirResultado("registroFin", elementos);
         return new DatosFinDeRegistro(elementos);
     }
-    
+
     //Concepto Repercutible
-    private ConceptoRepercutible conceptoRepercutible(){
-        
+    private ConceptoRepercutible conceptoRepercutible() {
+
         elementos = new ArrayList<String>(2);
         elementos.add("");
         elementos.add("");
-        
+
         NodeList flowList = this.doc.getElementsByTagName("ConceptoRepercutible");
         for (int i = 0; i < flowList.getLength(); i++) {
             NodeList childList = flowList.item(i).getChildNodes();
@@ -4822,6 +4895,10 @@ public class xmlHelper {
         this.codFactura = this.doc.getElementsByTagName("CodigoFiscalFactura").item(0).getTextContent();
         this.empEmi = Integer.parseInt(this.doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
         this.tipoFactura = this.doc.getElementsByTagName("TipoFactura").item(0).getTextContent();
+    }
+
+    private void iniciarVariablesPagoRemesa() {
+        this.codigoRemesa = this.doc.getElementsByTagName("CodigoRemesa").item(0).getTextContent();
     }
 
     /*--------------------------Utilidades---------------------------*/

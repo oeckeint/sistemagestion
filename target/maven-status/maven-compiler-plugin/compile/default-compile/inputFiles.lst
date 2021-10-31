@@ -4,6 +4,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\Cliente.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\MasDeUnClienteEncontrado.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRConsumo.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaImporteTotal.java
+C:\NetBeansProjects\sistemagestion\src\main\java\datos\entity\Tarifa.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeProcedenciaDesde.java
 C:\NetBeansProjects\sistemagestion\src\main\java\utileria\texto\Cadenas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\ConceptoRepercutible.java
@@ -14,11 +15,14 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPot
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\FacturaDaoImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\entity\OtraFactura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\Etiquetas.java
+C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\TarifaDaoImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPotenciaAFacturar.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\DatosGeneralesFactura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Inicio.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarRemesaPago.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\ClienteDaoImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosFacturaAtr.java
+C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\CrudDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Facturas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\DocumentoXmlDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\procesamientoxml\PotenciaAFacturar.java
@@ -49,6 +53,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\datos\service\ClienteServiceImp
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\DistribuidoraDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\utileria\StringHelper.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\service\PeajesServiceImp.java
+C:\NetBeansProjects\sistemagestion\src\main\java\datos\service\TarifasServiceImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\Cargos.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\LecturaDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\utilidades.java
