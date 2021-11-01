@@ -14,22 +14,46 @@
         </div>
             <c:if test="${ documento != null }">
             <div class="container">
-                
+                <hr>
+                <div class="row justify-content-between p-0">
+                    <div class="col-6">
+                        <h2 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura <span class="badge badge-danger">Improved!</span></h2>
+                    </div>
+                    <div class="col-6 row justify-content-end">
+                        <div class="col-3">
+                            <a href="${pageContext.request.contextPath}/clasificar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Clasificar</a>
+                        </div>
+                        <div class="col-3">
+                            <a href="${pageContext.request.contextPath}/procesar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Procesar</a>
+                        </div>
+                        <div class="col-5">
+                            <form action="${pageContext.request.contextPath}/${controller}/busqueda" method="post" id="myForm">
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <button class="btn btn-primary" type="submit" id="btnSubmit"><i class="fas fa-search"></i></button>
+                                    </div>
+                                    <input type="text"  name="valor" class="form-control" id="inlineFormInputGroup" placeholder="Buscar" value="${ultimaBusqueda}" required>
+                                    <select class="form-select fa" name="filtro">
+                                        <option class="fa" value="cliente">&#xf007;</option>
+                                        <option class="fa" value="remesa">&#xf621;</option>
+                                        <option class="fa" value="codFisFac" selected="true">&#xf15c;</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <hr>
                 <div class="card row">
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><h3>Comentarios</h3> ${documento.comentarios}</li>
-                    <c:choose>
-                                <c:when test="${ documento.idError != 0}">
-                                <li class="list-group-item"><h5>Se encontraron errores importantes</h5> Revisar codigos:  <Strong>${documento.idError}</strong></li>
-                        </c:when>
-                    </c:choose>
+                        <li class="list-group-item"><h3>Comentarios</h3> ${documento.com}</li>
+                        <c:if test="${documento.idErr != ''}">
+                            <li class="list-group-item"><h5>Se encontraron errores importantes</h5> Revisar codigos:  <Strong>${documento.idErr}</strong></li>
+                        </c:if>
                     </ul>
                 </div>
                          
                 <!--Primer Renglón-->
-                <hr>
-                <h2 class="display-4">Factura</h2>
-                <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
                         <h3 class="list-group-item list-group-item-action active text-center h4">Cabecera</h3>
@@ -46,12 +70,12 @@
                         </div>
                         <div class="col-8 col-md-7">
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item px-1">${documento.cabecera.codEmpEmi}</li>
-                                <li class="list-group-item px-1">${documento.cabecera.codEmpDes}</li>
-                                <li class="list-group-item px-1">${documento.cabecera.codPro}</li>
-                                <li class="list-group-item px-1">${documento.cabecera.codPas}</li>
-                                <li class="list-group-item px-1">${documento.cabecera.codSol}</li>
-                                <li class="list-group-item px-1">${documento.cabecera.cups}</li>
+                                <li class="list-group-item px-1">${documento.codEmpEmi}</li>
+                                <li class="list-group-item px-1">${documento.codEmpDes}</li>
+                                <li class="list-group-item px-1">${documento.codPro}</li>
+                                <li class="list-group-item px-1">${documento.codPas}</li>
+                                <li class="list-group-item px-1">${documento.codSol}</li>
+                                <li class="list-group-item px-1">${documento.cups}</li>
                             </ul>
                         </div>
                         </div>
@@ -62,21 +86,21 @@
                             <div class="col-5">
                             <ul class="list-group list-group-flush text-right">
                                 <dt class="list-group-item px-1">CodFiscal</dt>
+                                <dt class="list-group-item px-1">ImporteTotal</dt>
                                 <dt class="list-group-item px-1">TipoFactura</dt>
                                 <dt class="list-group-item px-1">Motivo</dt>
                                 <dt class="list-group-item px-1">Fecha</dt>
-                                <dt class="list-group-item px-1">Comentarios</dt>
                                 <dt class="list-group-item px-1">ImpTotal</dt>
                             </ul>
                         </div>
                         <div class="col-7">
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item px-1">${documento.datosGeneralesFactura.codFisFac}</li>
-                                <li class="list-group-item px-1">${documento.datosGeneralesFactura.tipFac}</li>
-                                <li class="list-group-item px-1">${documento.datosGeneralesFactura.motFac}</li>
-                                <li class="list-group-item px-1">${documento.datosGeneralesFactura.fecFac}</li>
-                                <li class="list-group-item px-1">${documento.datosGeneralesFactura.com}</li>
-                                <li class="list-group-item px-1">${documento.datosGeneralesFactura.impTotFac}</li>                              
+                                <li class="list-group-item px-1">${documento.codFisFac}</li>
+                                <li class="list-group-item px-1">${documento.impTotFac}</li>
+                                <li class="list-group-item px-1">${documento.tipFac}</li>
+                                <li class="list-group-item px-1">${documento.motFac}</li>
+                                <li class="list-group-item px-1">${documento.fecFac}</li>
+                                <li class="list-group-item px-1">${documento.rfImpTot}</li>                              
                             </ul>
                         </div>
                         </div>
@@ -92,8 +116,8 @@
                         </div>
                         <div class="col-7">
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item px-1">${documento.conceptoRepercutible.conRep}</li>
-                                <li class="list-group-item px-1">${documento.conceptoRepercutible.impTot}</li>
+                                <li class="list-group-item px-1">${documento.conRep}</li>
+                                <li class="list-group-item px-1">${documento.impTotConRep}</li>
                             </ul>
                         </div>
                         </div>
@@ -104,22 +128,29 @@
                 <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Excesos Potencia</h3>
+                        <h3 class="list-group-item list-group-item-action active text-center h4">Fin Registro</h3>
                         <div class="row">
                             <div class="col-5">
                             <ul class="list-group list-group-flush text-right">
                                 <dt class="list-group-item px-1">Remesa</dt>
+                                <dt class="list-group-item px-1">Remesa pago</dt>
+                                <dt class="list-group-item px-1">Estado pago</dt>
                             </ul>
                         </div>
                         <div class="col-7">
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item px-1">${documento.registroFin.idRemesa}</li>
+                                <li class="list-group-item px-1">${documento.idRem}</li>
+                                <li class="list-group-item px-1">${documento.remesaPago}</li>
+                                <li class="list-group-item px-1">${documento.estadoPago}</li>
                             </ul>
                         </div>
                         </div>
                     </div>
+                    <c:url var="detalles" value="/clientes/detalles">
+                            <c:param name="idCliente" value="${cliente.idCliente}"/>
+                    </c:url>
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                            <h3 class="list-group-item list-group-item-action active text-center h4">Cliente</h3>
+                            <h3 class="list-group-item list-group-item-action active text-center h4">Cliente <a href="${detalles}" class="btn btn-danger"><i class="fas fa-eye"></i></a> <span class="badge badge-danger">New!</span></h3>
                             <div class="row">
                             <div class="col-5">
                                 <ul class="list-group list-group-flush text-right">
@@ -131,10 +162,10 @@
                             </div>
                                 <div class="col-7">
                                     <ul class="list-group list-group-flush">
-                                        <li class="list-group-item px-1">${documento.cliente.idCliente}</li>
-                                        <li class="list-group-item px-1">${documento.cliente.cups}</li>
-                                        <li class="list-group-item px-1">${documento.cliente.nombreCliente}</li>
-                                        <li class="list-group-item px-1">${documento.cliente.tarifa}</li>
+                                        <li class="list-group-item px-1">${cliente.idCliente}</li>
+                                        <li class="list-group-item px-1">${cliente.cups}</li>
+                                        <li class="list-group-item px-1">${cliente.nombreCliente}</li>
+                                        <li class="list-group-item px-1">${cliente.tarifa}</li>
                                     </ul>
                                 </div>
                             </div>

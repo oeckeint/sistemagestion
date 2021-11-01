@@ -22,9 +22,9 @@
                                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
                                     <li><a class="dropdown-item" href="${pageContext.request.contextPath}/peajes">Peajes</a></li>
                                     <li><a class="dropdown-item" href="${pageContext.request.contextPath}/facturas">Facturas</a></li>
-                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/otrasfacturas">Otras Facturas</a></li>
-                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/clasificar">Clasificar</a></li>
-                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/procesar">Procesar</a></li>
+                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/otrasfacturas">Otras Facturas <span class="badge badge-danger">Fixed!</span></a></li>
+                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/clasificar">Clasificar <span class="badge badge-danger">Fixed!</span></a></li>
+                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/procesar">Procesar <span class="badge badge-danger">New!</span></a></li>
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">

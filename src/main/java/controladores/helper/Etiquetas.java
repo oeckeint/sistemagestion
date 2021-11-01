@@ -58,4 +58,18 @@ public class Etiquetas {
     public static String CLASIFICAR_FORMULARIO_CONTROLLER = "clasificar";
     public static String CLASIFICAR_FORMULARIO_ETIQUETA_BOTON = "Clasificar";
     
+    //configuraciones
+    public static String CONFIGURACIONES__ICONO = "<i class=\"fas fa-cogs\"></i>";
+    public static String CONFIGURACIONES__TITULO_PAGINA = "Configuraciones";
+    public static String CONFIGURACIONES__ENCABEZADO = CONFIGURACIONES__ICONO + " " + CONFIGURACIONES__TITULO_PAGINA;
+    public static String CONFIGURACIONES__MENSAJE = "Utilidades y configuraciones para el funcionamiento de la aplicación";
+    
+    //configuraciones/formulario
+    public static String RESTAURAR_DB_FORMULARIO_ICONO = "<i class=\"fas fa-file-import\"></i>";
+    public static String RESTAURAR_DB_FORMULARIO_TITULO_PAGINA = "Restaurar DB";
+    public static String RESTAURAR_DB_FORMULARIO_ENCABEZADO = RESTAURAR_DB_FORMULARIO_ICONO + " " + RESTAURAR_DB_FORMULARIO_TITULO_PAGINA;
+    public static String RESTAURAR_DB_FORMULARIO_MENSAJE = "<i class=\"fas fa-exclamation-circle\"></i> ¡ATENCIÓN! esta a punto de reemplazar todos los datos existentes de la base de datos.";
+    public static String RESTAURAR_DB_FORMULARIO_CONTROLLER = "configuraciones";
+    public static String RESTAURAR_DB_FORMULARIO_ETIQUETA_BOTON = "Restaurar";
+    
 }

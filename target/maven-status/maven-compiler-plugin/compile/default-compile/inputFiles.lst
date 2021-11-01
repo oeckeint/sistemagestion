@@ -19,9 +19,9 @@ C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\TarifaDaoImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPotenciaAFacturar.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\DatosGeneralesFactura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Inicio.java
-C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarRemesaPago.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\ClienteDaoImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosFacturaAtr.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\TablaBusquedaNoExisteException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\CrudDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Facturas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\DocumentoXmlDao.java
@@ -59,12 +59,15 @@ C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\LecturaDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\utilidades.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosImpuestoElectrico.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarFactura.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarRemesaPagoPeaje.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarRemesaPagoOtrasFacturas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ArchivoVacioException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaPrecio.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\DocumentoXmlService.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\DatosFacturaDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeLecturaDesde.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\ConceptoRepercutible.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarRemesaPagoFactura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\OtrasFacturas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Peajes.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\RegistroFin.java

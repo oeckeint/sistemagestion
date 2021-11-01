@@ -4,7 +4,9 @@ import controladores.helper.Etiquetas;
 import controladores.helper.ProcesarFactura;
 import controladores.helper.ProcesarOtrasFacturas;
 import controladores.helper.ProcesarPeaje;
-import controladores.helper.ProcesarRemesaPago;
+import controladores.helper.ProcesarRemesaPagoFactura;
+import controladores.helper.ProcesarRemesaPagoOtrasFacturas;
+import controladores.helper.ProcesarRemesaPagoPeaje;
 import datos.interfaces.ClienteService;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.ArchivoVacioException;
@@ -15,6 +17,7 @@ import excepciones.FacturaYaExisteException;
 import excepciones.MasDeUnClienteEncontrado;
 import excepciones.PeajeCodRectNoExisteException;
 import excepciones.PeajeTipoFacturaNoSoportadaException;
+import excepciones.TablaBusquedaNoExisteException;
 import excepciones.XmlNoSoportado;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -145,7 +148,21 @@ public class ProcesamientoXml {
             if (documento.getElementsByTagName("OtrasFacturas").getLength() != 0) {
                 new ProcesarOtrasFacturas(documento, contenidoXmlServiceOtrasFacturas, clienteService, nombreArchivo);
             } else if (isRemesaPago) {
-                new ProcesarRemesaPago(documento, contenidoXmlServicePeajes);
+                String tablaBusqueda = documento.getElementsByTagName("TablaBusqueda").item(0).getTextContent();
+                switch(tablaBusqueda){
+                    case "contenido_xml":
+                        new ProcesarRemesaPagoPeaje(documento, contenidoXmlServicePeajes);
+                        break;
+                    case "contenido_xml_factura":
+                        new ProcesarRemesaPagoFactura(documento, contenidoXmlServiceFacturas);
+                        break;
+                    case "contenido_xml_otras_facturas":
+                        new ProcesarRemesaPagoOtrasFacturas(documento, contenidoXmlServiceOtrasFacturas);
+                        break;
+                    default:
+                        throw new TablaBusquedaNoExisteException(tablaBusqueda);
+                }
+                //new ProcesarRemesaPago(documento, contenidoXmlServicePeajes);
             } else if (is894) {
                 new ProcesarFactura(documento, contenidoXmlServiceFacturas, clienteService, nombreArchivo);
             } else {
@@ -154,7 +171,7 @@ public class ProcesamientoXml {
             archivosCorrectos++;
 
         } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado
-                | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException e) {
+                | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException | TablaBusquedaNoExisteException e) {
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
             utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         } catch (Exception e) {
@@ -219,6 +236,8 @@ public class ProcesamientoXml {
         this.archivosCorrectos = 0;
         this.archivosTotales = 0;
         this.archivosErroneos = new ArrayList<>();
+        this.is894 = false;
+        this.isRemesaPago = false;
     }
 
 }

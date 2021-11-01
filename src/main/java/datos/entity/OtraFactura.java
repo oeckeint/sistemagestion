@@ -51,6 +51,9 @@ public class OtraFactura {
     @Column(name = "cod_fis_fac")
     private String codFisFac;
     
+    @Column(name = "imp_tot_fac")
+    private double impTotFac;
+    
     @Column(name = "tip_fac")
     private String tipFac;
     
@@ -63,8 +66,8 @@ public class OtraFactura {
     @Column(name = "com")
     private String com;
     
-    @Column(name = "imp_tot_fac")
-    private double impTotFac;
+    @Column(name = "rf_imp_tot")
+    private double rfImpTot;
     
     @Column(name = "con_rep")
     private String conRep;
@@ -102,11 +105,12 @@ public class OtraFactura {
         this.codSol = datosCabecera.getCodigoDeSolicitud();
         this.cups = datosCabecera.getCups();
         this.codFisFac = datosGeneralesFactura.getCodigoFiscalFactura();
+        this.impTotFac = datosGeneralesFactura.getImpTotFac();
         this.tipFac = datosGeneralesFactura.getTipoFactura();
         this.motFac = datosGeneralesFactura.getMotivoFacturacion();
         this.fecFac = datosGeneralesFactura.getFechaFactura();
         this.com = comentarios;
-        this.impTotFac = datosFinDeRegistro.getImporteTotal();
+        this.rfImpTot = datosFinDeRegistro.getImporteTotal();
         this.conRep = conceptoRepercutible.getConRep();
         this.impTotConRep = conceptoRepercutible.getImpTotConRep();
         this.idRem = datosFinDeRegistro.getIdRemesa();
@@ -190,6 +194,14 @@ public class OtraFactura {
         return codFisFac;
     }
 
+    public double getImpTotFac() {
+        return impTotFac;
+    }
+
+    public void setImpTotFac(double impTotFac) {
+        this.impTotFac = impTotFac;
+    }
+
     public void setCodFisFac(String codFisFac) {
         this.codFisFac = codFisFac;
     }
@@ -226,12 +238,12 @@ public class OtraFactura {
         this.com = com;
     }
 
-    public double getImpTotFac() {
-        return impTotFac;
+    public double getRfImpTot() {
+        return rfImpTot;
     }
 
-    public void setImpTotFac(double impTotFac) {
-        this.impTotFac = impTotFac;
+    public void setRfImpTot(double rfImpTot) {
+        this.rfImpTot = rfImpTot;
     }
 
     public String getConRep() {
@@ -289,10 +301,10 @@ public class OtraFactura {
     public void setEstadoPago(int estadoPago) {
         this.estadoPago = estadoPago;
     }
-    
+
     @Override
     public String toString() {
-        return "OtraFactura{" + "idOtraFactura=" + idOtraFactura + ", isDeleted=" + isDeleted + ", codEmpEmi=" + codEmpEmi + ", codEmpDes=" + codEmpDes + ", codPro=" + codPro + ", codPas=" + codPas + ", codSol=" + codSol + ", idCliente=" + idCliente + ", cups=" + cups + ", codFisFac=" + codFisFac + ", tipFac=" + tipFac + ", motFac=" + motFac + ", fecFac=" + fecFac + ", com=" + com + ", impTotFac=" + impTotFac + ", conRep=" + conRep + ", impTotConRep=" + impTotConRep + ", idRem=" + idRem + ", comDev=" + comDev + ", idErr=" + idErr + '}';
+        return "OtraFactura{" + "idOtraFactura=" + idOtraFactura + ", isDeleted=" + isDeleted + ", codEmpEmi=" + codEmpEmi + ", codEmpDes=" + codEmpDes + ", codPro=" + codPro + ", codPas=" + codPas + ", codSol=" + codSol + ", idCliente=" + idCliente + ", cups=" + cups + ", codFisFac=" + codFisFac + ", tipFac=" + tipFac + ", motFac=" + motFac + ", fecFac=" + fecFac + ", com=" + com + ", rfImpTot=" + rfImpTot + ", conRep=" + conRep + ", impTotConRep=" + impTotConRep + ", idRem=" + idRem + ", comDev=" + comDev + ", idErr=" + idErr + ", remesaPago=" + remesaPago + ", estadoPago=" + estadoPago + '}';
     }
     
 }

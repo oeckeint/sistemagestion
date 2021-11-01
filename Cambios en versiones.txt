@@ -1,5 +1,34 @@
+V0.5.5
+**NOVEDADES**
+*Se implemento la nueva funcionalidad de pagoDeRemesa a traves de la lectura de archivos xml para marcar el pago de remesas de manera dinamica en las 3 tablas
+*Nueva categoria de configuraciones!
+    Ahora es mucho más facil el proceso de Respaldo y Restauración de Base de datos con archivos .sql con su formulario correspondiente
+    La carpeta de destino se encuentra dentro de la carpeta de Peajes
+*Se integro la funcionalidad de revisión de la existencia de carpetas, en proximas actualizaciones se harán todas de forma automatica
+*Se agregaron el campo impTotFac en las 3 tablas de los registros xml
+
+**BUGS**
+*Se arreglo el bug que no encontraba el cups cuando tenia más de 20 caracteres
+*Ahora se muestra correctamente la vista de "otras facturas" y sus filtros funcionan
+*Se arreglo del detalle de la no clasificacion de algunos archivos xml que no coincidian con las caracteristicas de Peajes
+
+V0.5.4
+
+*Se agrego un reloj digital 
+*Se agregaron nuevos botones para la vista detallada de los clientes junto con nuevas tablas
+*Se agrego un dropdown de tarifas para hacer más facil el registro de un cliente
+*Se agregaron los campos de remesa pago y status en las 3 tablas de los registros xml
+*Nuevos filtro de busqueda (CodFisFac) para 2 de las 3 vistas (contenido_xml contenido_xml_facturas)
+*Mejoras en la navegación entre vistas y filtros de busqueda con la implementación de dropdowns y colores
+*Se puede acceder desde la vista de un registro xml a el detalle del cliente
+
+V0.5.1
+Migración de glassfish 5 a Tomcat 9
+
+V0.5
+Migración exitosa a Spring Framework y Hibernate
+
 V0.4.2.3
-aa
 Se corrgió la lectura de los nodos de impTotCargos 01-02 que apuntaba a null al revisar nodos previos
 
 **Novedades**

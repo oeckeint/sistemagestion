@@ -27,17 +27,18 @@
         </div>
 
         <div class="container">
-            <div class="row align-items-center py-3">
+            <hr>
+            <div class="row justify-content-between p-0">
 
                 <div class="col-6">
-                    <h2 class="m-0"><i class="fas fa-list"></i> ${tablaTitulo} <span class="badge badge-success">${totalRegistros}</span></h2>
+                    <h2 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> ${tablaTitulo} <span class="badge badge-success">${totalRegistros}</span></h2>
                 </div>
 
-                <div class="col-6 row">
-                    <div class="col">
+                <div class="col-6 row justify-content-end">
+                    <div class="col-3">
                         <a href="${pageContext.request.contextPath}/clasificar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Clasificar</a>
                     </div>
-                    <div class="col">
+                    <div class="col-3">
                         <a href="${pageContext.request.contextPath}/procesar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Procesar</a>
                     </div>
                     <c:choose>
@@ -45,7 +46,7 @@
 
                         </c:when>
                         <c:otherwise>
-                            <div class="col">
+                            <div class="col-5">
                                 <form action="${pageContext.request.contextPath}/${controller}/busqueda" method="post" id="myForm">
                                     <div class="input-group mb-2">
                                         <div class="input-group-prepend">
@@ -65,6 +66,7 @@
                 </div>
 
             </div>
+            <hr>
             <c:choose>
                 <c:when test="${contenidoVisible == 'no' }">
 
@@ -86,10 +88,10 @@
                             <c:if test="${documentoResumen != null}">
                                 <tr>
                                     <td>-R</td>
-                                    <td>${documentoResumen.cliente.idCliente}</td>
-                                    <td>${documentoResumen.cabecera.cups}</td>
+                                    <td>${documentoResumen.idCliente}</td>
+                                    <td>${documentoResumen.cups}</td>
                                     <td>--</td>
-                                    <td>${documentoResumen.datosGeneralesFactura.impTotFac}</td>
+                                    <td>${documentoResumen.impTotFac}</td>
                                     <td>--</td>
                                     <td>--</td>
                                 </tr>
@@ -98,13 +100,16 @@
                                 <c:url var="detalles" value="/${controller}/detalles">
                                     <c:param name="codFisFac" value="${documento.codFisFac}"/>
                                 </c:url>
+                                <c:url var="detallesCliente" value="/clientes/detalles">
+                                    <c:param name="idCliente" value="${documento.idCliente}"/>
+                                </c:url>
                                 <tr>
                                     <td>${id.count}</td>
-                                    <td>${documento.cliente.idCliente}</td>
-                                    <td>${documento.cliente.cups}</td>
-                                    <td>${documento.datosGeneralesFactura.codFisFac}</td>
-                                    <td>${documento.datosGeneralesFactura.impTotFac}</td>
-                                    <td>${documento.registroFin.idRemesa}</td>
+                                    <td><a href="${detallesCliente}" class="btn btn-success">${documento.idCliente}</i></a></td>
+                                    <td>${documento.cups}</td>
+                                    <td>${documento.codFisFac}</td>
+                                    <td>${documento.impTotFac}</td>
+                                    <td>${documento.idRem}</td>
                                     <td><a href="${detalles}" class="btn btn-danger"><i class="fas fa-eye"></i></a></td>
                                 </tr>
                             </c:forEach>

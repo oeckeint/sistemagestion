@@ -47,6 +47,9 @@ public class Peaje {
     @Column(name = "codigo_fiscal_factura")
     private String codFisFac;
 
+    @Column(name = "imp_tot_fac")
+    private double impTotFac;
+    
     @Column(name = "tipo_factura")
     private String tipFac;
 
@@ -487,6 +490,7 @@ public class Peaje {
 
         //DatosGeneralesFactura
         this.codFisFac = datosGeneralesFactura.getCodigoFiscalFactura();
+        this.impTotFac = datosGeneralesFactura.getImpTotFac();
         this.tipFac = datosGeneralesFactura.getTipoFactura();
         this.motFac = datosGeneralesFactura.getMotivoFacturacion();
         this.codFacRecAnu = datosGeneralesFactura.getCodigoFacturaRectificadaAnulada();
@@ -744,6 +748,14 @@ public class Peaje {
 
     public void setCodFisFac(String codFisFac) {
         this.codFisFac = codFisFac;
+    }
+
+    public double getImpTotFac() {
+        return impTotFac;
+    }
+
+    public void setImpTotFac(double impTotFac) {
+        this.impTotFac = impTotFac;
     }
 
     public String getTipFac() {

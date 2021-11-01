@@ -4,6 +4,7 @@ import java.util.List;
 
 public class DatosGeneralesFactura {
     private String codigoFiscalFactura, tipoFactura, motivoFacturacion, codigoFacturaRectificadaAnulada, fechaFactura;
+    private double impTotFac;
 
     public DatosGeneralesFactura() {
     }
@@ -14,6 +15,7 @@ public class DatosGeneralesFactura {
         this.motivoFacturacion = datosGenerales.get(2);
         this.codigoFacturaRectificadaAnulada = datosGenerales.get(3);
         this.fechaFactura = datosGenerales.get(4);
+        this.impTotFac = Double.parseDouble(datosGenerales.get(5));
     }
 
     public String getCodigoFiscalFactura() {
@@ -35,8 +37,14 @@ public class DatosGeneralesFactura {
     public String getFechaFactura() {
         return fechaFactura;
     }
-    
-    
+
+    public double getImpTotFac() {
+        return impTotFac;
+    }
+
+    public void setImpTotFac(double impTotFac) {
+        this.impTotFac = impTotFac;
+    }
 
     @Override
     public String toString() {

@@ -30,7 +30,7 @@ public class ClienteDaoImp implements datos.interfaces.ClienteDao {
     @Override
     public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado{
         try {
-            return (Cliente) sessionFactory.getCurrentSession().createQuery("from Cliente c where c.cups = :cups").setParameter("cups", cups).getSingleResult();
+            return (Cliente) sessionFactory.getCurrentSession().createQuery("from Cliente c where c.cups like :cups").setParameter("cups", "%"+cups.substring(0, 20)+"%").getSingleResult();
         } catch (NoResultException e) {
             return null;
         } catch (NonUniqueResultException e){

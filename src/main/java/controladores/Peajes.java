@@ -115,7 +115,7 @@ public class Peajes {
             return "redirect:/peajes";
         } catch (RegistroVacioException e) {
             Etiquetas.FACTURAS_MENSAJE = "No se encontró coincidencia con el filtro de <Strong>" + filtro + "</Strong> y el valor de <Strong>" + valor + "</Strong>.";
-            return "redirect:/facturas";
+            return "redirect:/peajes";
         } catch (Exception e) {
             e.printStackTrace(System.out);
             System.out.println("(Peajes-controlador)" + e.getMessage());

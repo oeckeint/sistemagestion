@@ -67,6 +67,7 @@ public class OtrasFacturas {
             model.addAttribute("cliente", this.clienteService.encontrarCups(factura.getCups()));
             model.addAttribute("mensaje", "Se muestra el registro con el cod factura <Strong>" + codFisFac + "</Strong>");
             model.addAttribute("controller", Etiquetas.OTRAS_FACTURAS_CONTROLLER);
+            model.addAttribute("ultimaBusqueda", codFisFac);
             this.reiniciarVariables();
             return "xml/detalle_otras_facturas";
         } catch (Exception e) {
@@ -92,8 +93,7 @@ public class OtrasFacturas {
                     facturas = this.documentoXmlService.buscarByRemesa(valor);
                     break;
                 case "codFisFac":
-                    facturas.add((OtraFactura) this.documentoXmlService.buscarByCodFiscal(valor));
-                    break;
+                    return "redirect:/otrasfacturas/detalles?codFisFac=" + valor;
                 default:
                     Etiquetas.OTRAS_FACTURAS_MENSAJE = "El filtro <Strong>" + filtro + "</Strong> no es válido";
                     break;
