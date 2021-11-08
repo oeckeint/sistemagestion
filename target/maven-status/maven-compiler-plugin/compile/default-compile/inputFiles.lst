@@ -5,6 +5,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\MasDeUnClienteEncon
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRConsumo.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaImporteTotal.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\entity\Tarifa.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\FTP.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeProcedenciaDesde.java
 C:\NetBeansProjects\sistemagestion\src\main\java\utileria\texto\Cadenas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\ConceptoRepercutible.java
@@ -56,10 +57,10 @@ C:\NetBeansProjects\sistemagestion\src\main\java\datos\service\PeajesServiceImp.
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\service\TarifasServiceImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\Cargos.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\LecturaDao.java
-C:\NetBeansProjects\sistemagestion\src\main\java\controladores\utilidades.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosImpuestoElectrico.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarFactura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarRemesaPagoPeaje.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Configuraciones.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarRemesaPagoOtrasFacturas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ArchivoVacioException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaPrecio.java
@@ -88,6 +89,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\datos\entity\ClienteContrato.ja
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\ReactivaImporteTotal.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosGeneralesFactura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRLecturaHasta.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ErrorAlConectarConElServidorException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPmConsumo.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ClienteNoExisteException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\procesamientoxml\ResultadoArchivoXML.java
@@ -102,4 +104,5 @@ C:\NetBeansProjects\sistemagestion\src\main\java\datos\service\FacturasServiceIm
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosCabecera.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosIva.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ErrorDesconocidoException.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\CredencialesIncorrectasException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\DocumentoOtraFactura.java

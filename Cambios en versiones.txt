@@ -1,3 +1,11 @@
+V0.5.6
+**NOVEDADES**
+Se ha implementado la funcion de FTP para subir archivos creando sus vistas y procesamiento correspondiente
+
+**BUGS**
+Se ha detectado una excepcion al procesar las remesas que son numeros LONG en lugar de int
+Se ha detectado una exception al leer valores Double en conceptos repercutibles en archivos "OtrasFacturas"
+
 V0.5.5
 **NOVEDADES**
 *Se implemento la nueva funcionalidad de pagoDeRemesa a traves de la lectura de archivos xml para marcar el pago de remesas de manera dinamica en las 3 tablas

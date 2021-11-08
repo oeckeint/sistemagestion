@@ -17,7 +17,7 @@
                 <hr>
                 <div class="row justify-content-between p-0">
                     <div class="col-6">
-                        <h2 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura <span class="badge badge-danger">Improved!</span></h2>
+                        <h2 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura</h2>
                     </div>
                     <div class="col-6 row justify-content-end">
                         <div class="col-3">
@@ -150,7 +150,7 @@
                             <c:param name="idCliente" value="${cliente.idCliente}"/>
                     </c:url>
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                            <h3 class="list-group-item list-group-item-action active text-center h4">Cliente <a href="${detalles}" class="btn btn-danger"><i class="fas fa-eye"></i></a> <span class="badge badge-danger">New!</span></h3>
+                            <h3 class="list-group-item list-group-item-action active text-center h4">Cliente <a href="${detalles}" class="btn btn-danger"><i class="fas fa-eye"></i></a></h3>
                             <div class="row">
                             <div class="col-5">
                                 <ul class="list-group list-group-flush text-right">

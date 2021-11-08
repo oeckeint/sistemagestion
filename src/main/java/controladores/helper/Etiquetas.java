@@ -72,4 +72,12 @@ public class Etiquetas {
     public static String RESTAURAR_DB_FORMULARIO_CONTROLLER = "configuraciones";
     public static String RESTAURAR_DB_FORMULARIO_ETIQUETA_BOTON = "Restaurar";
     
+    //FTP
+    public static String FTP_FORMULARIO_ICONO = "<i class=\"fas fa-file-import\"></i>";
+    public static String FTP_FORMULARIO_TITULO_PAGINA = "FTP";
+    public static String FTP_FORMULARIO_ENCABEZADO = FTP_FORMULARIO_ICONO + " " + FTP_FORMULARIO_TITULO_PAGINA;
+    public static String FTP_FORMULARIO_MENSAJE = "Archivos para subir al servidor FTP, dependiendo del tamaño de los archivos la acción podría tardar un tiempo.";
+    public static String FTP_FORMULARIO_ETIQUETA_BOTON = "Subir";
+    
+    
 }

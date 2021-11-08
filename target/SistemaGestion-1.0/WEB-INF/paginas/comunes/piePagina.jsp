@@ -3,7 +3,7 @@
     <div class="container">
         <div class="row justify-content-md-between">
             <div class="col-4">
-                <p class="lead text-center">Copyright &COPY; DevWorkshop 2021 V0.5.5</p>
+                <p class="lead text-center">Copyright &COPY; DevWorkshop 2021 V0.5.6</p>
             </div>
             <div class="col-3">
                 <p id="reloj" class="lead text-center bg-secondary"></p>

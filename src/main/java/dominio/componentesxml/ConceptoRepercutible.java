@@ -16,7 +16,7 @@ public class ConceptoRepercutible {
 
     public ConceptoRepercutible(List<String> datos) {
         this.conRep = datos.get(0);
-        this.impTotConRep = Double.parseDouble(datos.get(1));
+        this.impTotConRep = Double.parseDouble(String.valueOf(datos.get(1)));
     }
 
     public String getConRep() {

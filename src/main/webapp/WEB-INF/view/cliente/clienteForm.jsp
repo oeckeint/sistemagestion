@@ -67,16 +67,16 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="tarifa">Tarifa</label>
-                                            <form:select path="tarifa" cssClass="custom-select" required="true">
-                                                <form:options items="${tarifas}" itemValue="nombreTarifa" itemLabel="nombreTarifa"></form:options>
-                                            </form:select>
-                                        </div>
+                                        <form:select path="tarifa" cssClass="custom-select" required="true">
+                                            <form:options items="${tarifas}" itemValue="nombreTarifa" itemLabel="nombreTarifa"></form:options>
+                                        </form:select>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
         </form:form>
 
         <!--Footer-->

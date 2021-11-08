@@ -378,7 +378,7 @@ public class xmlHelper {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
         if (peaje != null) {
-            String nuevaRemesa = StringHelper.toInteger(this.doc.getElementsByTagName("IdRemesa").item(0).getTextContent()).toString();
+            String nuevaRemesa = String.valueOf(Long.parseLong(this.doc.getElementsByTagName("IdRemesa").item(0).getTextContent()));
             contenidoXmlService.rectificar(peaje, nuevaRemesa, nombreArchivo);
             this.registrarPeajeN();
         } else {
@@ -4936,8 +4936,8 @@ public class xmlHelper {
     private ConceptoRepercutible conceptoRepercutible() {
 
         elementos = new ArrayList<String>(2);
-        elementos.add("");
-        elementos.add("");
+        elementos.add("0.0");
+        elementos.add("0.0");
 
         NodeList flowList = this.doc.getElementsByTagName("ConceptoRepercutible");
         for (int i = 0; i < flowList.getLength(); i++) {
@@ -4950,7 +4950,7 @@ public class xmlHelper {
                             elementos.set(0, childList.item(j).getTextContent().trim());
                             break;
                         case "ImporteTotalConceptoRepercutible":
-                            elementos.set(1, Double.parseDouble(childList.item(j).getTextContent().trim()) + ((Double) elementos.get(1)));
+                            elementos.set(1, Double.parseDouble(childList.item(j).getTextContent().trim()) + (Double.parseDouble(elementos.get(1).toString())));
                             break;
                         default:
                             break;
