@@ -55,12 +55,12 @@ public class ArchivoTexto {
     private static String momentoActual() {
         return new SimpleDateFormat("<dd/MM/yyyy HH:mm:ss> ").format(new Date());
     }
-    
-    private static String identificarAdvertencia(String cod){
+
+    private static String identificarAdvertencia(String cod) {
 
         StringBuilder advertencia = new StringBuilder("¡ADVERTENCIA! (" + cod + ") - ");
 
-        switch(cod){
+        switch (cod) {
             case "1":
                 advertencia.append("Se encontraron más de 12 valores de <PotenciaContratada>");
                 break;
@@ -138,6 +138,12 @@ public class ArchivoTexto {
                 break;
             case "26":
                 advertencia.append("Se encontraró más de 1 TotalImporteTipoCargo en el tipo de cargo 02");
+                break;
+            case "27":
+                advertencia.append("Se encontraró más de 6 ValorEnergiaExcedentaria");
+                break;
+            case "28":
+                advertencia.append("Los valores de EnergiaExcedentaria no corresponden con el total");
                 break;
             default:
                 advertencia.append("No se reconoce la advertencia con el código, contacte con el adminstrador del sistema");

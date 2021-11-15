@@ -1,3 +1,10 @@
+V0.5.6.1
+*Novedades*
+6 Nuevos campos de energia excedentaria para PEAJES incluyendo lectura, validaciones, vista(solo en caso de existir)creacion de nueva tabla en sql y sus relaciones
+
+**BUGS**
+Se esta trabjando sobre la funcionalida de FTP para configurar la compatibilidad con el servidor sobre internet
+
 V0.5.6
 **NOVEDADES**
 Se ha implementado la funcion de FTP para subir archivos creando sus vistas y procesamiento correspondiente

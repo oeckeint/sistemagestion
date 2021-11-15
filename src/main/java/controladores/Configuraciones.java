@@ -41,7 +41,8 @@ public class Configuraciones {
         String rutaRespaldoDefault = "C:\\Peajes\\Backups\\" + this.momentoActual() + ".sql";
 
         //Revisión de que exista el directorio de Backups de lo contrario lo creará
-        Process p = Runtime.getRuntime().exec("mysqldump -u root -padmin sge");
+        Process p = Runtime.getRuntime().exec("C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump -u root -padmin sge");
+        //Process p = Runtime.getRuntime().exec("mysqldump -u root -padmin sge");
         InputStream is = p.getInputStream();
         FileOutputStream fos = new FileOutputStream(rutaRespaldoDefault);
 
@@ -73,7 +74,8 @@ public class Configuraciones {
     public String restaurarDB(@RequestParam("archivosql") MultipartFile file, Model model) throws IOException {
         File f = new File("C:\\Peajes\\Backups\\HistorialDeRestauraciones\\" + file.getOriginalFilename());
         file.transferTo(f);
-        Process p = Runtime.getRuntime().exec("mysql -u root -padmin sge");
+        Process p = Runtime.getRuntime().exec("C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysql -u root -padmin sge");
+        //Process p = Runtime.getRuntime().exec("mysql -u root -padmin sge");
         OutputStream os = p.getOutputStream();
         FileInputStream fis = new FileInputStream("C:\\Peajes\\Backups\\HistorialDeRestauraciones\\" + file.getOriginalFilename());
 

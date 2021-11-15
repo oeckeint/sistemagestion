@@ -29,10 +29,10 @@ public class ClientesHelper {
     public static final String FORMULARIO_EXITO_ELIMINAR = "Se ha eliminado exitosamente el cliente con el cups ";
 
     public static final List<String> TARIFAS = Arrays.asList(
-            "T20A", "T21A", "T20DHA", "T21DHA", "T20TD",
-            "T30A", "T31A", "T30TD",
-            "T61A", "T62A",
-            "T61TD", "T62TD"
+            "20A", "21A", "20DHA", "21DHA", "20TD",
+            "30A", "31A", "30TD",
+            "61A", "62A",
+            "61TD", "62TD"
     );
 
     public static final boolean validarCliente(Cliente cliente) {

@@ -1,11 +1,14 @@
 package datos.entity;
 
 import dominio.componentesxml.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -463,6 +466,10 @@ public class Peaje {
     
     @Column(name = "estado_pago")
     private int estadoPago;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_energia_excedentaria")
+    private EnergiaExcedentaria energiaExcedentaria;
 
     public Peaje() {
     }
@@ -1860,6 +1867,14 @@ public class Peaje {
 
     public void setEstadoPago(int estadoPago) {
         this.estadoPago = estadoPago;
+    }
+
+    public EnergiaExcedentaria getEnergiaExcedentaria() {
+        return energiaExcedentaria;
+    }
+
+    public void setEnergiaExcedentaria(EnergiaExcedentaria energiaExcedentaria) {
+        this.energiaExcedentaria = energiaExcedentaria;
     }
     
 }

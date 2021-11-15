@@ -1,6 +1,7 @@
 package controladores.helper;
 
 import datos.entity.Cliente;
+import datos.entity.EnergiaExcedentaria;
 import datos.entity.Factura;
 import datos.entity.OtraFactura;
 import datos.entity.Peaje;
@@ -37,6 +38,7 @@ public class xmlHelper {
     private String tarifaAtrFac;
     private String nombreArchivo;
     private String codigoRemesa;
+    private boolean existeEnergiaExcedentaria;
 
     public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService) {
         this.doc = doc;
@@ -103,7 +105,7 @@ public class xmlHelper {
             System.out.println("Exception");
         }
     }
-    
+
     public void procesarRemesaPagoFactura() {
         try {
             HashMap<String, String> elementos = new HashMap<String, String>();
@@ -153,7 +155,7 @@ public class xmlHelper {
             System.out.println("Exception");
         }
     }
-    
+
     public void procesarRemesaPagoOtraFactura() {
         try {
             HashMap<String, String> elementos = new HashMap<String, String>();
@@ -328,7 +330,7 @@ public class xmlHelper {
 
     /*------------------------Registro de Peajes--------------------------------------*/
     /**
-     * Busca ña factura para rectificar, de lo contrario arroja una exception
+     * Busca la factura para rectificar, de lo contrario arroja una exception
      * Registra los el tipos de Peajes A
      *
      * @throws CodRectNoExisteException
@@ -349,19 +351,23 @@ public class xmlHelper {
      * Registra el peaje de tipo N
      */
     private void registrarPeajeN() throws MasDeUnClienteEncontrado {
-        this.contenidoXmlService.guardar(
-                new Peaje(
-                        this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
-                        this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
-                        this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
-                        this.Cargos01(), this.Cargos02(), this.ImporteTotalCargo01(), this.ImporteTotalCargo02(),
-                        this.impuestoElectrico(), this.alquileres(), this.iva(),
-                        this.aeConsumo(), this.aeLecturaDesde(), this.aeLecturaHasta(), this.aeProcedenciaDesde(), this.aeProcedenciaHasta(),
-                        this.rConsumo(), this.rLecturaDesde(), this.rLecturaHasta(), this.rImporteTotal(),
-                        this.pmConsumo(), this.pmLecturaHasta(),
-                        this.registroFin(), this.comentarios.toString(), this.errores.toString()
-                )
+        Peaje peaje = new Peaje(
+                this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
+                this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
+                this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
+                this.Cargos01(), this.Cargos02(), this.ImporteTotalCargo01(), this.ImporteTotalCargo02(),
+                this.impuestoElectrico(), this.alquileres(), this.iva(),
+                this.aeConsumo(), this.aeLecturaDesde(), this.aeLecturaHasta(), this.aeProcedenciaDesde(), this.aeProcedenciaHasta(),
+                this.rConsumo(), this.rLecturaDesde(), this.rLecturaHasta(), this.rImporteTotal(),
+                this.pmConsumo(), this.pmLecturaHasta(),
+                this.registroFin(), this.comentarios.toString(), this.errores.toString()
         );
+        EnergiaExcedentaria energiaExcedentaria = this.energiaExcedentaria();
+        if (existeEnergiaExcedentaria) {
+            existeEnergiaExcedentaria = false;
+            peaje.setEnergiaExcedentaria(energiaExcedentaria);
+        }
+        this.contenidoXmlService.guardar(peaje);
         System.out.print("\n\nComentarios : " + comentarios.toString());
         System.out.print("Codigo Errores : " + errores.toString());
     }
@@ -1009,9 +1015,9 @@ public class xmlHelper {
                         break;
                     } else if (indice > 5) {
                         int aux = indice++ - 6;
-                        elementos.set(aux, (double) elementos.get(aux) + (Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()) / 1000));
+                        elementos.set(aux, (double) elementos.get(aux) + (Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim())));
                     } else {
-                        elementos.set(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()) / 1000);
+                        elementos.set(indice++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -1134,6 +1140,55 @@ public class xmlHelper {
         return new DatosEnergiaActivaImporteTotal(elementos);
     }
 
+    //EnergiaExcedentaria
+    private EnergiaExcedentaria energiaExcedentaria() {
+
+        elementos = new ArrayList<>(7);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+        elementos.add(0.0);
+
+        int indice = 0;
+        boolean continuar = true;
+        NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
+        //Se iteran los nodos correspondan con el flowList
+        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
+            //Se obtienen los nodos internos
+            NodeList childList = flowListPeriodo.item(i).getChildNodes();
+            //Se recorren los nodos internos
+            for (int j = 0; j < childList.getLength(); j++) {
+                if (indice > elementos.size() - 1) {
+                    continuar = false;
+                    this.agregarError("27");
+                    break;
+                }
+                if ("ValorEnergiaExcedentaria".equals(childList.item(j).getNodeName())) {
+                    this.existeEnergiaExcedentaria = true;
+                    elementos.set(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
+                }
+            }
+            if (!continuar) {
+                break;
+            }
+        }
+        if (existeEnergiaExcedentaria) {
+            double total = 0.0;
+            for (int i = 0; i < elementos.size(); i++) {
+                total += Double.parseDouble(elementos.get(i).toString());
+            }
+            elementos.set(6, Double.parseDouble(this.doc.getElementsByTagName("ValorTotalEnergiaExcedentaria").item(0).getTextContent()));
+            if (total != Double.parseDouble(elementos.get(6).toString())) {
+                this.agregarError("28");
+            }
+        }
+        this.imprimirResultado("energiaExcedentaria", elementos);
+        return new EnergiaExcedentaria(elementos);
+    }
+
     //Cargos
     private Cargos Cargos01() {
 
@@ -1157,6 +1212,7 @@ public class xmlHelper {
                 if (indice > elementos.size()) {
                     continuar = false;
                     this.agregarError("23");
+                    break;
                 }
                 Node childNode = childList.item(j);
                 if ("PrecioCargo".equals(childNode.getNodeName())) {
@@ -1193,6 +1249,7 @@ public class xmlHelper {
                 if (indice > elementos.size()) {
                     continuar = false;
                     this.agregarError("25");
+                    break;
                 }
                 Node childNode = childList.item(j);
                 if ("TotalImporteTipoCargo".equals(childNode.getNodeName())) {
@@ -1241,6 +1298,7 @@ public class xmlHelper {
                 if (indice > elementos.size()) {
                     continuar = false;
                     this.agregarError("24");
+                    break;
                 }
                 Node childNode = childList.item(j);
                 if ("PrecioCargo".equals(childNode.getNodeName())) {
@@ -1277,6 +1335,7 @@ public class xmlHelper {
                 if (indice > elementos.size()) {
                     continuar = false;
                     this.agregarError("26");
+                    break;
                 }
                 Node childNode = childList.item(j);
                 if ("TotalImporteTipoCargo".equals(childNode.getNodeName())) {
@@ -1326,6 +1385,7 @@ public class xmlHelper {
                 if (indice > elementos.size()) {
                     continuar = false;
                     this.agregarError("23");
+                    break;
                 }
                 Node childNode = childList.item(j);
                 if ("PrecioCargo".equals(childNode.getNodeName())) {
@@ -1362,6 +1422,7 @@ public class xmlHelper {
                 if (indice > elementos.size()) {
                     continuar = false;
                     this.agregarError("25");
+                    break;
                 }
                 Node childNode = childList.item(j);
                 if ("TotalImporteTipoCargo".equals(childNode.getNodeName())) {
@@ -1410,6 +1471,7 @@ public class xmlHelper {
                 if (indice > elementos.size()) {
                     continuar = false;
                     this.agregarError("24");
+                    break;
                 }
                 Node childNode = childList.item(j);
                 if ("PrecioCargo".equals(childNode.getNodeName())) {
@@ -1446,6 +1508,7 @@ public class xmlHelper {
                 if (indice > elementos.size()) {
                     continuar = false;
                     this.agregarError("26");
+                    break;
                 }
                 Node childNode = childList.item(j);
                 if ("TotalImporteTipoCargo".equals(childNode.getNodeName())) {
@@ -5015,29 +5078,41 @@ public class xmlHelper {
         String control = "";
 
         switch (this.cliente.getTarifa()) {
-            case "T20A":
+            case "20A":
                 control = "1";
                 break;
-            case "T21A":
+            case "21A":
                 control = "5";
                 break;
-            case "T20DHA":
+            case "20DHA":
                 control = "4";
                 break;
-            case "T21DHA":
+            case "21DHA":
                 control = "6";
                 break;
-            case "T30A":
+            case "30A":
                 control = "3";
                 break;
-            case "T31A":
+            case "31A":
                 control = "11";
                 break;
-            case "T61A":
+            case "61A":
                 control = "12";
                 break;
-            case "T62A":
+            case "62A":
                 control = "13";
+                break;
+            case "20TD":
+                control = "18";
+                break;
+            case "30TD":
+                control = "19";
+                break;
+            case "61TD":
+                control = "20";
+                break;
+            case "62TD":
+                control = "21";
                 break;
             default:
                 break;

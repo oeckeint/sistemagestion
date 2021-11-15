@@ -79,8 +79,10 @@ public class FTP {
                 
                 fs = new FileInputStream(f);
                 this.cargarConfiguraciones();
-                this.clienteFTP.setFileType(FTPClient.BINARY_FILE_TYPE);
-                this.clienteFTP.storeFile("\\httpdocs\\" + this.definirCarpeta(file.getOriginalFilename()) + "\\" +file.getOriginalFilename(), fs);
+                this.clienteFTP.setFileType(FTPClient.BINARY_FILE_TYPE, FTPClient.BINARY_FILE_TYPE);
+                this.clienteFTP.enterRemotePassiveMode();
+                this.clienteFTP.changeWorkingDirectory(".\\httpdocs\\" + this.definirCarpeta(file.getOriginalFilename()));
+                this.clienteFTP.storeFile(file.getOriginalFilename(), fs);
                 
                 this.clienteFTP.logout();
                 this.clienteFTP.disconnect();

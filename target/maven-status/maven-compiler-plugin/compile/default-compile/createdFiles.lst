@@ -21,6 +21,7 @@ controladores\helper\ProcesarOtrasFacturas.class
 excepciones\PeajeTipoFacturaNoSoportadaException.class
 dominio\componentesxml\DatosPotenciaPrecio.class
 controladores\Peajes.class
+datos\entity\EnergiaExcedentaria.class
 excepciones\ArchivoNoCumpleParaSerClasificado.class
 dominio\componentesxml\ReactivaImporteTotal.class
 dominio\procesamientoxml\PotenciaAFacturar.class
