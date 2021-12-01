@@ -5,6 +5,7 @@ import datos.entity.Tarifa;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
 import java.util.List;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -67,12 +68,28 @@ public class Clientes {
 
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute("cliente") Cliente cliente, Model model) {
-        if (ClientesHelper.validarCliente(cliente)) {
-            clienteService.guardar(cliente);
-            ClientesHelper.cliente = null;
-            return "redirect:/clientes";
-        } else {
-            ClientesHelper.cliente = cliente;
+        try {
+            if (ClientesHelper.validarCliente(cliente)) {
+                clienteService.guardar(cliente);
+                ClientesHelper.cliente = null;
+                return "redirect:/clientes";
+            } else {
+                ClientesHelper.cliente = cliente;
+                return "redirect:/clientes/formulario";
+            }
+        } catch (ConstraintViolationException e) {
+            switch(e.getErrorCode()){
+                case 1062:
+                    ClientesHelper.mensaje = "No ha sido posible guardar el registro, el cups <Strong>" + cliente.getCups() + "</Strong> ya ha sido registrado.";
+                    break;
+                default:
+                    e.printStackTrace(System.out);
+                    break;
+            }
+            return "redirect:/clientes/formulario";
+        } catch (Exception e) {
+            System.out.println("Algo salio mal al guardar el registro");
+            e.printStackTrace(System.out);
             return "redirect:/clientes/formulario";
         }
     }

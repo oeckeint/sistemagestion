@@ -56,6 +56,7 @@ excepciones\FacturaYaExisteException.class
 dominio\componentesxml\DatosRLecturaDesde.class
 datos\dao\DatosFacturaDao.class
 datos\entity\Tarifa.class
+datos\entity\ClientePuntoSuministro.class
 datos\dao\PeajesImp.class
 dominio\componentesxml\DatosIva.class
 datos\service\ClienteServiceImp.class

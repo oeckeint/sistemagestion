@@ -49,6 +49,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\controladores\ControlXmlOtrasFa
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DocumentoXml.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\entity\Factura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPmLecturaHasta.java
+C:\NetBeansProjects\sistemagestion\src\main\java\datos\entity\ClientePuntoSuministro.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeConsumo.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\service\OtrasFacturasServiceImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\service\ClienteServiceImp.java

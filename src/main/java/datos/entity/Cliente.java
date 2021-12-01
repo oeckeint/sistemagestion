@@ -1,15 +1,19 @@
 package datos.entity;
 
+import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "cliente")
-public class Cliente {
+public class Cliente implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +31,19 @@ public class Cliente {
 
     @Column(name = "is_deleted")
     private short isDeleted;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_cliente_punto_suministro")
+    private ClientePuntoSuministro clientePuntoSuministro;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_cliente_datos")
+    private ClienteDatosGenerales clienteDatosGenerales;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_cliente_contrato")
+    private ClienteContrato clienteContrato;
+    
     public Cliente() {
     }
 
@@ -87,6 +103,30 @@ public class Cliente {
         this.isDeleted = isDeleted;
     }
 
+    public ClientePuntoSuministro getClientePuntoSuministro() {
+        return clientePuntoSuministro;
+    }
+
+    public void setClientePuntoSuministro(ClientePuntoSuministro clientePuntoSuministro) {
+        this.clientePuntoSuministro = clientePuntoSuministro;
+    }
+
+    public ClienteDatosGenerales getClienteDatosGenerales() {
+        return clienteDatosGenerales;
+    }
+
+    public void setClienteDatosGenerales(ClienteDatosGenerales clienteDatosGenerales) {
+        this.clienteDatosGenerales = clienteDatosGenerales;
+    }
+
+    public ClienteContrato getClienteContrato() {
+        return clienteContrato;
+    }
+
+    public void setClienteContrato(ClienteContrato clienteContrato) {
+        this.clienteContrato = clienteContrato;
+    }
+    
     @Override
     public String toString() {
         return "Cliente{" + "idCliente=" + idCliente + ", cups=" + cups + ", nombreCliente=" + nombreCliente + ", tarifa=" + tarifa + ", isDeleted=" + isDeleted + '}';

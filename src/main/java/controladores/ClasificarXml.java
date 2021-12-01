@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 @Controller
 @RequestMapping("/clasificar")
 public class ClasificarXml {
-    
+
     @Autowired
     ClienteService clienteService;
 
@@ -117,7 +117,7 @@ public class ClasificarXml {
         }
     }
 
-    private void initializarVariables(Document doc) throws ArchivoNoCumpleParaSerClasificado{
+    private void initializarVariables(Document doc) throws ArchivoNoCumpleParaSerClasificado {
         try {
             elementosXml.put("cups", doc.getElementsByTagName("CUPS").item(0).getTextContent());
             elementosXml.put("empEmi", doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
@@ -132,10 +132,10 @@ public class ClasificarXml {
             elementosXml.clear();
             System.out.println("Parece no ser un archivo de peaje, se intentará revisar si es MensajeAceptacionModificacionDeATR");
             this.inicializarVariables2(doc);
-       }
+        }
     }
-    
-    private void inicializarVariables2(Document doc) throws ArchivoNoCumpleParaSerClasificado{
+
+    private void inicializarVariables2(Document doc) throws ArchivoNoCumpleParaSerClasificado {
         try {
             elementosXml.put("cups", doc.getElementsByTagName("CUPS").item(0).getTextContent());
             elementosXml.put("empEmi", doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
@@ -214,11 +214,14 @@ public class ClasificarXml {
         }
 
         NumberFormat formater = new DecimalFormat("#0000");
-
+        String finString = this.elementosXml.get("codSol");
+        if (this.elementosXml.get("codPro").equals("F1")) {
+            finString = this.elementosXml.get("codFisFac");
+        }
         String nombreArchivo = "C:\\Peajes\\Procesados\\" + subCarpeta + "\\"
                 + formater.format(this.cliente.getIdCliente()) + "-" + this.cliente.getTarifa() + "_"
                 + this.elementosXml.get("empEmi") + "_" + this.elementosXml.get("empDes") + "_" + this.elementosXml.get("codPro") + "_"
-                + this.elementosXml.get("codPas") + "_" + this.elementosXml.get("cups") + "_" + this.elementosXml.get("codSol")
+                + this.elementosXml.get("codPas") + "_" + this.elementosXml.get("cups") + "_" + finString
                 + ".xml";
         File f = new File(nombreArchivo);
 
@@ -276,7 +279,7 @@ public class ClasificarXml {
             }
         }
     }
-    
+
     /**
      * Lectura y formateo del archivo xml recibido
      *
@@ -285,7 +288,7 @@ public class ClasificarXml {
      * el que se esta tratando
      * @return el archivo ya formateado y preparado para la lectura
      */
-    public Document prepareXml(File archivo, String nombreArchivo) throws ArchivoVacioException{
+    public Document prepareXml(File archivo, String nombreArchivo) throws ArchivoVacioException {
         Document doc = null;
         try {
             if (archivo.length() != 0) {

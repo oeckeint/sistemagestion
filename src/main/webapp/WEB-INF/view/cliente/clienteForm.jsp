@@ -58,7 +58,15 @@
                                 <div class="card-body">
                                     <div class="form-group">
                                         <label for="cups">CUPS</label>
-                                        <form:input path="cups" cssClass="form-control" required="true"></form:input>
+                                        <c:choose>
+                                            <c:when test="${cliente.cups == null}">
+                                                <form:input path="cups" cssClass="form-control" required="true"></form:input>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <form:input path="cups" cssClass="form-control" required="true" disabled="true"></form:input>
+                                                <form:hidden path="cups"></form:hidden>
+                                            </c:otherwise>
+                                        </c:choose>
                                         <form:hidden path="idCliente"></form:hidden>
                                         </div>
                                         <div class="form-group">

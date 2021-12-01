@@ -40,7 +40,7 @@
 
                 <!--Primer Renglón-->
                 <div class="row justify-content-around">
-                    <div class="list-group col-12 col-md-5 col-lg-4 p-2">
+                    <div class="list-group col-12 col-md-5 col-lg-5 p-2">
                         <h3 class="list-group-item list-group-item-action active text-center h4">Cliente</h3>
                         <div class="row">
                             <div class="col-3 col-md-4">
@@ -63,117 +63,122 @@
                             </div>
                         </div>
                     </div>
-                    <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Contrato</h3>
-                        <div class="row">
-                            <div class="col-5">
-                                <ul class="list-group list-group-flush text-right">
-                                    <dt class="list-group-item px-1">Inicio</dt>
-                                    <dt class="list-group-item px-1">Fin</dt>
-                                    <dt class="list-group-item px-1">Estatus</dt>
-                                    <dt class="list-group-item px-1">Producto</dt>
-                                    <dt class="list-group-item px-1">Coste Gestion</dt>
-                                    <dt class="list-group-item px-1">Alquileres</dt>
-                                    <dt class="list-group-item px-1">Id oferta</dt>
-                                </ul>
-                            </div>
-                            <div class="col-7">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                </ul>
+                    <c:if test="${cliente.clienteContrato != null}">
+                        <div class="list-group col-12 col-md-5 col-lg-5 p-2">
+                            <h3 class="list-group-item list-group-item-action active text-center h4">Contrato</h3>
+                            <div class="row">
+                                <div class="col-5">
+                                    <ul class="list-group list-group-flush text-right">
+                                        <dt class="list-group-item px-1">Inicio</dt>
+                                        <dt class="list-group-item px-1">Fin</dt>
+                                        <dt class="list-group-item px-1">Activado</dt>
+                                        <dt class="list-group-item px-1">Producto</dt>
+                                        <dt class="list-group-item px-1">Coste Gestion</dt>
+                                        <dt class="list-group-item px-1">Alquileres</dt>
+                                        <dt class="list-group-item px-1">Id oferta</dt>
+                                    </ul>
+                                </div>
+                                <div class="col-7">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item px-1">${cliente.clienteContrato.inicioContrato}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteContrato.finContrato}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteContrato.activado}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteContrato.producto}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteContrato.costeGestion}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteContrato.alquieres}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteContrato.idOferta}</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </c:if>
                 </div>
 
                 <div class="row justify-content-around">
-                    <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Punto de suministro</h3>
-                        <div class="row">
-                            <div class="col-5">
-                                <ul class="list-group list-group-flush text-right">
-                                    <dt class="list-group-item px-1">Dir suministro</dt>
-                                    <dt class="list-group-item px-1">CP</dt>
-                                    <dt class="list-group-item px-1">Población</dt>
-                                    <dt class="list-group-item px-1">Provincia</dt>
-                                    <dt class="list-group-item px-1">Distribuidora</dt>
-                                    <dt class="list-group-item px-1">ATR</dt>
-                                    <dt class="list-group-item px-1">Contador</dt>
-                                    <dt class="list-group-item px-1">Tipo PM</dt>
-                                    <dt class="list-group-item px-1">Modo Lectura</dt>
-                                    <dt class="list-group-item px-1">Tarifa</dt>
-                                    <dt class="list-group-item px-1">Activats</dt>
-                                    <dt class="list-group-item px-1">P1</dt>
-                                    <dt class="list-group-item px-1">P2</dt>
-                                    <dt class="list-group-item px-1">P3</dt>
-                                    <dt class="list-group-item px-1">P4</dt>
-                                    <dt class="list-group-item px-1">P5</dt>
-                                    <dt class="list-group-item px-1">P6</dt>
-                                </ul>
-                            </div>
-                            <div class="col-7">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Datos Generales</h3>
-                        <div class="row">
-                            <div class="col-5">
-                                <ul class="list-group list-group-flush text-right">
-                                    <dt class="list-group-item px-1">Titular</dt>
-                                    <dt class="list-group-item px-1">Cuenta</dt>
-                                    <dt class="list-group-item px-1">CIF</dt>
-                                    <dt class="list-group-item px-1">Dom social</dt>
-                                    <dt class="list-group-item px-1">CP</dt>
-                                    <dt class="list-group-item px-1">Población</dt>
-                                    <dt class="list-group-item px-1">Email</dt>
-                                    <dt class="list-group-item px-1">CNAES</dt>
-                                    <dt class="list-group-item px-1">Grupo</dt>
-                                    <dt class="list-group-item px-1">Comercial</dt>
-                                </ul>
-                            </div>
-                            <div class="col-7">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                    <li class="list-group-item px-1">---</li>
-                                </ul>
+                    <c:if test="${cliente.clientePuntoSuministro != null}">
+                        <div class="list-group col-12 col-md-5 col-lg-5 p-2">
+                            <h3 class="list-group-item list-group-item-action active text-center h4">Punto de suministro</h3>
+                            <div class="row">
+                                <div class="col-5">
+                                    <ul class="list-group list-group-flush text-right">
+                                        <dt class="list-group-item px-1">Dir suministro</dt>
+                                        <dt class="list-group-item px-1">CP</dt>
+                                        <dt class="list-group-item px-1">Población</dt>
+                                        <dt class="list-group-item px-1">Provincia</dt>
+                                        <dt class="list-group-item px-1">Distribuidora</dt>
+                                        <dt class="list-group-item px-1">ATR</dt>
+                                        <dt class="list-group-item px-1">Contador</dt>
+                                        <dt class="list-group-item px-1">Tipo PM</dt>
+                                        <dt class="list-group-item px-1">Modo Lectura</dt>
+                                        <dt class="list-group-item px-1">Tarifa</dt>
+                                        <dt class="list-group-item px-1">Activado</dt>
+                                        <dt class="list-group-item px-1">P1</dt>
+                                        <dt class="list-group-item px-1">P2</dt>
+                                        <dt class="list-group-item px-1">P3</dt>
+                                        <dt class="list-group-item px-1">P4</dt>
+                                        <dt class="list-group-item px-1">P5</dt>
+                                        <dt class="list-group-item px-1">P6</dt>
+                                    </ul>
+                                </div>
+                                <div class="col-7">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.direccionSuministro}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.codigoPostal}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.poblacion}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.provincia}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.distribuidora}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.atr}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.contador}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.tipoPM}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.modoLectura}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.tarifa}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.activado}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.p1}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.p2}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.p3}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.p4}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.p5}</li>
+                                        <li class="list-group-item px-1">${cliente.clientePuntoSuministro.p6}</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </c:if>
+                    <c:if test="${cliente.clienteDatosGenerales != null}">
+                        <div class="list-group col-12 col-md-5 col-lg-5 p-2">
+                            <h3 class="list-group-item list-group-item-action active text-center h4">Datos Generales</h3>
+                            <div class="row">
+                                <div class="col-5">
+                                    <ul class="list-group list-group-flush text-right">
+                                        <dt class="list-group-item px-1">Titular</dt>
+                                        <dt class="list-group-item px-1">Cuenta</dt>
+                                        <dt class="list-group-item px-1">CIF</dt>
+                                        <dt class="list-group-item px-1">Dom social</dt>
+                                        <dt class="list-group-item px-1">CP</dt>
+                                        <dt class="list-group-item px-1">Población</dt>
+                                        <dt class="list-group-item px-1">Email</dt>
+                                        <dt class="list-group-item px-1">CNAES</dt>
+                                        <dt class="list-group-item px-1">Grupo</dt>
+                                        <dt class="list-group-item px-1">Comercial</dt>
+                                    </ul>
+                                </div>
+                                <div class="col-7">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item px-1">${cliente.clienteDatosGenerales.titular}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteDatosGenerales.cuenta}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteDatosGenerales.cif}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteDatosGenerales.dominioSocial}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteDatosGenerales.codigoPostal}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteDatosGenerales.poblacion}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteDatosGenerales.email}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteDatosGenerales.cnae}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteDatosGenerales.grupo}</li>
+                                        <li class="list-group-item px-1">${cliente.clienteDatosGenerales.comercial}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </c:if>
                 </div>
 
             </div>

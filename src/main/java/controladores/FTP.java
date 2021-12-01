@@ -60,7 +60,6 @@ public class FTP {
         return "comunes/formulario_sftp";
     }
 
-
     @PostMapping("/subir")
     public String subirArchivos(@RequestParam("archivos") MultipartFile[] files) throws IOException {
         FileInputStream fis = null;
@@ -76,14 +75,15 @@ public class FTP {
                 while ((dato = fileContent.read()) != -1) {
                     fos.write(dato);
                 }
-                
+
                 fs = new FileInputStream(f);
                 this.cargarConfiguraciones();
-                this.clienteFTP.setFileType(FTPClient.BINARY_FILE_TYPE, FTPClient.BINARY_FILE_TYPE);
-                this.clienteFTP.enterRemotePassiveMode();
-                this.clienteFTP.changeWorkingDirectory(".\\httpdocs\\" + this.definirCarpeta(file.getOriginalFilename()));
-                this.clienteFTP.storeFile(file.getOriginalFilename(), fs);
-                
+                this.clienteFTP.setFileType(FTPClient.BINARY_FILE_TYPE);
+                //this.clienteFTP.enterRemotePassiveMode();
+                //this.clienteFTP.changeWorkingDirectory(".\\httpdocs\\" + this.definirCarpeta(file.getOriginalFilename()));
+                this.clienteFTP.storeFile("httpdocs/" + this.definirCarpeta(file.getOriginalFilename()) + "/" + file.getOriginalFilename(), fs);
+                //this.clienteFTP.rename(file.getOriginalFilename(), "httpdocs/" + file.getOriginalFilename());
+
                 this.clienteFTP.logout();
                 this.clienteFTP.disconnect();
                 archivosCorrectos++;
@@ -103,10 +103,10 @@ public class FTP {
     }
 
     private String definirCarpeta(String nombreArchivo) {
-        if (!StringHelper.isValid(nombreArchivo) || nombreArchivo.length() < 10 || !nombreArchivo.contains("ES")) {
+        if (!StringHelper.isValid(nombreArchivo) || nombreArchivo.length() < 11 || !nombreArchivo.contains("ES")) {
             return "";
         }
-        String codigo = nombreArchivo.substring(6, 10);
+        String codigo = nombreArchivo.substring(7, 11);
         String carpeta = "";
         switch (codigo) {
             case "0021":
