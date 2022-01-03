@@ -36,12 +36,12 @@ public class ClienteContrato {
 
     @Column(name = "alquileres")
     private double alquieres;
+    
+    @Column(name = "id_oferta")
+    private int idOferta;
 
     @OneToOne(mappedBy = "clienteContrato", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Cliente cliente;
-
-    @Column(name = "id_oferta")
-    private int idOferta;
 
     public ClienteContrato() {
     }

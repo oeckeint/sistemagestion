@@ -24,16 +24,16 @@ import utileria.StringHelper;
 public class xmlHelper {
 
     private DocumentoXmlService contenidoXmlService;
-    private ClienteService clienteService;
+    ClienteService clienteService;
     private ArrayList elementos;
-    private Document doc;
-    private StringBuilder errores;
-    private StringBuilder comentarios;
+    Document doc;
+    StringBuilder errores;
+    StringBuilder comentarios;
     private String cups;
     private String codFactura;
     private int empEmi;
     private String tipoFactura;
-    private Cliente cliente;
+    Cliente cliente;
     private String EmpresaEmisora;
     private String tarifaAtrFac;
     private String nombreArchivo;
@@ -51,6 +51,28 @@ public class xmlHelper {
         this.doc = doc;
         this.contenidoXmlService = contenidoXmlService;
         this.iniciarVariablesPagoRemesa();
+    }
+    
+    /**
+     * Constructor usado para CambiodeComercializador SinCambios
+     * @param doc
+     * @param clienteService 
+     */
+    public xmlHelper(Document doc, ClienteService clienteService) {
+        this.errores = new StringBuilder("");
+        this.comentarios = new StringBuilder("");
+        this.doc = doc;
+        this.clienteService = clienteService;
+        this.iniciarVariablesCambioComercializador();
+    }
+    
+    public boolean existeClientebyCups() throws MasDeUnClienteEncontrado, ClienteNoExisteException{
+        this.cliente = clienteService.encontrarCups(this.cups);
+        if (this.cliente != null) {
+            return true;
+        } else {
+            throw new ClienteNoExisteException(cups);
+        }
     }
 
     /**
@@ -5057,9 +5079,14 @@ public class xmlHelper {
     private void iniciarVariablesPagoRemesa() {
         this.codigoRemesa = this.doc.getElementsByTagName("CodigoRemesa").item(0).getTextContent();
     }
+    
+    private void iniciarVariablesCambioComercializador() {
+        this.empEmi = Integer.parseInt(this.doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
+        this.cups = this.doc.getElementsByTagName("CUPS").item(0).getTextContent();
+    }
 
     /*--------------------------Utilidades---------------------------*/
-    private void imprimirResultado(String nombreMetodo, ArrayList elementos) {
+    void imprimirResultado(String nombreMetodo, ArrayList elementos) {
         System.out.println(Cadenas.LINEA + nombreMetodo + elementos);
     }
 
@@ -5122,6 +5149,26 @@ public class xmlHelper {
             System.out.println("Inconsistencia en el factor de tarifa, se encontro " + this.tarifaAtrFac + " en donde se esperaba " + control);
             this.agregarError("21");
         }
+    }
+    
+    /**
+     * Obtiene el contenido de un nodo en un String
+     * @param nodo
+     * @return 
+     */
+    String obtenerContenidoNodo(String nodo){
+        return this.doc.getElementsByTagName(nodo).item(0).getTextContent();
+    }
+
+    /**
+     * Obtiene el valor de un nodo de una lista que generalmente viene desde un ciclo for
+     * lo transforma a entero y el resultado lo divide entre 1000
+     * @param nodeList
+     * @param index
+     * @return 
+     */
+    Integer obtenerContenidoNodoSobre1000(NodeList nodeList, int index){
+        return StringHelper.toInteger(nodeList.item(index).getTextContent()) / 1000;
     }
 
 }

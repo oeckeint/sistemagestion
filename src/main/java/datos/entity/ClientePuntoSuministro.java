@@ -1,6 +1,7 @@
 package datos.entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -173,6 +174,15 @@ public class ClientePuntoSuministro implements Serializable {
         this.activado = activado;
     }
 
+    public void setPotencias(int elementos[]){
+        this.p1 = elementos[0];
+        this.p2 = elementos[1];
+        this.p3 = elementos[2];
+        this.p4 = elementos[3];
+        this.p5 = elementos[4];
+        this.p6 = elementos[5];
+    }
+    
     public int getP1() {
         return p1;
     }

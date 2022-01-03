@@ -1,5 +1,6 @@
 package controladores;
 
+import controladores.helper.CambiodeComercializador;
 import controladores.helper.Etiquetas;
 import controladores.helper.ProcesarFactura;
 import controladores.helper.ProcesarOtrasFacturas;
@@ -8,16 +9,22 @@ import controladores.helper.ProcesarRemesaPagoFactura;
 import controladores.helper.ProcesarRemesaPagoOtrasFacturas;
 import controladores.helper.ProcesarRemesaPagoPeaje;
 import datos.interfaces.ClienteService;
+import datos.interfaces.CrudDao;
 import datos.interfaces.DocumentoXmlService;
+import excepciones.ArchivoNoCumpleParaSerClasificado;
 import excepciones.ArchivoVacioException;
 import excepciones.ClienteNoExisteException;
 import excepciones.CodRectNoExisteException;
 import excepciones.ErrorDesconocidoException;
 import excepciones.FacturaYaExisteException;
+import excepciones.MasDatosdeLosEsperadosException;
 import excepciones.MasDeUnClienteEncontrado;
+import excepciones.NoExisteElNodoException;
 import excepciones.PeajeCodRectNoExisteException;
 import excepciones.PeajeTipoFacturaNoSoportadaException;
+import excepciones.TablaBusquedaNoEspecificadaException;
 import excepciones.TablaBusquedaNoExisteException;
+import excepciones.TarifaNoExisteException;
 import excepciones.XmlNoSoportado;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import utileria.StringHelper;
 
 @Controller
 @RequestMapping("/procesar")
@@ -58,13 +66,20 @@ public class ProcesamientoXml {
 
     @Autowired
     protected ClienteService clienteService;
+    
+    @Autowired
+    @Qualifier(value = "tarifasServiceImp")
+    private CrudDao tarifasService;
 
     int archivosCorrectos;
     int archivosTotales;
     List<String> archivosErroneos;
-    private int empresaEmisora;
-    private boolean is894;
+    private boolean isFactura;
     private boolean isRemesaPago;
+    private boolean isOtrasFacturas;
+    private boolean isMACCConCambios;
+    private boolean isMACCSinCambios;
+    private boolean isPeaje;
 
     /**
      * Muestra el fomulario que procesa los archivos
@@ -94,8 +109,6 @@ public class ProcesamientoXml {
     @PostMapping("/procesar")
     public String procesamiento(@RequestParam("archivosxml") MultipartFile[] files) throws IOException {
         for (MultipartFile file : files) {
-            this.empresaEmisora = 0;
-            this.is894 = false;
             archivosTotales++;
             File f;
             FileOutputStream ous;
@@ -117,6 +130,7 @@ public class ProcesamientoXml {
             this.procesar(f, file.getOriginalFilename());
             //Eliminación del archivo temporal
             f.deleteOnExit();
+            this.reiniciarVariablesBooleanas();
         }
         Etiquetas.PROCESAMIENTO_FORMULARIO_MENSAJE = "Archivos Procesados (" + archivosCorrectos + " de " + archivosTotales + ")";
         return "redirect:/procesar";
@@ -131,47 +145,32 @@ public class ProcesamientoXml {
      */
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void procesar(File archivo, String nombreArchivo) {
-
         System.out.println("(Ini)************************-----------------------------" + nombreArchivo);
 
         try {
             Document documento = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(documento);
-            //Revision de la compatiblidad
-            if (!isRemesaPago) {
-                if (documento.getElementsByTagName("MensajeFacturacion").getLength() == 0) {
-                    throw new XmlNoSoportado();
-                }
-            }
 
-            //Revisa el nodo "Otras facturas" y en caso de que el valor sea mayor a 1 ejecutara la clase de Otras facturas
-            if (documento.getElementsByTagName("OtrasFacturas").getLength() != 0) {
+            if (isMACCSinCambios) {
+                new CambiodeComercializador(documento, clienteService, tarifasService);
+            } else if (isMACCConCambios) {
+                System.out.println("MensajeActivacionCambiodeComercializadorConCambios ");
+            } else if (isOtrasFacturas) {
                 new ProcesarOtrasFacturas(documento, contenidoXmlServiceOtrasFacturas, clienteService, nombreArchivo);
             } else if (isRemesaPago) {
-                String tablaBusqueda = documento.getElementsByTagName("TablaBusqueda").item(0).getTextContent();
-                switch(tablaBusqueda){
-                    case "contenido_xml":
-                        new ProcesarRemesaPagoPeaje(documento, contenidoXmlServicePeajes);
-                        break;
-                    case "contenido_xml_factura":
-                        new ProcesarRemesaPagoFactura(documento, contenidoXmlServiceFacturas);
-                        break;
-                    case "contenido_xml_otras_facturas":
-                        new ProcesarRemesaPagoOtrasFacturas(documento, contenidoXmlServiceOtrasFacturas);
-                        break;
-                    default:
-                        throw new TablaBusquedaNoExisteException(tablaBusqueda);
-                }
-                //new ProcesarRemesaPago(documento, contenidoXmlServicePeajes);
-            } else if (is894) {
+                this.procesarOtraFactura(documento);
+            } else if (isFactura) {
                 new ProcesarFactura(documento, contenidoXmlServiceFacturas, clienteService, nombreArchivo);
-            } else {
+            } else if (isPeaje){
                 new ProcesarPeaje(documento, contenidoXmlServicePeajes, clienteService, nombreArchivo);
+            } else {
+                throw new XmlNoSoportado();
             }
             archivosCorrectos++;
 
         } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado
-                | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException | TablaBusquedaNoExisteException e) {
+                | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException | TablaBusquedaNoExisteException | TablaBusquedaNoEspecificadaException
+                | NoExisteElNodoException | ArchivoNoCumpleParaSerClasificado | MasDatosdeLosEsperadosException | TarifaNoExisteException e) {
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
             utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         } catch (Exception e) {
@@ -212,20 +211,38 @@ public class ProcesamientoXml {
     }
 
     /**
-     * Busca e inicializa los valores desde el documentoXML en varibales de
-     * instancia para definir el flujo del documento
+     * Busca e inicializa los valores desde el documentoXML en variables
+     * booleanas para definir el flujo del documento
      *
      * @param doc es el archivo xml a tratar
      */
     private void initializarVariables(Document doc) {
-        try {
-            this.empresaEmisora = Integer.parseInt(doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
-            if (this.empresaEmisora == 894) {
-                is894 = true;
-            }
-        } catch (Exception e) {
-            this.isRemesaPago = doc.getElementsByTagName("RemesaPago").item(0).getTextContent().length() != 0;
+        if (existeNodo(doc, "MensajeActivacionCambiodeComercializadorConCambios")) {
+            this.isMACCConCambios = true;
+        } else if (existeNodo(doc, "MensajeActivacionCambiodeComercializadorSinCambios")) {
+            this.isMACCSinCambios = true;
         }
+        
+        if (existeNodo(doc, "CodigoREEEmpresaEmisora")) {
+            this.isFactura = StringHelper.toInteger(doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent()) == 894;
+        }
+        
+        if (existeNodo(doc, "RemesaPago")) {
+            this.isRemesaPago = true;
+        } else if (existeNodo(doc, "OtrasFacturas")) {
+            this.isOtrasFacturas = true;
+        } else if (existeNodo(doc, "MensajeFacturacion")) {
+            this.isPeaje = true;
+        }
+    }
+    
+    private void reiniciarVariablesBooleanas(){
+        this.isOtrasFacturas = false;
+        this.isMACCConCambios = false;
+        this.isMACCSinCambios = false;
+        this.isFactura = false;
+        this.isRemesaPago = false;
+        this.isPeaje = false;
     }
 
     /**
@@ -236,8 +253,46 @@ public class ProcesamientoXml {
         this.archivosCorrectos = 0;
         this.archivosTotales = 0;
         this.archivosErroneos = new ArrayList<>();
-        this.is894 = false;
-        this.isRemesaPago = false;
+    }
+
+    /**
+     * Revisa si existe un nodo especificado
+     *
+     * @param nodo
+     * @return
+     */
+    private boolean existeNodo(Document documento, String nodo) {
+        try {
+            return documento.getElementsByTagName(nodo).getLength() != 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    private void procesarOtraFactura(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException {
+        if (existeNodo(doc, "TablaBusqueda")) {
+            String tablaBusqueda = doc.getElementsByTagName("TablaBusqueda").item(0).getTextContent();
+            if (StringHelper.isValid(tablaBusqueda)) {
+                switch (tablaBusqueda) {
+                    case "contenido_xml":
+                        new ProcesarRemesaPagoPeaje(doc, contenidoXmlServicePeajes);
+                        break;
+                    case "contenido_xml_factura":
+                        new ProcesarRemesaPagoFactura(doc, contenidoXmlServiceFacturas);
+                        break;
+                    case "contenido_xml_otras_facturas":
+                        new ProcesarRemesaPagoOtrasFacturas(doc, contenidoXmlServiceOtrasFacturas);
+                        break;
+                    default:
+                        throw new TablaBusquedaNoExisteException(tablaBusqueda);
+                }
+            } else {
+                throw new TablaBusquedaNoEspecificadaException();
+            }
+        } else {
+            throw new NoExisteElNodoException("TablaBusqueda");
+        }
     }
 
 }

@@ -19,6 +19,9 @@ public class Tarifa {
     @Column(name = "valor")
     private String nombreTarifa;
     
+    @Column(name = "tarifa_codigo")
+    private String tarifaCodigo;
+    
     @Column(name = "status")
     private int status;
 
@@ -48,6 +51,14 @@ public class Tarifa {
 
     public void setNombreTarifa(String nombreTarifa) {
         this.nombreTarifa = nombreTarifa;
+    }
+
+    public String getTarifaCodigo() {
+        return tarifaCodigo;
+    }
+
+    public void setTarifaCodigo(String tarifaCodigo) {
+        this.tarifaCodigo = tarifaCodigo;
     }
 
     public int getStatus() {

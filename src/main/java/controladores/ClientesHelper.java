@@ -29,7 +29,7 @@ public class ClientesHelper {
     public static final String FORMULARIO_EXITO_ELIMINAR = "Se ha eliminado exitosamente el cliente con el cups ";
 
     public static final List<String> TARIFAS = Arrays.asList(
-            "20A", "21A", "20DHA", "21DHA", "20TD",
+            "019", "20A", "21A", "20DHA", "21DHA", "20TD",
             "30A", "31A", "30TD",
             "61A", "62A",
             "61TD", "62TD"

@@ -1,3 +1,13 @@
+V0.5.6.2
+Se ha iniciado con el desarrollo del procesamiento de archivos xml de tipo CambioDeComercializador
+Se incluyeron nuevas utilerias para el uso fail en futuras pruebas por parte del usuario
+
+Se hicieron cambios en el flujo del procesamiento del controlador ProcesamientoXml para su mejor entendimiento
+
+**Cuestiones
+porque es necesario tener dos plujos para sinCambios / conCambios si en principio usan los mismos datos
+cual es la tarifa que debe prevalecer cuando se valida (nombre o codigo)
+
 V0.5.6.1
 **NOVEDADES**
 Se ha implementado la funcion de FTP para subir archivos creando sus vistas y procesamiento correspondiente

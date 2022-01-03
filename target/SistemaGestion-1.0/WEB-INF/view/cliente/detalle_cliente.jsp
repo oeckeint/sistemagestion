@@ -49,7 +49,7 @@
                                     <dt class="list-group-item px-1">CUPS</dt>
                                     <dt class="list-group-item px-1">Nombre</dt>
                                     <dt class="list-group-item px-1">Tarifa</dt>
-                                    <dt class="list-group-item px-1">Status</dt>
+                                    <dt class="list-group-item px-1">Archivado</dt>
                                 </ul>
                             </div>
                             <div class="col-8 col-md-7">
@@ -58,7 +58,16 @@
                                     <li class="list-group-item px-1">${cliente.cups}</li>
                                     <li class="list-group-item px-1">${cliente.nombreCliente}</li>
                                     <li class="list-group-item px-1">${cliente.tarifa}</li>
-                                    <li class="list-group-item px-1">${cliente.isDeleted}</li>
+                                    <li class="list-group-item px-1">
+                                        <c:choose>
+                                            <c:when test="${cliente.isDeleted == 0}">
+                                                No
+                                            </c:when>
+                                            <c:when test="${cliente.isDeleted == 1}">
+                                                Si
+                                            </c:when>
+                                        </c:choose>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

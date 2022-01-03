@@ -29,6 +29,7 @@ controladores\ControlXmlFacturas.class
 excepciones\CodRectNoExisteException.class
 datos\service\TarifasServiceImp.class
 controladores\Inicio.class
+excepciones\MasDatosdeLosEsperadosException.class
 dominio\componentesxml\DatosGeneralesFactura.class
 datos\entity\ClienteContrato.class
 excepciones\CredencialesIncorrectasException.class
@@ -65,13 +66,16 @@ controladores\helper\ProcesarRemesaPagoOtrasFacturas.class
 dominio\componentesxml\DatosCabecera.class
 datos\service\PeajesServiceImp.class
 dominio\componentesxml\ConceptoRepercutible.class
+datos\entity\ClienteDatosGenerales.class
 dominio\componentesxml\DatosFinDeRegistro.class
 datos\entity\Peaje.class
+excepciones\TablaBusquedaNoEspecificadaException.class
 controladores\Configuraciones.class
 controladores\helper\ProcesarRemesaPagoPeaje.class
 datos\interfaces\DocumentoXmlDao.class
 utileria\ArchivoTexto.class
 dominio\componentesxml\DatosEnergiaActivaPrecio.class
+excepciones\NoExisteElNodoException.class
 datos\interfaces\ClienteDao.class
 dominio\componentesxml\DatosAeLecturaDesde.class
 dominio\otrasfactuas\RegistroFin.class
@@ -87,6 +91,7 @@ controladores\ProcesamientoOtrasFacturas.class
 datos\dao\LecturaDao.class
 dominio\componentesxml\DatosPotenciaContratada.class
 dominio\otrasfactuas\Cabecera.class
+controladores\helper\CambiodeComercializador.class
 datos\dao\DistribuidoraDao.class
 dominio\componentesxml\DatosFacturaAtr.class
 dominio\componentesxml\DatosAeProcedenciaHasta.class

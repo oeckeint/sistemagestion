@@ -5,11 +5,14 @@ C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\MasDeUnClienteEncon
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRConsumo.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaImporteTotal.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\entity\Tarifa.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\TablaBusquedaNoEspecificadaException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\FTP.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeProcedenciaDesde.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\NoExisteElNodoException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\utileria\texto\Cadenas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\ConceptoRepercutible.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\entity\EnergiaExcedentaria.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\MasDatosdeLosEsperadosException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\NoEsUnNumeroException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\ClientesHelper.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ArchivoNoCumpleParaSerClasificado.java
@@ -65,6 +68,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarRe
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Configuraciones.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarRemesaPagoOtrasFacturas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ArchivoVacioException.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\CambiodeComercializador.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaPrecio.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\DocumentoXmlService.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\DatosFacturaDao.java
@@ -72,6 +76,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeL
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\ConceptoRepercutible.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarRemesaPagoFactura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\OtrasFacturas.java
+C:\NetBeansProjects\sistemagestion\src\main\java\datos\entity\ClienteDatosGenerales.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Peajes.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\otrasfactuas\RegistroFin.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAlquileres.java
