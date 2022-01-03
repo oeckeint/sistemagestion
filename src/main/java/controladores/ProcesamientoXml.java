@@ -37,6 +37,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -106,7 +107,7 @@ public class ProcesamientoXml {
      * @return redireccionamiento al formulario
      * @throws IOException
      */
-    @PostMapping("/procesar")
+    @PostMapping(path = "/procesar", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String procesamiento(@RequestParam("archivosxml") MultipartFile[] files) throws IOException {
         for (MultipartFile file : files) {
             archivosTotales++;

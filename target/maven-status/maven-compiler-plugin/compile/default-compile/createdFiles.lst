@@ -7,6 +7,7 @@ dominio\componentesxml\DatosAeLecturaHasta.class
 dominio\Lectura.class
 controladores\OtrasFacturas.class
 excepciones\MasDeUnClienteEncontrado.class
+excepciones\TarifaNoExisteException.class
 datos\interfaces\CrudDao.class
 dominio\otrasfactuas\DocumentoOtraFactura.class
 dominio\Distribuidora.class
@@ -23,6 +24,7 @@ dominio\componentesxml\DatosPotenciaPrecio.class
 controladores\Peajes.class
 datos\entity\EnergiaExcedentaria.class
 excepciones\ArchivoNoCumpleParaSerClasificado.class
+app\config\MySpringMvcDispatcherServletInitializer.class
 dominio\componentesxml\ReactivaImporteTotal.class
 dominio\procesamientoxml\PotenciaAFacturar.class
 controladores\ControlXmlFacturas.class
@@ -48,6 +50,7 @@ controladores\ClasificarXml.class
 excepciones\ArchivoVacioException.class
 dominio\componentesxml\DatosAeConsumo.class
 controladores\ClientesHelper.class
+app\config\AppConfig.class
 datos\interfaces\DocumentoXmlService.class
 excepciones\XmlNoSoportado.class
 dominio\componentesxml\Cargos.class
@@ -55,6 +58,7 @@ dominio\componentesxml\DatosAeProcedenciaDesde.class
 datos\dao\OtrasFacturasDaoImp.class
 excepciones\FacturaYaExisteException.class
 dominio\componentesxml\DatosRLecturaDesde.class
+app\config\SecurityWebApplicationInitializer.class
 datos\dao\DatosFacturaDao.class
 datos\entity\Tarifa.class
 datos\entity\ClientePuntoSuministro.class
@@ -88,6 +92,7 @@ dominio\procesamientoxml\ResultadoArchivoXML.class
 controladores\helper\ProcesarRemesaPagoFactura.class
 controladores\FTP.class
 controladores\ProcesamientoOtrasFacturas.class
+controladores\helper\NombresNodos.class
 datos\dao\LecturaDao.class
 dominio\componentesxml\DatosPotenciaContratada.class
 dominio\otrasfactuas\Cabecera.class
@@ -104,6 +109,7 @@ datos\service\FacturasServiceImp.class
 dominio\componentesxml\DatosExcesoPotencia.class
 dominio\componentesxml\DatosPmConsumo.class
 controladores\helper\Etiquetas.class
+controladores\helper\NombresNodos$ESTADOS.class
 excepciones\PeajeCodRectNoExisteException.class
 excepciones\EmpresaEmisoraNoSoportada.class
 controladores\Clientes.class
@@ -111,5 +117,6 @@ dominio\componentesxml\DatosImpuestoElectrico.class
 dominio\componentesxml\DatosRLecturaHasta.class
 controladores\helper\ProcesarPeaje.class
 excepciones\ErrorDesconocidoException.class
+app\config\SecurityConfig.class
 controladores\ControlXmlOtrasFacturas.class
 controladores\EvaluacionXml.class

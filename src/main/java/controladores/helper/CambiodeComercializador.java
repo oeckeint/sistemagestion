@@ -30,6 +30,7 @@ public class CambiodeComercializador extends xmlHelper {
      * @throws ClienteNoExisteException
      * @throws ArchivoNoCumpleParaSerClasificado
      * @throws MasDatosdeLosEsperadosException
+     * @throws excepciones.TarifaNoExisteException
      */
     public CambiodeComercializador(Document doc, ClienteService clienteService, CrudDao tarifasService) throws MasDeUnClienteEncontrado, ClienteNoExisteException, ArchivoNoCumpleParaSerClasificado, MasDatosdeLosEsperadosException, TarifaNoExisteException {
         super(doc, clienteService);

@@ -6,6 +6,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRCo
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaImporteTotal.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\entity\Tarifa.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\TablaBusquedaNoEspecificadaException.java
+C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\TarifaNoExisteException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\FTP.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeProcedenciaDesde.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\NoExisteElNodoException.java
@@ -36,12 +37,15 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPot
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\EmpresaEmisoraNoSoportada.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\EvaluacionXml.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\FacturaYaExisteException.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\NombresNodos.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\OtrasFacturasDaoImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRLecturaDesde.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\procesamientoxml\Remesa.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActiva.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\ClienteDao.java
+C:\NetBeansProjects\sistemagestion\src\main\java\app\config\SecurityConfig.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeProcedenciaHasta.java
+C:\NetBeansProjects\sistemagestion\src\main\java\app\config\AppConfig.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\helper\ProcesarOtrasFacturas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\dao\PeajesImp.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosEnergiaActivaValores.java
@@ -88,6 +92,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\controladores\ProcesamientoXml.
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\PeajeTipoFacturaNoSoportadaException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\Distribuidora.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\ProcesamientoOtrasFacturas.java
+C:\NetBeansProjects\sistemagestion\src\main\java\app\config\SecurityWebApplicationInitializer.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosExcesoPotencia.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\RegistroVacioException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\XmlNoSoportado.java
@@ -97,6 +102,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\Reactiva
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosGeneralesFactura.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosRLecturaHasta.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ErrorAlConectarConElServidorException.java
+C:\NetBeansProjects\sistemagestion\src\main\java\app\config\MySpringMvcDispatcherServletInitializer.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPmConsumo.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\ClienteNoExisteException.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\procesamientoxml\ResultadoArchivoXML.java

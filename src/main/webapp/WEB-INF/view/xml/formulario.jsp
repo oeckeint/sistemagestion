@@ -4,6 +4,7 @@
 <html>
     <head>
         <jsp:include page="/WEB-INF/paginas/comunes/contenidoHead.jsp"></jsp:include>
+        <meta http-equiv = "Content-Type" content = "multipart/form-data; charset = utf-8" />
     </head>
     <body>
         <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp"></jsp:include>
