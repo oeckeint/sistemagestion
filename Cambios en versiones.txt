@@ -1,6 +1,6 @@
 V0.5.6.2
 Se ha iniciado con el desarrollo del procesamiento de archivos xml de tipo CambioDeComercializador
-Se incluyeron nuevas utilerias para el uso fail en futuras pruebas por parte del usuario
+Se incluyeron nuevas utilerias para el uso facil en futuras pruebas por parte del usuario
 
 Se hicieron cambios en el flujo del procesamiento del controlador ProcesamientoXml para su mejor entendimiento
 

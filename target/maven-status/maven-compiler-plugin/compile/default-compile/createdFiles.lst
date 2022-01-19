@@ -88,6 +88,7 @@ dominio\componentesxml\DatosEnergiaActivaImporteTotal.class
 excepciones\RegistroVacioException.class
 dominio\otrasfactuas\ConceptoRepercutible.class
 dominio\componentesxml\DatosPotenciaMaxDemandada.class
+controladores\Login.class
 dominio\procesamientoxml\ResultadoArchivoXML.class
 controladores\helper\ProcesarRemesaPagoFactura.class
 controladores\FTP.class

@@ -1,4 +1,5 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -33,9 +34,11 @@
                             <h2 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> Listado de clientes <span class="badge badge-success">${totalClientes}</span></h2>
                         </div>
                         <div class="col-6 row  justify-content-end">
-                            <div class="col-3">
-                                <a href="${pageContext.request.contextPath}/clientes/formulario" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Agregar</a>
-                            </div>
+                            <security:authorize access="hasRole('ADMIN')">
+                                <div class="col-3">
+                                    <a href="${pageContext.request.contextPath}/clientes/formulario" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Agregar</a>
+                                </div>
+                            </security:authorize>
                             <div class="col-5">
                                 <form action="${pageContext.request.contextPath}/clientes/busqueda" method="post" id="myForm">
                                     <div class="input-group mb-2">

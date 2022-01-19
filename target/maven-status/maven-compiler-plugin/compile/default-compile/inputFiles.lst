@@ -32,6 +32,7 @@ C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\CrudDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Facturas.java
 C:\NetBeansProjects\sistemagestion\src\main\java\datos\interfaces\DocumentoXmlDao.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\procesamientoxml\PotenciaAFacturar.java
+C:\NetBeansProjects\sistemagestion\src\main\java\controladores\Login.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosAeLecturaHasta.java
 C:\NetBeansProjects\sistemagestion\src\main\java\dominio\componentesxml\DatosPotenciaPrecio.java
 C:\NetBeansProjects\sistemagestion\src\main\java\excepciones\EmpresaEmisoraNoSoportada.java

@@ -1,5 +1,3 @@
-<%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<!--<script type="text/javascript" src="${pageContext.request.contextPath}/js/jsxml.js"></script>-->
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
     <div class="container">
         <strong>${mensajeRegistro}</strong>
