@@ -74,7 +74,18 @@
                 <c:otherwise>
                     <table class="table table-bordered text-center table-fluid" id="myTable">
                         <thead class="thead-dark">
-                            <tr><th>#Reg</th><th>Cliente</th><th>Cups</th><th>FechaH</th><th>ImpPot</th><th>ImpEneAct</th><th>CodFiscal</th><th>ImpFac</th><th>Detalles</th></tr>
+                            <tr>
+                                <th>#Reg</th>
+                                <th>Cliente</th>
+                                <th>Cups</th>
+                                <th>FHasta</th>
+                                <th>ImpPot</th>
+                                <th>ImpEneAct</th>
+                                <th>CodFiscal</th>
+                                <th>ImpFac</th>
+                                <th>EA</th>
+                                <th>Detalles</th>
+                            </tr>
                         </thead>
                         <tbody>
                             <c:if test="${documentoResumen != null}">
@@ -87,6 +98,7 @@
                                     <td>${documentoResumen.eaImpTot}</td>
                                     <td>--</td>
                                     <td>${documentoResumen.rfImpTot}</td>
+                                    <td>--</td>
                                     <td>--</td>
                                 </tr>
                             </c:if>
@@ -106,6 +118,7 @@
                                     <td>${documento.eaImpTot}</td>
                                     <td>${documento.codFisFac}</td>
                                     <td>${documento.rfImpTot}</td>
+                                    <td>${documento.eaValSum}</td>
                                     <td><a href="${detalles}" class="btn btn-danger"><i class="fas fa-eye"></i></a></td>
                                 </tr>
                             </c:forEach>
