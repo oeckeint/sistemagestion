@@ -1,3 +1,4 @@
+<%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
     <div class="container">
         <strong>${mensajeRegistro}</strong>
