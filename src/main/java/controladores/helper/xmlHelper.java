@@ -114,7 +114,7 @@ public class xmlHelper {
                             utileria.ArchivoTexto.escribirError("contenido_xml. El importe total " + peaje.getImpTotFac() + " del registro con el codFisFac " + elementos.get("codFisFac") + " no coincide con el indicado en el archivo " + elementos.get("Importe") + " pero igual se proceso");
                         }
                         peaje.setRemesaPago(this.codigoRemesa);
-                        peaje.setEstadoPago(1);
+                        peaje.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
                         this.contenidoXmlService.actualizar(peaje);
                     } else {
                         utileria.ArchivoTexto.escribirError("contenido_xml. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + peaje.getEstadoPago() + " por lo que no se pudo procesar");
