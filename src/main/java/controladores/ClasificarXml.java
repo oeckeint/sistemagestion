@@ -1,6 +1,7 @@
 package controladores;
 
 import controladores.helper.Etiquetas;
+import controladores.helper.NombresNodos;
 import datos.entity.Cliente;
 import datos.interfaces.ClienteService;
 import excepciones.ArchivoNoCumpleParaSerClasificado;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import utileria.xml;
 
 /**
  *
@@ -52,12 +54,13 @@ public class ClasificarXml {
     private HashMap<String, String> elementosXml;
     private Cliente cliente;
     private String nombreArchivo;
+    private String mensajeRegistro = Etiquetas.CLASIFICAR_FORMULARIO_MENSAJE;
 
     @GetMapping("")
     public String inicio(Model model) {
         model.addAttribute("tituloPagina", Etiquetas.CLASIFICAR_FORMULARIO_TITULO_PAGINA);
         model.addAttribute("titulo", Etiquetas.CLASIFICAR_FORMULARIO_ENCABEZADO);
-        model.addAttribute("mensajeRegistro", Etiquetas.CLASIFICAR_FORMULARIO_MENSAJE);
+        model.addAttribute("mensajeRegistro", mensajeRegistro);
         model.addAttribute("etiquetaBoton", Etiquetas.CLASIFICAR_FORMULARIO_ETIQUETA_BOTON);
         model.addAttribute("controller", Etiquetas.CLASIFICAR_FORMULARIO_CONTROLLER);
         model.addAttribute("archivosErroneos", this.archivosErroneos);
@@ -91,7 +94,7 @@ public class ClasificarXml {
             //Eliminación del archivo temporal
             f.deleteOnExit();
         }
-        Etiquetas.CLASIFICAR_FORMULARIO_MENSAJE = "Archivos clasificados (" + this.archivosCorrectos + " de " + archivosTotales + ")";
+        mensajeRegistro = "Archivos clasificados (" + this.archivosCorrectos + " de " + archivosTotales + ")";
         return "redirect:/clasificar";
     }
 
@@ -100,11 +103,11 @@ public class ClasificarXml {
             elementosXml.clear();
             Document doc = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(doc);
-            this.cliente = this.clienteService.encontrarCups(elementosXml.get("cups"));
+            this.cliente = this.clienteService.encontrarCups(elementosXml.get(NombresNodos.CUPS));
             if (this.cliente != null) {
                 this.generarXML(this.nombreArchivo, ruta);
             } else {
-                throw new ClienteNoExisteException(elementosXml.get("cups"));
+                throw new ClienteNoExisteException(elementosXml.get(NombresNodos.CUPS));
             }
         } catch (MasDeUnClienteEncontrado | ArchivoNoCumpleParaSerClasificado | ArchivoVacioException | ClienteNoExisteException e) {
             this.archivosErroneos.add("El archivo <Strong>" + this.nombreArchivo + "</Strong> no se clasificó porque " + e.getMessage());
@@ -119,15 +122,15 @@ public class ClasificarXml {
 
     private void initializarVariables(Document doc) throws ArchivoNoCumpleParaSerClasificado {
         try {
-            elementosXml.put("cups", doc.getElementsByTagName("CUPS").item(0).getTextContent());
-            elementosXml.put("empEmi", doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
-            elementosXml.put("empDes", doc.getElementsByTagName("CodigoREEEmpresaDestino").item(0).getTextContent());
-            elementosXml.put("codFisFac", doc.getElementsByTagName("CodigoFiscalFactura").item(0).getTextContent());
-            elementosXml.put("TipFac", doc.getElementsByTagName("TipoFactura").item(0).getTextContent());
-            elementosXml.put("MotFac", doc.getElementsByTagName("MotivoFacturacion").item(0).getTextContent());
-            elementosXml.put("codPro", doc.getElementsByTagName("CodigoDelProceso").item(0).getTextContent());
-            elementosXml.put("codSol", doc.getElementsByTagName("CodigoDeSolicitud").item(0).getTextContent());
-            elementosXml.put("codPas", doc.getElementsByTagName("CodigoDePaso").item(0).getTextContent());
+            elementosXml.put(NombresNodos.CUPS, xml.obtenerContenidoNodo(NombresNodos.CUPS, doc));
+            elementosXml.put(NombresNodos.EMP_EMI, xml.obtenerContenidoNodo(NombresNodos.EMP_EMI, doc));
+            elementosXml.put(NombresNodos.EMP_DES, xml.obtenerContenidoNodo(NombresNodos.EMP_DES, doc));
+            elementosXml.put(NombresNodos.COD_FIS_FAC, xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, doc));
+            elementosXml.put(NombresNodos.TIP_FAC, xml.obtenerContenidoNodo(NombresNodos.TIP_FAC, doc));
+            elementosXml.put(NombresNodos.MOT_FAC, xml.obtenerContenidoNodo(NombresNodos.MOT_FAC, doc));
+            elementosXml.put(NombresNodos.COD_PRO, xml.obtenerContenidoNodo(NombresNodos.COD_PRO, doc));
+            elementosXml.put(NombresNodos.COD_SOL, xml.obtenerContenidoNodo(NombresNodos.COD_SOL, doc));
+            elementosXml.put(NombresNodos.COD_PAS, xml.obtenerContenidoNodo(NombresNodos.COD_PAS, doc));
         } catch (NullPointerException e) {
             elementosXml.clear();
             System.out.println("Parece no ser un archivo de peaje, se intentará revisar si es MensajeAceptacionModificacionDeATR");
@@ -137,12 +140,12 @@ public class ClasificarXml {
 
     private void inicializarVariables2(Document doc) throws ArchivoNoCumpleParaSerClasificado {
         try {
-            elementosXml.put("cups", doc.getElementsByTagName("CUPS").item(0).getTextContent());
-            elementosXml.put("empEmi", doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
-            elementosXml.put("empDes", doc.getElementsByTagName("CodigoREEEmpresaDestino").item(0).getTextContent());
-            elementosXml.put("codPro", doc.getElementsByTagName("CodigoDelProceso").item(0).getTextContent());
-            elementosXml.put("codSol", doc.getElementsByTagName("CodigoDeSolicitud").item(0).getTextContent());
-            elementosXml.put("codPas", doc.getElementsByTagName("CodigoDePaso").item(0).getTextContent());
+            elementosXml.put(NombresNodos.CUPS, xml.obtenerContenidoNodo(NombresNodos.CUPS, doc));
+            elementosXml.put(NombresNodos.EMP_EMI, xml.obtenerContenidoNodo(NombresNodos.EMP_EMI, doc));
+            elementosXml.put(NombresNodos.EMP_DES, xml.obtenerContenidoNodo(NombresNodos.EMP_DES, doc));
+            elementosXml.put(NombresNodos.COD_PRO, xml.obtenerContenidoNodo(NombresNodos.COD_PRO, doc));
+            elementosXml.put(NombresNodos.COD_SOL, xml.obtenerContenidoNodo(NombresNodos.COD_SOL, doc));
+            elementosXml.put(NombresNodos.COD_PAS, xml.obtenerContenidoNodo(NombresNodos.COD_PAS, doc));
         } catch (NullPointerException e) {
             throw new ArchivoNoCumpleParaSerClasificado();
         }
@@ -150,19 +153,19 @@ public class ClasificarXml {
 
     private void generarXML(String nombreArchivoOriginal, String ruta) {
         String subCarpeta = "";
-        if (elementosXml.get("empEmi").equals("0894")) {
+        if (elementosXml.get(NombresNodos.EMP_EMI).equals("0894")) {
             subCarpeta = "0894";
         } else {
-            switch (elementosXml.get("codPro")) {
+            switch (elementosXml.get(NombresNodos.COD_PRO)) {
                 case "F1":
                     subCarpeta = "F";
                     //elementos[5] = this.LeerCodigoFactura(ruta); //CodigoFiscalFactura
 
-                    switch (elementosXml.get("TipFac")) {
+                    switch (elementosXml.get(NombresNodos.TIP_FAC)) {
                         case "A":
                             subCarpeta += "\\A";
                         case "N":
-                            switch (elementosXml.get("MotFac")) {
+                            switch (elementosXml.get(NombresNodos.MOT_FAC)) {
                                 case "01":
                                 case "02":
                                 case "03":
@@ -173,7 +176,7 @@ public class ClasificarXml {
                                     break;
                                 default:
                                     subCarpeta += "\\MotivosNoSoportados";
-                                    archivosErroneos.add("El motivo de factura (" + elementosXml.get("MotFac") + ") del archivo (" + nombreArchivoOriginal + ") no esta soportado");
+                                    archivosErroneos.add("El motivo de factura (" + elementosXml.get(NombresNodos.MOT_FAC) + ") del archivo (" + nombreArchivoOriginal + ") no esta soportado");
                                     break;
                             }
                             break;
@@ -188,7 +191,7 @@ public class ClasificarXml {
                             break;
                         default:
                             subCarpeta += "\\TiposNoSoportados";
-                            archivosErroneos.add("El tipo de factura (" + elementosXml.get("TipFac") + ") del archivo (" + nombreArchivoOriginal + ") no esta soportado");
+                            archivosErroneos.add("El tipo de factura (" + elementosXml.get(NombresNodos.TIP_FAC) + ") del archivo (" + nombreArchivoOriginal + ") no esta soportado");
                             break;
                     }
                     break;
@@ -214,22 +217,22 @@ public class ClasificarXml {
         }
 
         NumberFormat formater = new DecimalFormat("#0000");
-        String finString = this.elementosXml.get("codSol");
-        if (this.elementosXml.get("codPro").equals("F1")) {
-            finString = this.elementosXml.get("codFisFac");
+        String finString = this.elementosXml.get(NombresNodos.COD_SOL);
+        if (this.elementosXml.get(NombresNodos.COD_PRO).equals("F1")) {
+            finString = this.elementosXml.get(NombresNodos.COD_FIS_FAC);
         }
-        String nombreArchivo = "C:\\Peajes\\Procesados\\" + subCarpeta + "\\"
+        String nombreArchivoGuardado = "C:\\Peajes\\Procesados\\" + subCarpeta + "\\"
                 + formater.format(this.cliente.getIdCliente()) + "-" + this.cliente.getTarifa() + "_"
-                + this.elementosXml.get("empEmi") + "_" + this.elementosXml.get("empDes") + "_" + this.elementosXml.get("codPro") + "_"
-                + this.elementosXml.get("codPas") + "_" + this.elementosXml.get("cups") + "_" + finString
+                + this.elementosXml.get(NombresNodos.EMP_EMI) + "_" + this.elementosXml.get(NombresNodos.EMP_DES) + "_" + this.elementosXml.get(NombresNodos.COD_PRO) + "_"
+                + this.elementosXml.get(NombresNodos.COD_PAS) + "_" + this.elementosXml.get(NombresNodos.CUPS) + "_" + finString
                 + ".xml";
-        File f = new File(nombreArchivo);
+        File f = new File(nombreArchivoGuardado);
 
         FileWriter fichero = null;
         PrintWriter pw;
         try {
             f.createNewFile();
-            fichero = new FileWriter(nombreArchivo);
+            fichero = new FileWriter(nombreArchivoGuardado);
             pw = new PrintWriter(fichero);
 
             //---------------------Escritura en el archivo-------------------------
@@ -250,7 +253,7 @@ public class ClasificarXml {
                     pw.println(linea);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                e.printStackTrace(System.out);
             } finally {
                 // En el finally cerramos el fichero, para asegurarnos
                 // que se cierra tanto si todo va bien como si salta 
@@ -260,7 +263,7 @@ public class ClasificarXml {
                         fr.close();
                     }
                 } catch (Exception e2) {
-                    e2.printStackTrace();
+                    e2.printStackTrace(System.out);
                 }
             }
             //---------------------Fin de escritura en el archivo-------------------------
@@ -287,6 +290,7 @@ public class ClasificarXml {
      * @param nombreArchivo nombre del archivo para indentificar el nombre con
      * el que se esta tratando
      * @return el archivo ya formateado y preparado para la lectura
+     * @throws excepciones.ArchivoVacioException
      */
     public Document prepareXml(File archivo, String nombreArchivo) throws ArchivoVacioException {
         Document doc = null;
@@ -311,11 +315,12 @@ public class ClasificarXml {
      * Reinicio de las variables para la proxima recarga de la vista
      */
     private void reiniciarVariables() {
-        Etiquetas.CLASIFICAR_FORMULARIO_MENSAJE = "Clasificación de archivos xml en sus carpetas correspondientes.";
+        mensajeRegistro = Etiquetas.CLASIFICAR_FORMULARIO_MENSAJE;
         this.archivosCorrectos = 0;
         this.archivosTotales = 0;
         this.elementosXml = new HashMap<String, String>();
         this.archivosErroneos = new ArrayList<>();
         this.nombreArchivo = null;
     }
+    
 }
