@@ -9,7 +9,7 @@
     <name>SistemaGestion</name>
     
     <properties>
-        <springframework.version>5.3.13</springframework.version>
+        <springframework.version>5.3.14</springframework.version>
         <springsecurity.version>5.6.0</springsecurity.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
