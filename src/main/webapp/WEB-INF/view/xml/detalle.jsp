@@ -1,4 +1,5 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -27,7 +28,7 @@
                             <a href="${pageContext.request.contextPath}/procesar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Procesar</a>
                         </div>
                         <div class="col-5">
-                            <form action="${pageContext.request.contextPath}/${controller}/busqueda" method="post" id="myForm">
+                            <form:form  action="${pageContext.request.contextPath}/${controller}/busqueda" method="post" id="myForm">
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
                                         <button class="btn btn-primary" type="submit" id="btnSubmit"><i class="fas fa-search"></i></button>
@@ -39,7 +40,8 @@
                                         <option class="fa" value="codFisFac" selected="true">&#xf15c;</option>
                                     </select>
                                 </div>
-                            </form>
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            </form:form>
                         </div>
                     </div>
                 </div>

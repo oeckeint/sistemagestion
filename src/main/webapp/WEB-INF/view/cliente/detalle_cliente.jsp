@@ -1,4 +1,5 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -25,14 +26,15 @@
                             <a href="${pageContext.request.contextPath}/clientes/formulario" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Agregar</a>
                         </div>
                         <div class="col-5">
-                            <form action="${pageContext.request.contextPath}/clientes/busqueda" method="post" id="myForm">
+                            <form:form action="${pageContext.request.contextPath}/clientes/busqueda" method="post" id="myForm">
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
                                         <button class="btn btn-primary" type="submit" id="btnSubmit"><i class="fas fa-search"></i></button>
                                     </div>
                                     <input type="text"  name="valor" class="form-control" id="inlineFormInputGroup" placeholder="Buscar id cliente" value="${ultimaBusqueda}" required>
                                 </div>
-                            </form>
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            </form:form>
                         </div>
                     </div>
                 </div>

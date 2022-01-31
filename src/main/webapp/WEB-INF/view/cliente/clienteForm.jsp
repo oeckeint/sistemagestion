@@ -78,6 +78,7 @@
                                         <form:select path="tarifa" cssClass="custom-select" required="true">
                                             <form:options items="${tarifas}" itemValue="nombreTarifa" itemLabel="nombreTarifa"></form:options>
                                         </form:select>
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     </div>
                                 </div>
                             </div>

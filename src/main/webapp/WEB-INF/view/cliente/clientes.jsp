@@ -1,5 +1,6 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
+<%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -40,14 +41,15 @@
                                 </div>
                             </security:authorize>
                             <div class="col-5">
-                                <form action="${pageContext.request.contextPath}/clientes/busqueda" method="post" id="myForm">
+                                <form:form action="${pageContext.request.contextPath}/clientes/busqueda" method="post" id="myForm">
                                     <div class="input-group mb-2">
                                         <div class="input-group-prepend">
                                             <button class="btn btn-primary" type="submit" id="btnSubmit"><i class="fas fa-search"></i></button>
                                         </div>
-                                        <input type="text"  name="valor" class="form-control" id="inlineFormInputGroup" placeholder="Buscar id cliente" value="${ultimaBusqueda}" required>
+                                        <input type="text" name="valor" class="form-control" id="inlineFormInputGroup" placeholder="Buscar id cliente" value="${ultimaBusqueda}" required>
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     </div>
-                                </form>
+                                </form:form>
                             </div>
                         </div>
                     </div>
