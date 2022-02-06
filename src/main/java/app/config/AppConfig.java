@@ -3,11 +3,16 @@ package app.config;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import java.beans.PropertyVetoException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sql.DataSource;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -20,56 +25,76 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @EnableWebMvc
 @EnableTransactionManagement
 @ComponentScan(basePackages = {"app", "controladores", "datos"})
+@PropertySource("classpath:persistence-mysql.properties")
 public class AppConfig {
 
+    @Autowired
+    private Environment env;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     @Bean
-    public ViewResolver viewResolver(){
+    public ViewResolver viewResolver() {
         return new InternalResourceViewResolver("/WEB-INF/view/", ".jsp");
     }
-    
-    @Bean(name = "multipartResolver")
-    public CommonsMultipartResolver multipartResolver(){
+
+    @Bean
+    public CommonsMultipartResolver multipartResolver() {
         CommonsMultipartResolver cmr = new CommonsMultipartResolver();
         cmr.setDefaultEncoding("UTF-8");
         cmr.setMaxUploadSize(5242880);
         return cmr;
     }
-    
-    @Bean(destroyMethod = "close", name = "dataSource")
-    public ComboPooledDataSource getDataSource() throws PropertyVetoException{
+
+    @Bean
+    public DataSource securityDataSource() throws PropertyVetoException {
         ComboPooledDataSource cpds = new ComboPooledDataSource();
-        cpds.setDriverClass("com.mysql.cj.jdbc.Driver");
-        cpds.setJdbcUrl("jdbc:mysql://localhost:3306/sge?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true");
-        cpds.setUser("root");
-        cpds.setPassword("admin");
-        cpds.setMinPoolSize(5);
-        cpds.setMaxPoolSize(20);
-        cpds.setMaxIdleTime(30000);
+        
+        try {
+            cpds.setDriverClass(this.env.getProperty("jdbc.driver"));
+        } catch (PropertyVetoException e) {
+            throw new RuntimeException(e);
+        }
+
+        cpds.setJdbcUrl(this.env.getProperty("jdbc.url"));
+        cpds.setUser(this.env.getProperty("jdbc.user"));
+        cpds.setPassword(this.env.getProperty("jdbc.password"));
+        cpds.setInitialPoolSize(this.getIntProperty("connection.pool.initialPoolSize"));
+        cpds.setMinPoolSize(this.getIntProperty("connection.pool.minPoolSize"));
+        cpds.setMaxPoolSize(this.getIntProperty("connection.pool.maxPoolSize"));
+        cpds.setMaxIdleTime(this.getIntProperty("connection.pool.maxIdleTime"));
+        
+        logger.log(Level.INFO, ">>> jdbc.url={0}", this.env.getProperty("jdbc.url"));
+        logger.log(Level.INFO, ">>> jdbc.url={0}", this.env.getProperty("jdbc.user"));
+
         return cpds;
     }
-    
-    @Bean(name="sessionFactory")
-    @Scope("singleton")
-    public LocalSessionFactoryBean getSessionFactory(javax.sql.DataSource dataSource) throws PropertyVetoException{
+
+    @Bean
+    public LocalSessionFactoryBean sessionFactory(javax.sql.DataSource dataSource) throws PropertyVetoException {
         LocalSessionFactoryBean lsfb = new LocalSessionFactoryBean();
-        lsfb.setDataSource(this.getDataSource());
-        lsfb.setPackagesToScan("datos.entity");
-        lsfb.setHibernateProperties(additionalProperties());
-        return  lsfb;
+        lsfb.setDataSource(this.securityDataSource());
+        lsfb.setPackagesToScan(env.getProperty("hibernate.packagesToScan"));
+        lsfb.setHibernateProperties(getHibernateProperties());
+        return lsfb;
     }
-    
-    public Properties additionalProperties(){
+
+    public Properties getHibernateProperties() {
         Properties props = new Properties();
-        props.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-        props.setProperty("hibernate.show_sql", "true");
-        return  props;
+        props.setProperty("hibernate.dialect", env.getProperty("hibernate.dialect"));
+        props.setProperty("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
+        return props;
     }
-    
-    @Bean(name="transactionManager")
-    public HibernateTransactionManager getTransactionManager(SessionFactory sessionFactory) throws PropertyVetoException{
+
+    @Bean
+    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) throws PropertyVetoException {
         HibernateTransactionManager htm = new HibernateTransactionManager();
         htm.setSessionFactory(sessionFactory);
         return htm;
     }
-    
+
+    private int getIntProperty(String propName) {
+        return Integer.parseInt(env.getProperty(propName));
+    }
+
 }
