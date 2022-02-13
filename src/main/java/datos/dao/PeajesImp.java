@@ -16,7 +16,15 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
     @Override
     public List<Peaje> listar() {
         return this.sessionFactory.getCurrentSession()
-                .createQuery("from Peaje p order by p.idPeaje desc", Peaje.class)
+                .createQuery("from Peaje p "
+                            + "order by "
+                            + "case p.eaFecHas2"
+                            + " when '' then"
+                            + "     p.eaFecHas1"
+                            + " else"
+                            + "     p.eaFecHas2"
+                            + " end "
+                            + "desc", Peaje.class)
                 .getResultList();
     }
 
@@ -56,7 +64,15 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
     public List<Peaje> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException{
         try {
             return this.sessionFactory.getCurrentSession()
-                    .createQuery("from Peaje p where p.idCliente = :id", Peaje.class)
+                    .createQuery("from Peaje p where p.idCliente = :id "
+                            + "order by "
+                            + "case p.eaFecHas2"
+                            + " when '' then"
+                            + "     p.eaFecHas1"
+                            + " else"
+                            + "     p.eaFecHas2"
+                            + " end "
+                            + "desc", Peaje.class)
                     .setParameter("id", Long.parseLong(idCliente))
                     .getResultList();
         } catch (NumberFormatException e) {
@@ -68,7 +84,15 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
     @Override
     public List<Peaje> buscarByRemesa(String remesa) {
         return this.sessionFactory.getCurrentSession()
-                .createQuery("from Peaje p where p.rfIdRem = :remesa", Peaje.class)
+                .createQuery("from Peaje p where p.rfIdRem = :remesa "
+                            + "order by "
+                            + "case p.eaFecHas2"
+                            + " when '' then"
+                            + "     p.eaFecHas1"
+                            + " else"
+                            + "     p.eaFecHas2"
+                            + " end "
+                            + "desc", Peaje.class)
                 .setParameter("remesa", remesa)
                 .getResultList();
     }

@@ -85,9 +85,13 @@
             document.getElementById("pageHeader").innerHTML = "<fmt:message key='process.icon'/> <fmt:message key='header.process'/>";
         } else if(url.includes("/clasificar")){
             document.getElementById("pageHeader").innerHTML = "<fmt:message key='sort.icon'/> <fmt:message key='header.sort'/>";
+        } else if(url.includes("/peajes/detalles")){
+            document.getElementById("backList").setAttribute("href", "${pageContext.request.contextPath}/peajes");
+        } else if(url.includes("/facturas/detalles")){
+            document.getElementById("backList").setAttribute("href", "${pageContext.request.contextPath}/facturas");
         }
-        
     }
+    
     window.onload = function () {
         defineTitles();
         startTime();

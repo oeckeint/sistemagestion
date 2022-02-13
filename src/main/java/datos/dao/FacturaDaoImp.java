@@ -17,7 +17,15 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
     @Override
     public List<Factura> listar() {
         return this.sessionFactory.getCurrentSession()
-                .createQuery("from Factura f where f.isDeleted = 0 order by f.idFactura desc", Factura.class)
+                .createQuery("from Factura f where f.isDeleted = 0 "
+                            + "order by "
+                            + "case f.eaFecHas2"
+                            + " when '' then"
+                            + "     f.eaFecHas1"
+                            + " else"
+                            + "     f.eaFecHas2"
+                            + " end "
+                            + "desc", Factura.class)
                 .getResultList();
     }
 
@@ -52,7 +60,15 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
     public List<Factura> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException {
         try {
             return this.sessionFactory.getCurrentSession()
-                    .createQuery("from Factura f where f.idCliente = :id order by f.idFactura desc", Factura.class)
+                    .createQuery("from Factura f where f.idCliente = :id "
+                            + "order by "
+                            + "case f.eaFecHas2"
+                            + " when '' then"
+                            + "     f.eaFecHas1"
+                            + " else"
+                            + "     f.eaFecHas2"
+                            + " end "
+                            + "desc", Factura.class)
                     .setParameter("id", Long.parseLong(idCliente))
                     .getResultList();
         } catch (NumberFormatException e) {
@@ -64,7 +80,15 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
     @Override
     public List<Factura> buscarByRemesa(String remesa) {
         return this.sessionFactory.getCurrentSession()
-                .createQuery("from Factura f where f.rfIdRem = :remesa", Factura.class)
+                .createQuery("from Factura f where f.rfIdRem = :remesa "
+                            + "order by "
+                            + "case f.eaFecHas2"
+                            + " when '' then"
+                            + "     f.eaFecHas1"
+                            + " else"
+                            + "     f.eaFecHas2"
+                            + " end "
+                            + "desc", Factura.class)
                 .setParameter("remesa", remesa)
                 .getResultList();
     }

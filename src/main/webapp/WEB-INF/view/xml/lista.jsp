@@ -115,7 +115,12 @@
                                     <td>${id.count}</td>
                                     <td><a href="${detallesCliente}" class="btn btn-success">${documento.idCliente}</i></a></td>
                                     <td>${documento.cups}</td>
-                                    <td>${documento.eaFecHas1}</td>
+                                    <td>
+                                    <c:choose>
+                                        <c:when test="${documento.eaFecHas2 eq ''}">${documento.eaFecHas1}</c:when>
+                                        <c:otherwise>${documento.eaFecHas2}</c:otherwise>
+                                    </c:choose>
+                                    </td>
                                     <td>${documento.potImpTot}</td>
                                     <td>${documento.eaImpTot}</td>
                                     <td>${documento.codFisFac}</td>
