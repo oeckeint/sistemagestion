@@ -127,6 +127,30 @@ public class Peajes {
 
     }
 
+    @PostMapping("/comentar")
+    public String comentar(@RequestParam("comentario") String comentario, @RequestParam("codFisFac") String codFisFac){
+        Peaje peaje = (Peaje) documentoXmlService.buscarByCodFiscal(codFisFac);
+        if (peaje != null) {
+            peaje.setComentarios(comentario);
+            documentoXmlService.guardar(peaje);
+        }
+        return "redirect:/peajes/detalles?codFisFac=" + codFisFac;
+    }
+    
+    @GetMapping("/archivar")
+    public String archivar(@RequestParam("codFisFac") String codFisFac){
+        Peaje peaje = (Peaje) documentoXmlService.buscarByCodFiscal(codFisFac);
+        if (peaje != null) {
+            if (peaje.getIsDeleted() == 0) {
+                peaje.setIsDeleted(1);
+            } else {
+                peaje.setIsDeleted(0);
+            }
+            documentoXmlService.actualizar(peaje);
+        }
+        return "redirect:/peajes/detalles?codFisFac=" + codFisFac;
+    }
+    
     private Peaje resumen(List<Peaje> peajes) throws MasDeUnClienteEncontrado, RegistroVacioException {
         if (peajes.isEmpty()) {
             return null;

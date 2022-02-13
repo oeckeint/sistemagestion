@@ -16,7 +16,7 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
     @Override
     public List<Peaje> listar() {
         return this.sessionFactory.getCurrentSession()
-                .createQuery("from Peaje p "
+                .createQuery("from Peaje p where p.isDeleted = 0 "
                             + "order by "
                             + "case p.eaFecHas2"
                             + " when '' then"

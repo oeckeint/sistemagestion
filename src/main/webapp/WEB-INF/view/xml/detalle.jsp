@@ -1,5 +1,6 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -21,6 +22,18 @@
                         <h2 class="m-0"><a id="backList" href="${pageContext.request.contextPath}/facturas"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura</h2>
                     </div>
                     <div class="col-6 row justify-content-end">
+                        <security:authorize access="hasRole('ADMIN')">
+                            <div class="col-1">
+                                <c:choose>
+                                    <c:when test="${documento.isDeleted == 0}">
+                                        <a href="${pageContext.request.contextPath}/${controller}/archivar?codFisFac=${documento.codFisFac}" class="btn btn-danger m-0"><i class="fas fa-trash"></i></i></a>
+                                    </c:when>
+                                    <c:when test="${documento.isDeleted == 1}">
+                                        <a href="${pageContext.request.contextPath}/${controller}/archivar?codFisFac=${documento.codFisFac}" class="btn btn-success m-0"><i class="fas fa-trash-restore"></i></a>
+                                    </c:when>
+                                </c:choose>
+                            </div>
+                        </security:authorize>
                         <div class="col-3">
                             <a href="${pageContext.request.contextPath}/clasificar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Clasificar</a>
                         </div>
@@ -49,11 +62,20 @@
                 <div class="card row">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item"><h3>Comentarios</h3> ${documento.comentarios}</li>
-                            <c:choose>
-                                <c:when test="${ documento.idError != '0'}">
+                        <security:authorize access="hasRole('ADMIN')">
+                            <form:form  action="${pageContext.request.contextPath}/${controller}/comentar" method="post">
+                                <li class="list-group-item">
+                                    <h3 class="m-2"><button class="btn btn-success" type="submit" id="btnSubmit" value="comentar"><i class="fas fa-check-circle"></i> Actualizar comentario</button></h3>
+                                    <textarea name="comentario" cols="80" rows="5">${documento.comentarios}</textarea>
+                                    <input type="hidden" value="${documento.codFisFac}" name="codFisFac">
+                                </li>
+                            </form:form>
+                        </security:authorize>
+                        <c:choose>
+                            <c:when test="${documento.idError ne ''}">
                                 <li class="list-group-item"><h5>Se encontraron errores importantes</h5> Revisar codigos:  <Strong>${documento.idError}</strong></li>
-                                    </c:when>
-                                </c:choose>
+                            </c:when>
+                        </c:choose>
                     </ul>
                 </div>
 
@@ -72,6 +94,7 @@
                                     <dt class="list-group-item px-1">Solicitud</dt>
                                     <dt class="list-group-item px-1">FechaSol</dt>
                                     <dt class="list-group-item px-1">CUPS</dt>
+                                    <dt class="list-group-item px-1">Archivado</dt>
                                 </ul>
                             </div>
                             <div class="col-8 col-md-7">
@@ -83,6 +106,12 @@
                                     <li class="list-group-item px-1">${documento.codSol}</li>
                                     <li class="list-group-item px-1">${documento.fecSol}</li>
                                     <li class="list-group-item px-1">${documento.cups}</li>
+                                    <li class="list-group-item px-1">
+                                        <c:choose>
+                                            <c:when test="${documento.isDeleted == 0}">No</c:when>
+                                            <c:when test="${documento.isDeleted == 1}">Si</c:when>
+                                        </c:choose>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

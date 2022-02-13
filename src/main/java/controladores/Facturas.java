@@ -130,6 +130,30 @@ public class Facturas {
         }
         return "xml/lista";
     }
+    
+    @PostMapping("/comentar")
+    public String comentar(@RequestParam("comentario") String comentario, @RequestParam("codFisFac") String codFisFac){
+        Factura factura = (Factura) documentoXmlService.buscarByCodFiscal(codFisFac);
+        if (factura != null) {
+            factura.setComentarios(comentario);
+            documentoXmlService.guardar(factura);
+        }
+        return "redirect:/facturas/detalles?codFisFac=" + codFisFac;
+    }
+    
+    @GetMapping("/archivar")
+    public String archivar(@RequestParam("codFisFac") String codFisFac){
+        Factura factura = (Factura) documentoXmlService.buscarByCodFiscal(codFisFac);
+        if (factura != null) {
+            if (factura.getIsDeleted() == 0) {
+                factura.setIsDeleted(1);
+            } else {
+                factura.setIsDeleted(0);
+            }
+            documentoXmlService.actualizar(factura);
+        }
+        return "redirect:/facturas/detalles?codFisFac=" + codFisFac;
+    }
 
     private Factura resumen(List<Factura> facturas) throws MasDeUnClienteEncontrado, RegistroVacioException {
         if (facturas.isEmpty()) {
