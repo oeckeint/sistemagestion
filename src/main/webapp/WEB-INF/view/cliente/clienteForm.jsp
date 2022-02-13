@@ -35,7 +35,7 @@
                                 <div class="card-header">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <h3><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> ${tablaTitulo} <strong>${cliente.cups}</strong></h3>
+                                            <h3><a href="${pageContext.request.contextPath}/clientes"><i class="fas fa-arrow-circle-left text-success"></i></a> ${tablaTitulo} <strong>${cliente.cups}</strong></h3>
                                         </div>
                                         <div class="col-md-6"> 
                                             <div class="row justify-content-end">

@@ -12,7 +12,7 @@
 <!--<script type="text/javascript" src="${pageContext.request.contextPath}/js/jsxml.js"></script>-->
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <div class="container">
-                <h5 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> <strong>${mensajeRegistro}</strong></h5>
+                <h5 class="m-0"><a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-circle-left text-success"></i></a> <strong>${mensajeRegistro}</strong></h5>
             </div>
         </div>
 

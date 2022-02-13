@@ -19,7 +19,7 @@
                 <hr>
                 <div class="row justify-content-between p-0">
                     <div class="col-6">
-                        <h2 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> Detalles cliente</h2>
+                        <h2 class="m-0"><a href="${pageContext.request.contextPath}/clientes"><i class="fas fa-arrow-circle-left text-success"></i></a> Detalles cliente</h2>
                     </div>
                     <div class="col-6 row  justify-content-end">
                         <div class="col-3">

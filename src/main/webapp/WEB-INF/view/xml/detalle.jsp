@@ -18,7 +18,7 @@
                 <hr>
                 <div class="row justify-content-between p-0">
                     <div class="col-6">
-                        <h2 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura</h2>
+                        <h2 class="m-0"><a href="${pageContext.request.contextPath}/facturas"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura</h2>
                     </div>
                     <div class="col-6 row justify-content-end">
                         <div class="col-3">
@@ -872,36 +872,37 @@
                             </div>
                         </div>
                     </div>
-
-                    <c:if test="${documento.energiaExcedentaria != null}">
-                        <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                            <h3 class="list-group-item list-group-item-action active text-center h4">Energia Excedentaria</h3>
-                            <div class="row">
-                                <div class="col-5">
-                                    <ul class="list-group list-group-flush text-right">
-                                        <dt class="list-group-item px-1">Excedentaria 01</dt>
-                                        <dt class="list-group-item px-1">Excedentaria 02</dt>
-                                        <dt class="list-group-item px-1">Excedentaria 03</dt>
-                                        <dt class="list-group-item px-1">Excedentaria 04</dt>
-                                        <dt class="list-group-item px-1">Excedentaria 05</dt>
-                                        <dt class="list-group-item px-1">Excedentaria 06</dt>
-                                        <dt class="list-group-item px-1">Total</dt>
-                                    </ul>
-                                </div>
-                                <div class="col-7">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria01}</li>
-                                        <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria02}</li>
-                                        <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria03}</li>
-                                        <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria04}</li>
-                                        <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria05}</li>
-                                        <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria06}</li>
-                                        <li class="list-group-item px-1">${documento.energiaExcedentaria.valorTotalEnergiaExcedentaria}</li>
-                                    </ul>
+                    <c:catch var="nullPointerException">
+                        <c:if test="${documento.energiaExcedentaria != null}">
+                            <div class="list-group col-12 col-md-5 col-lg-4 p-2">
+                                <h3 class="list-group-item list-group-item-action active text-center h4">Energia Excedentaria</h3>
+                                <div class="row">
+                                    <div class="col-5">
+                                        <ul class="list-group list-group-flush text-right">
+                                            <dt class="list-group-item px-1">Excedentaria 01</dt>
+                                            <dt class="list-group-item px-1">Excedentaria 02</dt>
+                                            <dt class="list-group-item px-1">Excedentaria 03</dt>
+                                            <dt class="list-group-item px-1">Excedentaria 04</dt>
+                                            <dt class="list-group-item px-1">Excedentaria 05</dt>
+                                            <dt class="list-group-item px-1">Excedentaria 06</dt>
+                                            <dt class="list-group-item px-1">Total</dt>
+                                        </ul>
+                                    </div>
+                                    <div class="col-7">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria01}</li>
+                                            <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria02}</li>
+                                            <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria03}</li>
+                                            <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria04}</li>
+                                            <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria05}</li>
+                                            <li class="list-group-item px-1">${documento.energiaExcedentaria.energiaExcedentaria06}</li>
+                                            <li class="list-group-item px-1">${documento.energiaExcedentaria.valorTotalEnergiaExcedentaria}</li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </c:if>
+                        </c:if>
+                    </c:catch>
                 </div>
 
 

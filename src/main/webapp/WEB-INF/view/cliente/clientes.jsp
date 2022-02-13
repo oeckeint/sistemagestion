@@ -32,7 +32,7 @@
                 <div class="col-12">
                     <div class="row justify-content-between p-0">
                         <div class="col-md-12 col-lg-5">
-                            <h2 class="m-0"><a href="javascript:history.back();"><i class="fas fa-arrow-circle-left text-success"></i></a> Listado de clientes <span class="badge badge-success">${totalClientes}</span></h2>
+                            <h2 class="m-0"><a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-circle-left text-success"></i></a> Listado de clientes <span class="badge badge-success">${totalClientes}</span></h2>
                         </div>
                         <div class="col-6 row  justify-content-end">
                             <security:authorize access="hasRole('ADMIN')">
