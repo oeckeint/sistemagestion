@@ -58,7 +58,7 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
         Peaje peaje = documento;
         peaje.setIdPeaje(0L);
         peaje.setCodFisFac(documento.getCodFisFac() + "-A");
-        peaje.setTipFac("Av");
+        peaje.setTipFac("R");
         peaje.setNumDias(documento.getNumDias() * -1);
         
         peaje.setExcPot1(documento.getExcPot1() * -1);
@@ -87,6 +87,11 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
         peaje.setPotFac2(peaje.getPotFac2() * -1);
         peaje.setPotFac3(peaje.getPotFac3() * -1);
         peaje.setPotImpTot(peaje.getPotImpTot() * -1);
+        
+        peaje.setEaFecDes1(peaje.getEaFecHas1());
+        peaje.setEaFecHas1(peaje.getEaFecDes1());
+        peaje.setEaFecDes2(peaje.getEaFecHas2());
+        peaje.setEaFecHas2(peaje.getEaFecDes2());
         
         peaje.setEaVal1(peaje.getEaVal1() * -1);
         peaje.setEaVal2(peaje.getEaVal2() * -1);

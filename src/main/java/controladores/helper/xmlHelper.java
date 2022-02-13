@@ -438,8 +438,7 @@ public class xmlHelper {
      * y los importes totales
      */
     private void registrarPeajeNA() throws MasDeUnClienteEncontrado {
-        this.contenidoXmlService.guardar(
-                new Peaje(
+        Peaje peaje = new Peaje(
                         this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
                         this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal_A(),
                         this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal_A(),
@@ -449,8 +448,9 @@ public class xmlHelper {
                         this.rConsumo_A(), this.rLecturaDesde_A(), this.rLecturaHasta_A(), this.rImporteTotal_A(),
                         this.pmConsumo_A(), this.pmLecturaHasta_A(),
                         this.registroFin(), this.comentarios.toString(), this.errores.toString()
-                )
-        );
+                );
+        this.prepareAbono(peaje);
+        this.contenidoXmlService.guardar(peaje);
         System.out.print("\n\nComentarios : " + comentarios.toString());
         System.out.print("Codigo Errores : " + errores.toString());
     }
@@ -5170,5 +5170,14 @@ public class xmlHelper {
     Integer obtenerContenidoNodoSobre1000(NodeList nodeList, int index){
         return StringHelper.toInteger(nodeList.item(index).getTextContent()) / 1000;
     }
-
+    
+    private Peaje prepareAbono(Peaje peaje){
+        peaje.setTipFac("Av");
+        peaje.setEaFecDes1(peaje.getEaFecHas1());
+        peaje.setEaFecHas1(peaje.getEaFecDes1());
+        peaje.setEaFecDes2(peaje.getEaFecHas2());
+        peaje.setEaFecHas2(peaje.getEaFecDes2());
+        return peaje;
+    }
+    
 }
