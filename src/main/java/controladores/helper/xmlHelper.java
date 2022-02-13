@@ -52,11 +52,12 @@ public class xmlHelper {
         this.contenidoXmlService = contenidoXmlService;
         this.iniciarVariablesPagoRemesa();
     }
-    
+
     /**
      * Constructor usado para CambiodeComercializador SinCambios
+     *
      * @param doc
-     * @param clienteService 
+     * @param clienteService
      */
     public xmlHelper(Document doc, ClienteService clienteService) {
         this.errores = new StringBuilder("");
@@ -65,8 +66,8 @@ public class xmlHelper {
         this.clienteService = clienteService;
         this.iniciarVariablesCambioComercializador();
     }
-    
-    public boolean existeClientebyCups() throws MasDeUnClienteEncontrado, ClienteNoExisteException{
+
+    public boolean existeClientebyCups() throws MasDeUnClienteEncontrado, ClienteNoExisteException {
         this.cliente = clienteService.encontrarCups(this.cups);
         if (this.cliente != null) {
             return true;
@@ -273,7 +274,7 @@ public class xmlHelper {
      * @throws MasDeUnClienteEncontrado
      */
     public void procesarFactura(String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado {
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException {
         //Se verifica que el cliente exista
         this.cliente = this.clienteService.encontrarCups(this.cups);
         if (this.cliente != null) {
@@ -317,7 +318,7 @@ public class xmlHelper {
      * @throws excepciones.MasDeUnClienteEncontrado
      */
     public void procesarPeaje(String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException {
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException {
         //Se verifica que el cliente exista
         this.cliente = this.clienteService.encontrarCups(this.cups);
         if (this.cliente != null) {
@@ -357,7 +358,7 @@ public class xmlHelper {
      *
      * @throws CodRectNoExisteException
      */
-    private void registrarPeajeA() throws MasDeUnClienteEncontrado, PeajeCodRectNoExisteException {
+    private void registrarPeajeA() throws MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
         if (peaje != null) {
@@ -372,7 +373,7 @@ public class xmlHelper {
     /**
      * Registra el peaje de tipo N
      */
-    private void registrarPeajeN() throws MasDeUnClienteEncontrado {
+    private void registrarPeajeN() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
         Peaje peaje = new Peaje(
                 this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
                 this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
@@ -402,7 +403,7 @@ public class xmlHelper {
      * @param nombreArchivo
      * @throws CodRectNoExisteException
      */
-    private void registrarPeajeR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado {
+    private void registrarPeajeR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
         if (peaje != null) {
@@ -437,18 +438,18 @@ public class xmlHelper {
      * Registra el Peaje de tipo A poniendo en negativo los valores de AE, R, PM
      * y los importes totales
      */
-    private void registrarPeajeNA() throws MasDeUnClienteEncontrado {
+    private void registrarPeajeNA() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
         Peaje peaje = new Peaje(
-                        this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
-                        this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal_A(),
-                        this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal_A(),
-                        this.Cargos01_A(), this.Cargos02_A(), this.ImporteTotalCargo01_A(), this.ImporteTotalCargo02_A(),
-                        this.impuestoElectrico(), this.alquileres(), this.iva(),
-                        this.aeConsumo_A(), this.aeLecturaDesde_A(), this.aeLecturaHasta_A(), this.aeProcedenciaDesde_A(), this.aeProcedenciaHasta_A(),
-                        this.rConsumo_A(), this.rLecturaDesde_A(), this.rLecturaHasta_A(), this.rImporteTotal_A(),
-                        this.pmConsumo_A(), this.pmLecturaHasta_A(),
-                        this.registroFin(), this.comentarios.toString(), this.errores.toString()
-                );
+                this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
+                this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal_A(),
+                this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal_A(),
+                this.Cargos01_A(), this.Cargos02_A(), this.ImporteTotalCargo01_A(), this.ImporteTotalCargo02_A(),
+                this.impuestoElectrico(), this.alquileres(), this.iva(),
+                this.aeConsumo_A(), this.aeLecturaDesde_A(), this.aeLecturaHasta_A(), this.aeProcedenciaDesde_A(), this.aeProcedenciaHasta_A(),
+                this.rConsumo_A(), this.rLecturaDesde_A(), this.rLecturaHasta_A(), this.rImporteTotal_A(),
+                this.pmConsumo_A(), this.pmLecturaHasta_A(),
+                this.registroFin(), this.comentarios.toString(), this.errores.toString()
+        );
         this.prepareAbono(peaje);
         this.contenidoXmlService.guardar(peaje);
         System.out.print("\n\nComentarios : " + comentarios.toString());
@@ -458,7 +459,7 @@ public class xmlHelper {
     /**
      * Registra el Factura de tipo N
      */
-    private void registrarFacturaN() throws MasDeUnClienteEncontrado {
+    private void registrarFacturaN() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
         this.contenidoXmlService.guardar(
                 new Factura(
                         this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
@@ -483,7 +484,7 @@ public class xmlHelper {
      * @param nombreArchivo
      * @throws CodRectNoExisteException
      */
-    private void registrarFacturaR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado {
+    private void registrarFacturaR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         Factura factura = (Factura) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
         if (factura != null) {
@@ -608,7 +609,7 @@ public class xmlHelper {
         return new DatosGeneralesFactura(elementos);
     }
 
-    private DatosFacturaAtr datosFacturaAtr() throws MasDeUnClienteEncontrado {
+    private DatosFacturaAtr datosFacturaAtr() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
         elementos = new ArrayList<String>(7);
         elementos.add(0, "0");
         elementos.add(1, "0");
@@ -1736,6 +1737,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -1766,6 +1770,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -1777,6 +1782,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -1915,6 +1923,9 @@ public class xmlHelper {
                             case "12":
                             case "13":
                             case "14":
+                            case "19":
+                            case "20":
+                            case "21":
                                 //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                 if (!"0".equals(defPeriodo)) {
                                     //Evaluacion de los periodos
@@ -1945,6 +1956,7 @@ public class xmlHelper {
                                 break;
                             case "4":
                             case "6":
+                            case "18":
                                 //Se verifica la empresa para definir los casos especiales
                                 if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -1956,6 +1968,9 @@ public class xmlHelper {
                                             break;
                                         case '2':
                                             elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case '3':
+                                            elementos.set(2, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
                                             break;
                                         default:
                                             break;
@@ -2090,6 +2105,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -2120,6 +2138,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -2131,6 +2150,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -2239,6 +2261,9 @@ public class xmlHelper {
                             case "12":
                             case "13":
                             case "14":
+                            case "19":
+                            case "20":
+                            case "21":
                                 if (!"0".equals(defPeriodo)) {
                                     continuar = false;
                                     elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
@@ -2373,6 +2398,9 @@ public class xmlHelper {
                             case "12":
                             case "13":
                             case "14":
+                            case "19":
+                            case "20":
+                            case "21":
                                 if (!"0".equals(defPeriodo)) {
                                     continuar = false;
                                     elementos.set(0, Integer.parseInt(childList.item(j).getTextContent().trim()));
@@ -2508,6 +2536,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -2538,6 +2569,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -2549,6 +2581,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -2687,6 +2722,9 @@ public class xmlHelper {
                             case "12":
                             case "13":
                             case "14":
+                            case "19":
+                            case "20":
+                            case "21":
                                 //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                 if (!"0".equals(defPeriodo)) {
                                     //Evaluacion de los periodos
@@ -2717,6 +2755,7 @@ public class xmlHelper {
                                 break;
                             case "4":
                             case "6":
+                            case "18":
                                 //Se verifica la empresa para definir los casos especiales
                                 if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -2728,6 +2767,9 @@ public class xmlHelper {
                                             break;
                                         case '2':
                                             elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case '3':
+                                            elementos.set(2, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
                                             break;
                                         default:
                                             break;
@@ -2862,6 +2904,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -2892,6 +2937,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -2903,6 +2949,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -3044,6 +3093,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -3074,6 +3126,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -3085,6 +3138,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -3228,6 +3284,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -3258,6 +3317,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -3269,6 +3329,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -3390,6 +3453,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -3420,6 +3486,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -3431,6 +3498,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -3569,6 +3639,9 @@ public class xmlHelper {
                             case "12":
                             case "13":
                             case "14":
+                            case "19":
+                            case "20":
+                            case "21":
                                 //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                 if (!"0".equals(defPeriodo)) {
                                     //Evaluacion de los periodos
@@ -3599,6 +3672,7 @@ public class xmlHelper {
                                 break;
                             case "4":
                             case "6":
+                            case "18":
                                 //Se verifica la empresa para definir los casos especiales
                                 if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -3610,6 +3684,9 @@ public class xmlHelper {
                                             break;
                                         case '2':
                                             elementos.set(1, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case '3':
+                                            elementos.set(2, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
                                             break;
                                         default:
                                             break;
@@ -3744,6 +3821,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -3774,6 +3854,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -3785,6 +3866,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -3893,6 +3977,9 @@ public class xmlHelper {
                             case "12":
                             case "13":
                             case "14":
+                            case "19":
+                            case "20":
+                            case "21":
                                 if (!"0".equals(defPeriodo)) {
                                     continuar = false;
                                     elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
@@ -4027,6 +4114,9 @@ public class xmlHelper {
                             case "12":
                             case "13":
                             case "14":
+                            case "19":
+                            case "20":
+                            case "21":
                                 if (!"0".equals(defPeriodo)) {
                                     continuar = false;
                                     elementos.set(0, -Integer.parseInt(childList.item(j).getTextContent().trim()));
@@ -4162,6 +4252,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -4192,6 +4285,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -4203,6 +4297,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -4341,6 +4438,9 @@ public class xmlHelper {
                             case "12":
                             case "13":
                             case "14":
+                            case "19":
+                            case "20":
+                            case "21":
                                 //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                 if (!"0".equals(defPeriodo)) {
                                     //Evaluacion de los periodos
@@ -4371,6 +4471,7 @@ public class xmlHelper {
                                 break;
                             case "4":
                             case "6":
+                            case "18":
                                 //Se verifica la empresa para definir los casos especiales
                                 if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -4382,6 +4483,9 @@ public class xmlHelper {
                                             break;
                                         case '2':
                                             elementos.set(1, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                            break;
+                                        case '3':
+                                            elementos.set(2, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
                                             break;
                                         default:
                                             break;
@@ -4516,6 +4620,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -4546,6 +4653,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -4557,6 +4665,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -4698,6 +4809,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -4728,6 +4842,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -4739,6 +4854,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -4882,6 +5000,9 @@ public class xmlHelper {
                                 case "12":
                                 case "13":
                                 case "14":
+                                case "19":
+                                case "20":
+                                case "21":
                                     //Se revisa que la definicion del segundo caracter del periodo sea diferente de 0
                                     if (!"0".equals(defPeriodo)) {
                                         //Evaluacion de los periodos
@@ -4912,6 +5033,7 @@ public class xmlHelper {
                                     break;
                                 case "4":
                                 case "6":
+                                case "18":
                                     //Se verifica la empresa para definir los casos especiales
                                     if (this.EmpresaEmisora.equals("0022") || this.EmpresaEmisora.equals("0113") || this.EmpresaEmisora.equals("0212")) {
 
@@ -4923,6 +5045,9 @@ public class xmlHelper {
                                                 break;
                                             case '2':
                                                 elementos.set(1, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                break;
+                                            case '3':
+                                                elementos.set(2, (double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                 break;
                                             default:
                                                 break;
@@ -5079,7 +5204,7 @@ public class xmlHelper {
     private void iniciarVariablesPagoRemesa() {
         this.codigoRemesa = this.doc.getElementsByTagName("CodigoRemesa").item(0).getTextContent();
     }
-    
+
     private void iniciarVariablesCambioComercializador() {
         this.empEmi = Integer.parseInt(this.doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
         this.cups = this.doc.getElementsByTagName("CUPS").item(0).getTextContent();
@@ -5099,12 +5224,13 @@ public class xmlHelper {
         utileria.ArchivoTexto.escribirAdvertencia(this.nombreArchivo, codError);
     }
 
-    private void validarTarifa() throws MasDeUnClienteEncontrado {
+    private void validarTarifa() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
         this.cliente = this.clienteService.encontrarCups(this.cups);
         //Cliente c = new ClienteDao().encontrarCups(new Cliente(this.cups));
         String control = "";
+        String tarifa = this.cliente.getTarifa();
 
-        switch (this.cliente.getTarifa()) {
+        switch (tarifa) {
             case "20A":
                 control = "1";
                 break;
@@ -5142,7 +5268,7 @@ public class xmlHelper {
                 control = "21";
                 break;
             default:
-                break;
+                throw new TarifaNoExisteException(tarifa);
         }
 
         if (!control.equals(this.tarifaAtrFac)) {
@@ -5150,28 +5276,30 @@ public class xmlHelper {
             this.agregarError("21");
         }
     }
-    
+
     /**
      * Obtiene el contenido de un nodo en un String
+     *
      * @param nodo
-     * @return 
+     * @return
      */
-    String obtenerContenidoNodo(String nodo){
+    String obtenerContenidoNodo(String nodo) {
         return this.doc.getElementsByTagName(nodo).item(0).getTextContent();
     }
 
     /**
-     * Obtiene el valor de un nodo de una lista que generalmente viene desde un ciclo for
-     * lo transforma a entero y el resultado lo divide entre 1000
+     * Obtiene el valor de un nodo de una lista que generalmente viene desde un
+     * ciclo for lo transforma a entero y el resultado lo divide entre 1000
+     *
      * @param nodeList
      * @param index
-     * @return 
+     * @return
      */
-    Integer obtenerContenidoNodoSobre1000(NodeList nodeList, int index){
+    Integer obtenerContenidoNodoSobre1000(NodeList nodeList, int index) {
         return StringHelper.toInteger(nodeList.item(index).getTextContent()) / 1000;
     }
-    
-    private Peaje prepareAbono(Peaje peaje){
+
+    private Peaje prepareAbono(Peaje peaje) {
         peaje.setTipFac("Av");
         peaje.setEaFecDes1(peaje.getEaFecHas1());
         peaje.setEaFecHas1(peaje.getEaFecDes1());
@@ -5179,5 +5307,5 @@ public class xmlHelper {
         peaje.setEaFecHas2(peaje.getEaFecDes2());
         return peaje;
     }
-    
+
 }

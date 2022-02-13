@@ -8,6 +8,7 @@ import excepciones.FacturaYaExisteException;
 import excepciones.MasDeUnClienteEncontrado;
 import excepciones.PeajeCodRectNoExisteException;
 import excepciones.PeajeTipoFacturaNoSoportadaException;
+import excepciones.TarifaNoExisteException;
 import javax.persistence.NonUniqueResultException;
 import org.w3c.dom.Document;
 
@@ -18,7 +19,7 @@ import org.w3c.dom.Document;
 public class ProcesarPeaje extends xmlHelper {
 
     public ProcesarPeaje(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService, String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, NonUniqueResultException, PeajeCodRectNoExisteException {
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, NonUniqueResultException, PeajeCodRectNoExisteException, TarifaNoExisteException {
         super(doc, contenidoXmlService, clienteService);
         super.procesarPeaje(nombreArchivo);
     }

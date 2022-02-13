@@ -7,6 +7,7 @@ import excepciones.CodRectNoExisteException;
 import excepciones.FacturaYaExisteException;
 import excepciones.MasDeUnClienteEncontrado;
 import excepciones.PeajeTipoFacturaNoSoportadaException;
+import excepciones.TarifaNoExisteException;
 import org.w3c.dom.Document;
 
 /**
@@ -16,7 +17,7 @@ import org.w3c.dom.Document;
 public class ProcesarFactura extends xmlHelper {
 
     public ProcesarFactura(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService, String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado {
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException {
         super(doc, contenidoXmlService, clienteService);
         super.procesarFactura(nombreArchivo);
     }
