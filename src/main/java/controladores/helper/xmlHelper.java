@@ -5300,7 +5300,7 @@ public class xmlHelper {
     }
 
     private Peaje prepareAbono(Peaje peaje) {
-        peaje.setTipFac("Av");
+        peaje.setTipFac("A");
         peaje.setEaFecDes1(peaje.getEaFecHas1());
         peaje.setEaFecHas1(peaje.getEaFecDes1());
         peaje.setEaFecDes2(peaje.getEaFecHas2());
