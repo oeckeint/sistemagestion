@@ -859,7 +859,9 @@
                                     <dt class="list-group-item px-1">FechaValor</dt>
                                     <dt class="list-group-item px-1">FechaLimite</dt>
                                     <dt class="list-group-item px-1">Remesa</dt>
-                                    <dt class="list-group-item px-1">Remesa pago</dt>
+                                    <c:if test="${documento.remesaPago != null}">
+                                        <dt class="list-group-item px-1">Remesa pago</dt>
+                                    </c:if>
                                     <dt class="list-group-item px-1">Estado pago</dt>
                                 </ul>
                             </div>
@@ -871,7 +873,9 @@
                                     <li class="list-group-item px-1">${documento.rfFecVal}</li>
                                     <li class="list-group-item px-1">${documento.rfFecLimPag}</li>
                                     <li class="list-group-item px-1">${documento.rfIdRem}</li>
-                                    <li class="list-group-item px-1">${documento.remesaPago}</li>
+                                    <c:if test="${documento.remesaPago != null}">
+                                        <li class="list-group-item px-1">${documento.remesaPago}</li>
+                                    </c:if>
                                     <li class="list-group-item px-1">${documento.estadoPago}</li>
                                 </ul>
                             </div>

@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -467,7 +468,7 @@ public class Peaje {
     @Column(name = "estado_pago")
     private int estadoPago;
     
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "id_energia_excedentaria")
     private EnergiaExcedentaria energiaExcedentaria;
 

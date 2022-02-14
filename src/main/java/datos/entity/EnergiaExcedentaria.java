@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -41,8 +42,8 @@ public class EnergiaExcedentaria {
     @Column(name = "valor_total_energia_excedentaria")
     private double valorTotalEnergiaExcedentaria;
 
-    @OneToOne(mappedBy = "energiaExcedentaria", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Peaje peaje;
+    @OneToMany(mappedBy = "energiaExcedentaria", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Peaje> peajes;
 
     public EnergiaExcedentaria() {
     }
@@ -125,12 +126,12 @@ public class EnergiaExcedentaria {
         this.valorTotalEnergiaExcedentaria = valorTotalEnergiaExcedentaria;
     }
 
-    public Peaje getPeaje() {
-        return peaje;
+    public List<Peaje> getPeajes() {
+        return peajes;
     }
 
-    public void setPeaje(Peaje peaje) {
-        this.peaje = peaje;
+    public void setPeajes(List<Peaje> peajes) {
+        this.peajes = peajes;
     }
 
     @Override
