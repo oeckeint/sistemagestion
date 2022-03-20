@@ -7,6 +7,8 @@ public interface DocumentoXmlDao<T> {
 
     public List<T> listar();
     
+    public List<T> listar(int rows, int page);
+    
     public void guardar(T documento);
     
     public void actualizar(T documento);
@@ -19,4 +21,7 @@ public interface DocumentoXmlDao<T> {
     
     public List<T> buscarByRemesa(String remesa);
     
+    public int contarPaginacion(int rows);
+    
+    public int contarRegistros();
 }

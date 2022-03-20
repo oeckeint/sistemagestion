@@ -67,5 +67,23 @@ public class OtrasFacturasServiceImp implements datos.interfaces.DocumentoXmlSer
     public void actualizar(OtraFactura documento) {
         this.documentoXmlDao.actualizar(documento);
     }
+
+    @Override
+    @Transactional
+    public List<OtraFactura> listar(int rows, int page) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    @Transactional
+    public int contarPaginacion(int rows) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    @Transactional
+    public int contarRegistros() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

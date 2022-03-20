@@ -64,4 +64,22 @@ public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<
         this.documentoXmlDao.actualizar(documento);
     }
 
+    @Override
+    @Transactional
+    public List<Factura> listar(int rows, int page) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    @Transactional
+    public int contarPaginacion(int rows) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    @Transactional
+    public int contarRegistros() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

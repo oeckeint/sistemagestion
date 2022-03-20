@@ -98,4 +98,19 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
         this.sessionFactory.getCurrentSession().update(documento);
     }
 
+    @Override
+    public List<Factura> listar(int rows, int page) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int contarPaginacion(int rows) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int contarRegistros() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

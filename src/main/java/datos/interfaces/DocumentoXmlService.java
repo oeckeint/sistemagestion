@@ -7,6 +7,8 @@ public interface DocumentoXmlService<T> {
     
     public List<T> listar();
     
+    public List<T> listar(int rows, int page);
+    
     public void guardar(T documento);
     
     public void eliminar(long id);
@@ -21,4 +23,7 @@ public interface DocumentoXmlService<T> {
     
     public void actualizar(T documento);
     
+    public int contarPaginacion(int rows);
+    
+    public int contarRegistros();
 }

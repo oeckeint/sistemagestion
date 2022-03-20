@@ -21,6 +21,12 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
     public List<Peaje> listar() {
         return this.documentoXmlDao.listar();
     }
+    
+    @Override
+    @Transactional
+    public List<Peaje> listar(int rows, int page) {
+        return this.documentoXmlDao.listar(rows, page);
+    }
 
     @Override
     @Transactional
@@ -183,6 +189,18 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
     @Transactional
     public void actualizar(Peaje documento) {
         this.documentoXmlDao.actualizar(documento);
+    }
+
+    @Override
+    @Transactional
+    public int contarPaginacion(int rows) {
+        return this.documentoXmlDao.contarPaginacion(rows);
+    }
+
+    @Override
+    @Transactional
+    public int contarRegistros() {
+        return this.documentoXmlDao.contarRegistros();
     }
 
 }

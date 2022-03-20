@@ -1,6 +1,7 @@
 package controladores;
 
 import controladores.helper.Etiquetas;
+import controladores.helper.Utilidades;
 import datos.entity.Peaje;
 import datos.interfaces.ClienteService;
 import java.util.List;
@@ -30,7 +31,12 @@ public class Peajes {
     private ClienteService clienteService;
 
     @GetMapping("")
-    public String listar(Model model) {
+    public String listar(@RequestParam(required = false, defaultValue = "1", name = "page") Integer page, 
+                        @RequestParam(required = false, defaultValue = "50", name = "rows") Integer rows,
+                        Model model) {
+        if (page < 1) {
+            page = 1;
+        }
         model.addAttribute("tituloPagina", Etiquetas.PEAJES_TITULO_PAGINA);
         model.addAttribute("titulo", Etiquetas.PEAJES_ENCABEZADO);
 
@@ -40,12 +46,16 @@ public class Peajes {
         Etiquetas.PEAJES_MENSAJE = (Etiquetas.PEAJES_MENSAJE == null) ? Etiquetas.PEAJES_INSTRUCCION_LISTAR : Etiquetas.PEAJES_MENSAJE;
         model.addAttribute("mensaje", Etiquetas.PEAJES_MENSAJE);
 
-        List<Peaje> peajes = this.documentoXmlService.listar();
+        List<Peaje> peajes = this.documentoXmlService.listar(rows, page - 1);
         model.addAttribute("documentos", peajes);
-        model.addAttribute("totalRegistros", peajes.size());
+        model.addAttribute("registrosMostrados", rows * page);
+        model.addAttribute("totalRegistros", this.documentoXmlService.contarRegistros());
+        model.addAttribute("paginaActual", page);
+        model.addAttribute("ultimaPagina", this.documentoXmlService.contarPaginacion(rows));
         model.addAttribute("controller", Etiquetas.PEAJES_CONTROLLER);
+        model.addAttribute("rows", rows);
         this.reiniciarVariables();
-        return "xml/lista";
+        return "xml/lista2";
     }
 
     @GetMapping("/detalles")
@@ -128,7 +138,7 @@ public class Peajes {
     }
 
     @PostMapping("/comentar")
-    public String comentar(@RequestParam("comentario") String comentario, @RequestParam("codFisFac") String codFisFac){
+    public String comentar(@RequestParam("comentario") String comentario, @RequestParam("codFisFac") String codFisFac) {
         Peaje peaje = (Peaje) documentoXmlService.buscarByCodFiscal(codFisFac);
         if (peaje != null) {
             peaje.setComentarios(comentario);
@@ -136,9 +146,9 @@ public class Peajes {
         }
         return "redirect:/peajes/detalles?codFisFac=" + codFisFac;
     }
-    
+
     @GetMapping("/archivar")
-    public String archivar(@RequestParam("codFisFac") String codFisFac){
+    public String archivar(@RequestParam("codFisFac") String codFisFac) {
         Peaje peaje = (Peaje) documentoXmlService.buscarByCodFiscal(codFisFac);
         if (peaje != null) {
             if (peaje.getIsDeleted() == 0) {
@@ -150,7 +160,7 @@ public class Peajes {
         }
         return "redirect:/peajes/detalles?codFisFac=" + codFisFac;
     }
-    
+
     private Peaje resumen(List<Peaje> peajes) throws MasDeUnClienteEncontrado, RegistroVacioException {
         if (peajes.isEmpty()) {
             return null;
