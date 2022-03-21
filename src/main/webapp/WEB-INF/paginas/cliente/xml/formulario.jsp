@@ -5,17 +5,20 @@
     </div>
 </div>
 
-<form:form method="POST" action="${pageContext.request.contextPath}/${controller}/procesar?${_csrf.parameterName}=${_csrf.token}" enctype="multipart/form-data">
+<form:form method="POST" action="${pageContext.request.contextPath}/${controller}/procesar?${_csrf.parameterName}=${_csrf.token}" enctype="multipart/form-data" id="filesInput">
     <div class="container my-5">
         <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <input class="btn btn-outline-secondary" type="submit" value="${etiquetaBoton}"/>
+            <div class="input-group-prepend" id="espacioBoton">
+                <button class="btn btn-outline-secondary" type="button" id="btnSubmit" onclick="enviarArchivos();">
+                    ${etiquetaBoton}
+                </button>
             </div>
-            <div class="custom-file">
-                <input type="file" name="archivosxml" accept=".xml" multiple="true" class="custom-file-input" id="inputGroupFile03" aria-describedby="inputGroupFileAddon03" required>
+            <div class="custom-file" id="archivosAEnviar">
+                <input type="file" name="archivosxml" accept=".xml" multiple="true" class="custom-file-input" aria-describedby="inputGroupFileAddon03" id="xmlFiles" required>
                 <label class="custom-file-label" for="inputGroupFile03">Seleccione sus archivos</label>
             </div>
         </div>
+        <div id="nombreArchivos"></div>
     </div>
 </form:form>
 
@@ -28,11 +31,46 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
 <script>
-    $("#btnSubmit").click(function () {
-        $(this).prop("disabled", true); //deshabilitamos el botón
-        $(this).html(
-                `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  ${etiquetaBoton}` //añadimos el spinner
-                );
-        document.getElementById("myForm").submit();
-    });
+    let filesInput = document.querySelector("#archivosAEnviar");
+    let button = document.querySelector("#btnSubmit");
+    let xmlFiles = document.querySelector("#xmlFiles");
+    filesInput.addEventListener("change", stateHandle);
+    button.disabled = true;
+
+    function stateHandle() {
+        if (document.querySelector("#archivosAEnviar").value === "") {
+            button.disabled = true;
+        } else {
+            button.disabled = false;
+        }
+        document.getElementById("nombreArchivos").innerHTML = "<hr/><h5>Archivos seleccionados <span class='badge badge-success'>" + xmlFiles.files.length + "</span></h5><hr/>";
+        for (var i = 0, max = xmlFiles.files.length; i < max; i++) {
+            if(i + 1 === max) {
+                document.getElementById("nombreArchivos").innerHTML += (i + 1) + ".- " + xmlFiles.files[i].name;
+            } else if(i >= 30) {
+                document.getElementById("nombreArchivos").innerHTML += "<Strong>" + (max - 30 + " archivos más ...</Strong>");
+                break;
+            } else {
+                document.getElementById("nombreArchivos").innerHTML += (i + 1) + ".- " + xmlFiles.files[i].name + "<br/>";
+            }
+        }
+        document.getElementById("nombreArchivos").innerHTML += "<hr/>";
+        
+    }
+
+    function enviarArchivos() {
+        filesInput.style.display = "none";
+        let span = document.createElement("span");
+        span.className = "spinner-border spinner-border-sm";
+        button.disabled = true;
+        if('Clasificar'.localeCompare('${etiquetaBoton}') === 0){
+            button.className = "btn btn-primary";
+            button.firstChild.data = "Clasificando ";
+        } else if('Procesar'.localeCompare('${etiquetaBoton}') === 0){
+            button.className = "btn btn-success";
+            button.firstChild.data = "Procesando ";
+        }
+        button.appendChild(span);
+        document.getElementById("filesInput").submit();
+    }
 </script>

@@ -13,11 +13,7 @@
 
         <jsp:include page="/WEB-INF/paginas/cliente/xml/formulario.jsp"></jsp:include>
         
-        <c:forEach var="archivoErroneo" items="${archivosErroneos}">
-            <div class="alert alert-danger" role="alert">
-                <div class="container">${archivoErroneo}</div>
-            </div>
-        </c:forEach>
+        <jsp:include page="../comunes/mensajeError.jsp"></jsp:include>
 
         <jsp:include page="/WEB-INF/paginas/comunes/piePagina.jsp"></jsp:include>
     </body>
