@@ -1,10 +1,12 @@
 package datos.dao;
 
 import datos.entity.Factura;
+import datos.entity.Peaje;
 import excepciones.NoEsUnNumeroException;
 import java.util.List;
 import javax.persistence.NoResultException;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -26,6 +28,23 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
                             + "     f.eaFecHas2"
                             + " end "
                             + "desc", Factura.class)
+                .getResultList();
+    }
+    
+    @Override
+    public List<Factura> listar(int rows, int page) {
+        return this.sessionFactory.getCurrentSession()
+                .createQuery("from Factura f where f.isDeleted = 0 "
+                            + "order by "
+                            + "case f.eaFecHas2"
+                            + " when '' then"
+                            + "     f.eaFecHas1"
+                            + " else"
+                            + "     f.eaFecHas2"
+                            + " end "
+                            + "desc", Factura.class)
+                .setFirstResult(rows * page)
+                .setMaxResults(rows)
                 .getResultList();
     }
 
@@ -99,18 +118,18 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
     }
 
     @Override
-    public List<Factura> listar(int rows, int page) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public int contarPaginacion(int rows) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Query query = this.sessionFactory.getCurrentSession().createNativeQuery("select count(*) from contenido_xml_factura where is_deleted = 0");
+        Long a = Long.parseLong(query.uniqueResult().toString());
+        Double b = Math.ceil((double)a / rows);
+        return b.intValue();
     }
 
     @Override
     public int contarRegistros() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Query query = this.sessionFactory.getCurrentSession().createNativeQuery("select count(*) from contenido_xml_factura where is_deleted = 0");
+        Long a = Long.parseLong(query.uniqueResult().toString());
+        return a.intValue();
     }
 
 }

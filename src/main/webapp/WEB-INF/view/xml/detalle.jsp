@@ -34,28 +34,7 @@
                                 </c:choose>
                             </div>
                         </security:authorize>
-                        <div class="col-3">
-                            <a href="${pageContext.request.contextPath}/clasificar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Clasificar</a>
-                        </div>
-                        <div class="col-3">
-                            <a href="${pageContext.request.contextPath}/procesar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Procesar</a>
-                        </div>
-                        <div class="col-5">
-                            <form:form  action="${pageContext.request.contextPath}/${controller}/busqueda" method="post" id="myForm">
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <button class="btn btn-primary" type="submit" id="btnSubmit"><i class="fas fa-search"></i></button>
-                                    </div>
-                                    <input type="text"  name="valor" class="form-control" id="inlineFormInputGroup" placeholder="Buscar" value="${ultimaBusqueda}" required>
-                                    <select class="form-select fa" name="filtro">
-                                        <option class="fa" value="cliente">&#xf007;</option>
-                                        <option class="fa" value="remesa">&#xf621;</option>
-                                        <option class="fa" value="codFisFac" selected="true">&#xf15c;</option>
-                                    </select>
-                                </div>
-                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                            </form:form>
-                        </div>
+                        <jsp:include page="../comunes/BotonesXML.jsp" />
                     </div>
                 </div>
                 <hr>

@@ -1,6 +1,7 @@
 package controladores;
 
 import controladores.helper.Etiquetas;
+import controladores.helper.Utilidades;
 import datos.entity.Factura;
 import datos.interfaces.ClienteService;
 import datos.interfaces.DocumentoXmlService;
@@ -34,7 +35,11 @@ public class Facturas {
     private ClienteService clienteService;
 
     @GetMapping("")
-    public String listar(Model model) {
+    public String listar(@RequestParam(required = false, defaultValue = "1", name = "page") Integer paginaActual,
+            @RequestParam(required = false, defaultValue = "50", name = "rows") Integer rows,
+            Model model) {
+        paginaActual = Utilidades.revisarPaginaActual(paginaActual);
+        rows = Utilidades.revisarRangoRows(rows, 25);
         model.addAttribute("tituloPagina", Etiquetas.FACTURAS_TITULO_PAGINA);
         model.addAttribute("titulo", Etiquetas.FACTURAS_ENCABEZADO);
 
@@ -44,13 +49,24 @@ public class Facturas {
         Etiquetas.FACTURAS_MENSAJE = (Etiquetas.FACTURAS_MENSAJE == null) ? Etiquetas.FACTURAS_INSTRUCCION_LISTAR : Etiquetas.FACTURAS_MENSAJE;
         model.addAttribute("mensaje", Etiquetas.FACTURAS_MENSAJE);
 
-        List<Factura> facturas = this.documentoXmlService.listar();
-        model.addAttribute("documentos", facturas);
-        model.addAttribute("totalRegistros", facturas.size());
+        List<Factura> peajes = this.documentoXmlService.listar(rows, paginaActual - 1);
+        int ultimaPagina = this.documentoXmlService.contarPaginacion(rows);
+        int registrosMostrados =  rows * paginaActual;
+        if (peajes.isEmpty()) {
+            System.out.println("No hay mas elementos por mostrar");
+            peajes = this.documentoXmlService.listar(rows, ultimaPagina - 1);
+            registrosMostrados = this.documentoXmlService.contarRegistros();
+        }
+        model.addAttribute("documentos", peajes);
+        model.addAttribute("registrosMostrados", rows * paginaActual);
+        model.addAttribute("totalRegistros", this.documentoXmlService.contarRegistros());
+        model.addAttribute("paginaActual", paginaActual);
+        model.addAttribute("ultimaPagina", ultimaPagina);;
         model.addAttribute("controller", Etiquetas.FACTURAS_CONTROLLER);
+        model.addAttribute("rows", rows);
 
         this.reiniciarVariables();
-        return "xml/lista";
+        return "xml/lista2";
     }
 
     @GetMapping("/detalles")
@@ -68,6 +84,7 @@ public class Facturas {
             model.addAttribute("mensaje", "Se muestra el registro con el cod factura <Strong>" + codFisFac + "</Strong>");
             model.addAttribute("controller", "facturas");
             model.addAttribute("ultimaBusqueda", codFisFac);
+            model.addAttribute("filtro", "codFisFac");
             this.reiniciarVariables();
             return "xml/detalle";
         } catch (Exception e) {
@@ -114,6 +131,7 @@ public class Facturas {
             model.addAttribute("totalRegistros", facturas.size());
             model.addAttribute("ultimaBusqueda", valor);
             model.addAttribute("controller", Etiquetas.FACTURAS_CONTROLLER);
+            model.addAttribute("filtro", filtro);
             this.reiniciarVariables();
             
         } catch(NoEsUnNumeroException e){

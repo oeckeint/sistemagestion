@@ -31,12 +31,11 @@ public class Peajes {
     private ClienteService clienteService;
 
     @GetMapping("")
-    public String listar(@RequestParam(required = false, defaultValue = "1", name = "page") Integer page, 
-                        @RequestParam(required = false, defaultValue = "50", name = "rows") Integer rows,
-                        Model model) {
-        if (page < 1) {
-            page = 1;
-        }
+    public String listar(@RequestParam(required = false, defaultValue = "1", name = "page") Integer paginaActual,
+            @RequestParam(required = false, defaultValue = "50", name = "rows") Integer rows,
+            Model model) {
+        paginaActual = Utilidades.revisarPaginaActual(paginaActual);
+        rows = Utilidades.revisarRangoRows(rows, 25);
         model.addAttribute("tituloPagina", Etiquetas.PEAJES_TITULO_PAGINA);
         model.addAttribute("titulo", Etiquetas.PEAJES_ENCABEZADO);
 
@@ -46,12 +45,19 @@ public class Peajes {
         Etiquetas.PEAJES_MENSAJE = (Etiquetas.PEAJES_MENSAJE == null) ? Etiquetas.PEAJES_INSTRUCCION_LISTAR : Etiquetas.PEAJES_MENSAJE;
         model.addAttribute("mensaje", Etiquetas.PEAJES_MENSAJE);
 
-        List<Peaje> peajes = this.documentoXmlService.listar(rows, page - 1);
-        model.addAttribute("documentos", peajes);
-        model.addAttribute("registrosMostrados", rows * page);
+        List<Peaje> facturas = this.documentoXmlService.listar(rows, paginaActual - 1);
+        int ultimaPagina = this.documentoXmlService.contarPaginacion(rows);
+        int registrosMostrados =  rows * paginaActual;
+        if (facturas.isEmpty()) {
+            System.out.println("No hay mas elementos por mostrar");
+            facturas = this.documentoXmlService.listar(rows, ultimaPagina - 1);
+            registrosMostrados = this.documentoXmlService.contarRegistros();
+        }
+        model.addAttribute("documentos", facturas);
+        model.addAttribute("registrosMostrados", registrosMostrados);
         model.addAttribute("totalRegistros", this.documentoXmlService.contarRegistros());
-        model.addAttribute("paginaActual", page);
-        model.addAttribute("ultimaPagina", this.documentoXmlService.contarPaginacion(rows));
+        model.addAttribute("paginaActual", paginaActual);
+        model.addAttribute("ultimaPagina", ultimaPagina);
         model.addAttribute("controller", Etiquetas.PEAJES_CONTROLLER);
         model.addAttribute("rows", rows);
         this.reiniciarVariables();
@@ -72,6 +78,7 @@ public class Peajes {
             model.addAttribute("cliente", this.clienteService.encontrarCups(peaje.getCups()));
             model.addAttribute("mensaje", "Se muestra el registro con el cod factura <Strong>" + codFisFac + "</Strong>");
             model.addAttribute("controller", "peajes");
+            model.addAttribute("filtro", "codFisFac");
             model.addAttribute("ultimaBusqueda", codFisFac);
             this.reiniciarVariables();
             return "xml/detalle";
@@ -118,6 +125,7 @@ public class Peajes {
             model.addAttribute("totalRegistros", peajes.size());
             model.addAttribute("ultimaBusqueda", valor);
             model.addAttribute("controller", Etiquetas.PEAJES_CONTROLLER);
+            model.addAttribute("filtro", filtro);
             this.reiniciarVariables();
 
         } catch (NoEsUnNumeroException e) {

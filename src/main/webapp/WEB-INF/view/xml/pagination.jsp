@@ -46,18 +46,79 @@
             <c:param name="page" value="${ultimaPagina}"/>
         </c:url>
         <li class="page-item">
-            <select class="page-link" id="numberOfRows" onchange="changeNumberOfRows()">
-                <option value="25" ${rows == 25 ? 'selected' : ''}>25</option>
-                <option value="50" ${rows == 50 ? 'selected' : ''}>50</option>
-                <option value="75" ${rows == 75 ? 'selected' : ''}>75</option>
-            </select>
+        <li class="page-item">
+            <div class="col-auto">
+                <label class="mr-sm-2 sr-only" for="numberOfRows">Preference</label>
+                <select class="custom-select m-0" id="numberOfRows" onchange="changeNumberOfRows()">
+                    <option value="25" ${rows == 25 ? 'selected' : ''}>25</option>
+                    <option value="50" ${rows == 50 ? 'selected' : ''}>50</option>
+                    <option value="75" ${rows == 75 ? 'selected' : ''}>75</option>
+                    <option value="100" ${rows == 100 ? 'selected' : ''}>100</option>
+                    <option value="125" ${rows == 125 ? 'selected' : ''}>125</option>
+                    <option value="150" ${rows == 150 ? 'selected' : ''}>150</option>
+                </select>
+            </div>
         </li>
         <c:choose>
-            <c:when test="${paginaActual == 1}">
-                <li class="page-item disabled"><a class="page-link">${paginaActual}</a></li>
-                <li class="page-item"><a class="page-link" href="${pagIni2}">${paginaActual + 1}</a></li>
-                <li class="page-item"><a class="page-link" href="${pagIni3}">${paginaActual + 2}</a></li>
-                <li class="page-item disabled"><a class="page-link">...</a></li>
+            <c:when test="${ultimaPagina == 1}">
+                <c:if test="${paginaActual >= 1}">
+                    <li class="page-item disabled"><a class="page-link">1</a></li>
+                    </c:if>
+                </c:when>
+                <c:when test="${ultimaPagina == 2}">
+                    <c:choose>
+                        <c:when test="${paginaActual == 1}">
+                        <li class="page-item disabled"><a class="page-link" href="${pagIni1}">1</a></li>
+                        <li class="page-item"><a class="page-link" href="${pagIni2}">2</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="${nextPage}">Siguiente</a>
+                        </li>
+                    </c:when>
+                    <c:when test="${paginaActual >= 2}">
+                        <li class="page-item">
+                            <a class="page-link" href="${prevPage}" tabindex="-1" aria-disabled="true">Anterior</a>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="${pagIni1}">1</a></li>
+                        <li class="page-item disabled"><a class="page-link" href="${pagIni2}">2</a></li>
+                        </c:when>
+                    </c:choose>
+                </c:when>
+                <c:when test="${ultimaPagina == 3}">
+                    <c:choose>
+                        <c:when test="${paginaActual == 1}">
+                        <li class="page-item disabled"><a class="page-link" href="${pagIni1}">1</a></li>
+                        <li class="page-item"><a class="page-link" href="${pagIni2}">2</a></li>
+                        <li class="page-item"><a class="page-link" href="${pagIni3}">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="${nextPage}">Siguiente</a>
+                        </li>
+                    </c:when>
+                    <c:when test="${paginaActual == 2}">
+                        <li class="page-item">
+                            <a class="page-link" href="${prevPage}" tabindex="-1" aria-disabled="true">Anterior</a>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="${pagIni1}">1</a></li>
+                        <li class="page-item disabled"><a class="page-link" href="${pagIni2}">2</a></li>
+                        <li class="page-item"><a class="page-link" href="${pagIni1}">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="${nextPage}">Siguiente</a>
+                        </li>
+                    </c:when>
+                    <c:when test="${paginaActual >= 3}">
+                        <li class="page-item">
+                            <a class="page-link" href="${prevPage}" tabindex="-1" aria-disabled="true">Anterior</a>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="${pagIni1}">1</a></li>
+                        <li class="page-item"><a class="page-link" href="${pagIni2}">2</a></li>
+                        <li class="page-item disabled"><a class="page-link" href="${pagIni1}">3</a></li>
+                        </c:when>
+                    </c:choose>
+                </c:when>
+                <c:when test="${paginaActual == 1}">
+                <li class="page-item disabled"><a class="page-link" href="${pagIni1}">1</a></li>
+                <li class="page-item"><a class="page-link" href="${pagIni2}">2</a></li>
+                <li class="page-item"><a class="page-link" href="${pagIni3}">3</a></li>
+                <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
                 <li class="page-item"><a class="page-link" href="${pagFin1}">${ultimaPagina - 2}</a></li>
                 <li class="page-item"><a class="page-link" href="${pagFin2}">${ultimaPagina - 1}</a></li>
                 <li class="page-item"><a class="page-link" href="${pagFin3}">${ultimaPagina}</a></li>
@@ -80,7 +141,19 @@
                     <a class="page-link" href="${nextPage}">Siguiente</a>
                 </li>
             </c:when>
-            <c:when test="${paginaActual == ultimaPagina}">
+            <c:when test="${paginaActual >= ultimaPagina}">
+                <li class="page-item">
+                    <a class="page-link" href="${prevPage}" tabindex="-1" aria-disabled="true">Anterior</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="${pagIni1}">1</a></li>
+                <li class="page-item"><a class="page-link" href="${pagIni2}">2</a></li>
+                <li class="page-item"><a class="page-link" href="${pagIni3}">3</a></li>
+                <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="${pagFin1}">${ultimaPagina - 2}</a></li>
+                <li class="page-item"><a class="page-link" href="${pagFin2}">${ultimaPagina - 1}</a></li>
+                <li class="page-item disabled"><a class="page-link">${ultimaPagina}</a></li>
+                </c:when>
+                <c:when test="${paginaActual == ultimaPagina}">
                 <li class="page-item">
                     <a class="page-link" href="${prevPage}" tabindex="-1" aria-disabled="true">Anterior</a>
                 </li>

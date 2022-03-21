@@ -1,5 +1,7 @@
 package controladores;
 
+import controladores.helper.Etiquetas;
+import controladores.helper.Utilidades;
 import datos.entity.Cliente;
 import datos.entity.Tarifa;
 import datos.interfaces.ClienteService;
@@ -28,19 +30,35 @@ public class Clientes {
     private CrudDao tarifasService;
 
     @GetMapping("")
-    public String listar(Model model) {
+    public String listar(@RequestParam(required = false, defaultValue = "1", name = "page") Integer paginaActual,
+            @RequestParam(required = false, defaultValue = "50", name = "rows") Integer rows,
+            Model model) {
+        paginaActual = Utilidades.revisarPaginaActual(paginaActual);
+        rows = Utilidades.revisarRangoRows(rows, 25);
         model.addAttribute("tituloPagina", ClientesHelper.TITULO_PAGINA);
         model.addAttribute("titulo", ClientesHelper.ENCABEZADO);
+        model.addAttribute("tablaTitulo", ClientesHelper.TITULO_PAGINA);
 
         ClientesHelper.mensaje = (ClientesHelper.mensaje == null) ? ClientesHelper.INSTRUCCION_LISTAR : ClientesHelper.mensaje;
         model.addAttribute("mensaje", ClientesHelper.mensaje);
 
-        List<Cliente> clientes = clienteService.listar();
+        List<Cliente> clientes = clienteService.listar(rows, paginaActual -1);
+        int ultimaPagina = this.clienteService.contarPaginacion(rows);
+        int registrosMostrados =  rows * paginaActual;
+        if (clientes.isEmpty()) {
+            System.out.println("No hay mas elementos por mostrar");
+            clientes = this.clienteService.listar(rows, ultimaPagina - 1);
+            registrosMostrados = this.clienteService.contarRegistros();
+        }
         model.addAttribute("clientes", clientes);
-        model.addAttribute("totalClientes", clientes.size());
-
+        model.addAttribute("registrosMostrados", registrosMostrados);
+        model.addAttribute("totalRegistros", this.clienteService.contarRegistros());
+        model.addAttribute("paginaActual", paginaActual);
+        model.addAttribute("ultimaPagina", ultimaPagina);
+        model.addAttribute("controller", "clientes");
+        model.addAttribute("rows", rows);
         ClientesHelper.reiniciarVariables();
-        return "cliente/clientes";
+        return "cliente/clientes2";
     }
 
     @GetMapping("/formulario")
@@ -78,7 +96,7 @@ public class Clientes {
                 return "redirect:/clientes/formulario";
             }
         } catch (ConstraintViolationException e) {
-            switch(e.getErrorCode()){
+            switch (e.getErrorCode()) {
                 case 1062:
                     ClientesHelper.mensaje = "No ha sido posible guardar el registro, el cups <Strong>" + cliente.getCups() + "</Strong> ya ha sido registrado.";
                     break;

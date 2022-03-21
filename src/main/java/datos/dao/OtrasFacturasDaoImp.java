@@ -4,6 +4,7 @@ import datos.entity.OtraFactura;
 import excepciones.NoEsUnNumeroException;
 import java.util.List;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -20,6 +21,15 @@ public class OtrasFacturasDaoImp implements datos.interfaces.DocumentoXmlDao<Otr
                 .getResultList();
     }
 
+    @Override
+    public List<OtraFactura> listar(int rows, int page) {
+        return this.sessionFactory.getCurrentSession()
+                .createQuery("from OtraFactura o order by o.idOtraFactura desc", OtraFactura.class)
+                .setFirstResult(rows * page)
+                .setMaxResults(rows)
+                .getResultList();
+    }
+    
     @Override
     public void guardar(OtraFactura documento) {
         this.sessionFactory.getCurrentSession().save(documento);
@@ -74,18 +84,18 @@ public class OtrasFacturasDaoImp implements datos.interfaces.DocumentoXmlDao<Otr
     }
 
     @Override
-    public List<OtraFactura> listar(int rows, int page) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public int contarPaginacion(int rows) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Query query = this.sessionFactory.getCurrentSession().createNativeQuery("select count(*) from contenido_xml_otras_facturas where is_deleted = 0");
+        Long a = Long.parseLong(query.uniqueResult().toString());
+        Double b = Math.ceil((double)a / rows);
+        return b.intValue();
     }
 
     @Override
     public int contarRegistros() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Query query = this.sessionFactory.getCurrentSession().createNativeQuery("select count(*) from contenido_xml_otras_facturas where is_deleted = 0");
+        Long a = Long.parseLong(query.uniqueResult().toString());
+        return a.intValue();
     }
     
 }

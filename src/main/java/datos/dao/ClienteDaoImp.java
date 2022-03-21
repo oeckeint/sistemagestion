@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,17 +24,26 @@ public class ClienteDaoImp implements datos.interfaces.ClienteDao {
     }
 
     @Override
+    public List<Cliente> listar(int rows, int page) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from Cliente c where c.isDeleted = 0 order by c.idCliente desc", Cliente.class)
+                .setFirstResult(rows * page)
+                .setMaxResults(rows)
+                .getResultList();
+    }
+
+    @Override
     public Cliente encontrarId(long id) {
         return sessionFactory.getCurrentSession().get(Cliente.class, id);
     }
 
     @Override
-    public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado{
+    public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado {
         try {
-            return (Cliente) sessionFactory.getCurrentSession().createQuery("from Cliente c where c.cups like :cups").setParameter("cups", "%"+cups.substring(0, 20)+"%").getSingleResult();
+            return (Cliente) sessionFactory.getCurrentSession().createQuery("from Cliente c where c.cups like :cups").setParameter("cups", "%" + cups.substring(0, 20) + "%").getSingleResult();
         } catch (NoResultException e) {
             return null;
-        } catch (NonUniqueResultException e){
+        } catch (NonUniqueResultException e) {
             throw new MasDeUnClienteEncontrado(cups);
         }
     }
@@ -50,4 +60,20 @@ public class ClienteDaoImp implements datos.interfaces.ClienteDao {
                 .setParameter("id", id)
                 .executeUpdate();
     }
+
+    @Override
+    public int contarPaginacion(int rows) {
+        Query query = this.sessionFactory.getCurrentSession().createNativeQuery("select count(*) from cliente where is_deleted = 0");
+        Long a = Long.parseLong(query.uniqueResult().toString());
+        Double b = Math.ceil((double) a / rows);
+        return b.intValue();
+    }
+
+    @Override
+    public int contarRegistros() {
+        Query query = this.sessionFactory.getCurrentSession().createNativeQuery("select count(*) from cliente where is_deleted = 0");
+        Long a = Long.parseLong(query.uniqueResult().toString());
+        return a.intValue();
+    }
+
 }

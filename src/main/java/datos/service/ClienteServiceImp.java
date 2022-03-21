@@ -19,6 +19,12 @@ public class ClienteServiceImp implements datos.interfaces.ClienteService {
     public List<Cliente> listar() {
         return clienteDao.listar();
     }
+    
+    @Override
+    @Transactional
+    public List<Cliente> listar(int rows, int page) {
+        return this.clienteDao.listar(rows, page);
+    }
 
     @Override
     @Transactional
@@ -42,6 +48,18 @@ public class ClienteServiceImp implements datos.interfaces.ClienteService {
     @Transactional
     public void eliminar(long id) {
         this.clienteDao.eliminar(id);
+    }
+
+    @Override
+    @Transactional
+    public int contarPaginacion(int rows) {
+        return this.clienteDao.contarPaginacion(rows);
+    }
+
+    @Override
+    @Transactional
+    public int contarRegistros() {
+        return this.clienteDao.contarRegistros();
     }
 
 }

@@ -14,16 +14,22 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Jesus Sanchez <j.sanchez at dataWorkshop>
  */
 @Service
-public class OtrasFacturasServiceImp implements datos.interfaces.DocumentoXmlService<OtraFactura>{
+public class OtrasFacturasServiceImp implements datos.interfaces.DocumentoXmlService<OtraFactura> {
 
     @Autowired
     @Qualifier(value = "otrasFacturasDaoImp")
     private DocumentoXmlDao documentoXmlDao;
-    
+
     @Override
     @Transactional
     public List<OtraFactura> listar() {
         return this.documentoXmlDao.listar();
+    }
+
+    @Override
+    @Transactional
+    public List<OtraFactura> listar(int rows, int page) {
+        return this.documentoXmlDao.listar(rows, page);
     }
 
     @Override
@@ -46,7 +52,7 @@ public class OtrasFacturasServiceImp implements datos.interfaces.DocumentoXmlSer
 
     @Override
     @Transactional
-    public List<OtraFactura> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException{
+    public List<OtraFactura> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException {
         return this.documentoXmlDao.buscarByIdCliente(idCliente);
     }
 
@@ -61,7 +67,7 @@ public class OtrasFacturasServiceImp implements datos.interfaces.DocumentoXmlSer
     public void rectificar(OtraFactura documento, String nuevaRemesa, String nuevoNombreArchivo) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     @Override
     @Transactional
     public void actualizar(OtraFactura documento) {
@@ -70,20 +76,14 @@ public class OtrasFacturasServiceImp implements datos.interfaces.DocumentoXmlSer
 
     @Override
     @Transactional
-    public List<OtraFactura> listar(int rows, int page) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    @Transactional
     public int contarPaginacion(int rows) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.documentoXmlDao.contarPaginacion(rows);
     }
 
     @Override
     @Transactional
     public int contarRegistros() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.documentoXmlDao.contarRegistros();
     }
-    
+
 }

@@ -5,14 +5,20 @@ import excepciones.MasDeUnClienteEncontrado;
 import java.util.List;
 
 public interface ClienteDao {
-    
+
     public List<Cliente> listar();
-    
+
+    public List<Cliente> listar(int rows, int page);
+
     public Cliente encontrarId(long id);
-    
+
     public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado;
-    
+
     public void guardar(Cliente cliente);
-    
+
     public void eliminar(long id);
+
+    public int contarPaginacion(int rows);
+
+    public int contarRegistros();
 }

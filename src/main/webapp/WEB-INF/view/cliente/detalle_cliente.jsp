@@ -22,20 +22,7 @@
                         <h2 class="m-0"><a href="${pageContext.request.contextPath}/clientes"><i class="fas fa-arrow-circle-left text-success"></i></a> Detalles cliente</h2>
                     </div>
                     <div class="col-6 row  justify-content-end">
-                        <div class="col-3">
-                            <a href="${pageContext.request.contextPath}/clientes/formulario" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Agregar</a>
-                        </div>
-                        <div class="col-5">
-                            <form:form action="${pageContext.request.contextPath}/clientes/busqueda" method="post" id="myForm">
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <button class="btn btn-primary" type="submit" id="btnSubmit"><i class="fas fa-search"></i></button>
-                                    </div>
-                                    <input type="text"  name="valor" class="form-control" id="inlineFormInputGroup" placeholder="Buscar id cliente" value="${ultimaBusqueda}" required>
-                                </div>
-                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                            </form:form>
-                        </div>
+                        <jsp:include page="../comunes/busquedaCliente.jsp" />
                     </div>
                 </div>
                 <hr>

@@ -10,16 +10,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<Factura>{
-    
+public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<Factura> {
+
     @Autowired
     @Qualifier(value = "facturaDaoImp")
     private DocumentoXmlDao documentoXmlDao;
-    
+
     @Override
     @Transactional
     public List<Factura> listar() {
         return this.documentoXmlDao.listar();
+    }
+
+    @Override
+    @Transactional
+    public List<Factura> listar(int rows, int page) {
+        return this.documentoXmlDao.listar(rows, page);
     }
 
     @Override
@@ -42,7 +48,7 @@ public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<
 
     @Override
     @Transactional
-    public List<Factura> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException{
+    public List<Factura> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException {
         return this.documentoXmlDao.buscarByIdCliente(idCliente);
     }
 
@@ -66,20 +72,14 @@ public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<
 
     @Override
     @Transactional
-    public List<Factura> listar(int rows, int page) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    @Transactional
     public int contarPaginacion(int rows) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.documentoXmlDao.contarPaginacion(rows);
     }
 
     @Override
     @Transactional
     public int contarRegistros() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.documentoXmlDao.contarRegistros();
     }
 
 }

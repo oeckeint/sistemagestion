@@ -7,6 +7,8 @@ import java.util.List;
 public interface ClienteService {
 
     public List<Cliente> listar();
+    
+    public List<Cliente> listar(int rows, int page);
 
     public Cliente encontrarId(long id);
 
@@ -15,5 +17,9 @@ public interface ClienteService {
     public void guardar(Cliente cliente);
 
     public void eliminar(long id);
+    
+    public int contarPaginacion(int rows);
+    
+    public int contarRegistros();
 
 }

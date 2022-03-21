@@ -2,7 +2,6 @@ package datos.dao;
 
 import datos.entity.Peaje;
 import excepciones.NoEsUnNumeroException;
-import java.math.BigDecimal;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -121,7 +120,7 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
     public int contarPaginacion(int rows) {
         Query query = this.sessionFactory.getCurrentSession().createNativeQuery("select count(*) from contenido_xml where is_deleted = 0");
         Long a = Long.parseLong(query.uniqueResult().toString());
-        Double b = Math.ceil((double)a / rows);
+        Double b = Math.ceil((double) a / rows);
         return b.intValue();
     }
 
