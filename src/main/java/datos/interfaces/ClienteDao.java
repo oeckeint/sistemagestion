@@ -11,6 +11,8 @@ public interface ClienteDao {
     public List<Cliente> listar(int rows, int page);
 
     public Cliente encontrarId(long id);
+    
+    public List<Cliente> encontrarByNombre(String nombreCliente);
 
     public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado;
 

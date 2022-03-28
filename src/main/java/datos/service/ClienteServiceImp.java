@@ -17,7 +17,7 @@ public class ClienteServiceImp implements datos.interfaces.ClienteService {
     @Override
     @Transactional
     public List<Cliente> listar() {
-        return clienteDao.listar();
+        return this.clienteDao.listar();
     }
     
     @Override
@@ -29,13 +29,19 @@ public class ClienteServiceImp implements datos.interfaces.ClienteService {
     @Override
     @Transactional
     public Cliente encontrarId(long id) {
-        return clienteDao.encontrarId(id);
+        return this.clienteDao.encontrarId(id);
+    }
+    
+    @Override
+    @Transactional
+    public List<Cliente> encontrarByNombre(String nombreCliente) {
+        return this.clienteDao.encontrarByNombre(nombreCliente);
     }
 
     @Override
     @Transactional
     public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado{
-        return clienteDao.encontrarCups(cups);
+        return this.clienteDao.encontrarCups(cups);
     }
 
     @Override

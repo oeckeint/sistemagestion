@@ -1,5 +1,8 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<c:set var="language" value="${not empty param.language ? param.language : not empty language ? language : 'es'}" scope="session"/>
+<fmt:setLocale value="${language}"/>
+<fmt:setBundle basename="labels"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -10,7 +13,11 @@
         <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp"></jsp:include>
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 <div class="container">
-                ${mensaje}
+                <c:choose>
+                    <c:when test="${param.error != null}"><fmt:message key="login.badcredentials"/></c:when>
+                    <c:when test="${param.logout != null}"><fmt:message key="login.logout.message"/></c:when>
+                    <c:otherwise>${mensaje}</c:otherwise>
+                </c:choose>
             </div>
         </div>
 
@@ -22,7 +29,7 @@
                     <h2 class="m-0"><a href="${pageContext.request.contextPath}/">
                             <i class="fas fa-arrow-circle-left text-success"></i></a> 
                             ${tablaTitulo} 
-                        <span class="badge badge-success">
+                        <span class="badge bg-success">
                             <c:choose>
                                 <c:when test="${paginaActual < ultimaPagina}">
                                     ${registrosMostrados} / ${totalRegistros}
@@ -107,7 +114,7 @@
     function loadData(id, url) {
         let detailButton = document.querySelector("#detailButton" + id);
         let spanDetail = document.createElement("span");
-        spanDetail.className = "spinner-border spinner-border-sm detailSpinner"+id;
+        spanDetail.className = "spinner-border spinner-border-sm detailSpinner" + id;
         detailButton.disabled = true;
         detailButton.removeChild(document.getElementById("detailsIcon" + id));
         detailButton.appendChild(spanDetail);

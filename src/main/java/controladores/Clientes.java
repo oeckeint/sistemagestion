@@ -2,21 +2,30 @@ package controladores;
 
 import controladores.helper.Etiquetas;
 import controladores.helper.Utilidades;
+import datos.entity.BusquedaCliente;
 import datos.entity.Cliente;
 import datos.entity.Tarifa;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
+import excepciones.MasDeUnClienteEncontrado;
 import java.util.List;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/clientes")
@@ -32,6 +41,7 @@ public class Clientes {
     @GetMapping("")
     public String listar(@RequestParam(required = false, defaultValue = "1", name = "page") Integer paginaActual,
             @RequestParam(required = false, defaultValue = "50", name = "rows") Integer rows,
+            @RequestParam(required = false, name = "err") Integer error,
             Model model) {
         paginaActual = Utilidades.revisarPaginaActual(paginaActual);
         rows = Utilidades.revisarRangoRows(rows, 25);
@@ -42,9 +52,9 @@ public class Clientes {
         ClientesHelper.mensaje = (ClientesHelper.mensaje == null) ? ClientesHelper.INSTRUCCION_LISTAR : ClientesHelper.mensaje;
         model.addAttribute("mensaje", ClientesHelper.mensaje);
 
-        List<Cliente> clientes = clienteService.listar(rows, paginaActual -1);
+        List<Cliente> clientes = clienteService.listar(rows, paginaActual - 1);
         int ultimaPagina = this.clienteService.contarPaginacion(rows);
-        int registrosMostrados =  rows * paginaActual;
+        int registrosMostrados = rows * paginaActual;
         if (clientes.isEmpty()) {
             System.out.println("No hay mas elementos por mostrar");
             clientes = this.clienteService.listar(rows, ultimaPagina - 1);
@@ -57,6 +67,9 @@ public class Clientes {
         model.addAttribute("ultimaPagina", ultimaPagina);
         model.addAttribute("controller", "clientes");
         model.addAttribute("rows", rows);
+        if (!model.containsAttribute("busquedaCliente")) {
+            model.addAttribute("busquedaCliente", new BusquedaCliente());
+        }
         ClientesHelper.reiniciarVariables();
         return "cliente/clientes2";
     }
@@ -127,33 +140,65 @@ public class Clientes {
     }
 
     @GetMapping("/detalles")
-    public String detalles(Model model, @RequestParam("idCliente") long idCliente) {
-        Cliente cliente = this.clienteService.encontrarId(idCliente);
-        model.addAttribute("tituloPagina", "Detalles cliente");
-        model.addAttribute("titulo", "Detalles Cliente");
-        model.addAttribute("mensaje", "Estos son los datos que se encontraron con el id de cliente " + idCliente);
-        model.addAttribute("cliente", cliente);
-        return "cliente/detalle_cliente";
+    public String detalles2(@ModelAttribute("busquedaCliente") @Valid final BusquedaCliente busquedaCliente,
+            @RequestParam(required = false, name = "valor") final String valor, @RequestParam(required = false, name = "filtro") final String filtro, Model model) {
+        Cliente cliente = null;
+        try {
+            //Permite consultar datos desde la lista de clientes sin necesidad de implementar un formulario
+            switch (filtro) {
+                case "id":
+                    cliente = this.clienteService.encontrarId(Integer.valueOf(valor));
+                    break;
+                case "cups":
+                    cliente = this.clienteService.encontrarCups(valor);
+                    break;
+            }
+            if (cliente != null) {
+                model.addAttribute("tituloPagina", "Detalles cliente");
+                model.addAttribute("titulo", "Detalles Cliente");
+                model.addAttribute("mensaje", "Estos son los datos que se encontraron");
+                model.addAttribute("cliente", cliente);
+                model.addAttribute("busquedaCliente", busquedaCliente);
+                return "cliente/detalle_cliente";
+            }
+            return "redirect:/clientes?sinregistro&v=" + busquedaCliente.getValor() + "&f=" + busquedaCliente.getFiltro();
+        } catch (MasDeUnClienteEncontrado e) {
+            return "redirect:/clientes?cupsiguales";
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+            return "redirect:/clientes?unknown";
+        }
     }
 
     @PostMapping("/busqueda")
-    public String busqueda(Model model, @RequestParam("valor") String valor) {
+    public final String busqueda(@ModelAttribute("busquedaCliente") @Valid final BusquedaCliente busquedaCliente, final BindingResult binding, RedirectAttributes redirectAttributes, Model model) {
+        redirectAttributes.addFlashAttribute("busquedaCliente", busquedaCliente);
+        if (binding.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.busquedaCliente", binding);
+            return "redirect:/clientes";
+        }
         try {
-            long idCliente = Long.parseLong(valor);
-            Cliente cliente = this.clienteService.encontrarId(idCliente);
-            if (cliente == null) {
-                ClientesHelper.mensaje = "No se encontró algun registro con el id " + idCliente;
-                return "redirect:/clientes";
+            switch (busquedaCliente.getFiltro()) {
+                case "id":
+                case "cups":
+                    return "redirect:/clientes/detalles?valor=" + busquedaCliente.getValor() + "&filtro=" + busquedaCliente.getFiltro();
             }
-            model.addAttribute("tituloPagina", "Detalles cliente");
-            model.addAttribute("titulo", "Detalles Cliente");
-            model.addAttribute("mensaje", "Estos son los datos que se encontraron con el id de cliente " + idCliente);
-            model.addAttribute("cliente", cliente);
-            model.addAttribute("ultimaBusqueda", idCliente);
-            return "cliente/detalle_cliente";
+
+            List<Cliente> clientes = this.clienteService.encontrarByNombre(busquedaCliente.getValor());
+            System.out.println(clientes.size());
+            model.addAttribute("tituloPagina", "Busqueda de Clientes");
+            model.addAttribute("titulo", "Busqueda de Clientes");
+            model.addAttribute("tablaTitulo", "Clientes");
+            model.addAttribute("registrosMostrados", "--");
+            model.addAttribute("totalRegistros", clientes.size());
+            model.addAttribute("mensaje", "Estos son los datos que se encontraron con el valor " + busquedaCliente.getValor() + " y el filtro de " + busquedaCliente.getFiltro());
+            model.addAttribute("ultimaBusqueda", busquedaCliente.getValor());
+            model.addAttribute("busquedaCliente", busquedaCliente);
+            model.addAttribute("clientes", clientes);
+            return "cliente/clientes2";
         } catch (NumberFormatException e) {
             e.printStackTrace(System.out);
-            ClientesHelper.mensaje = "El filtro de <Strong>Cliente</Strong> solo acepta valores enteros, revisar el valor ingresado <Strong>" + valor + "</Strong>";
+            redirectAttributes.addAttribute("mensaje", "El filtro de <Strong>Cliente</Strong> solo acepta valores enteros, revisar el valor ingresado <Strong>" + busquedaCliente.getValor() + "</Strong>");
             return "redirect:/clientes";
         } catch (Exception e) {
             e.printStackTrace(System.out);

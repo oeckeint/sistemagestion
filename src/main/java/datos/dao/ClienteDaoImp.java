@@ -47,6 +47,14 @@ public class ClienteDaoImp implements datos.interfaces.ClienteDao {
             throw new MasDeUnClienteEncontrado(cups);
         }
     }
+    
+    @Override
+    public List<Cliente> encontrarByNombre(String nombreCliente) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from Cliente c where c.isDeleted = 0 and c.nombreCliente LIKE :nombreCliente order by c.idCliente desc", Cliente.class)
+                .setParameter("nombreCliente", "%" + nombreCliente + "%")
+                .getResultList();
+    }
 
     @Override
     public void guardar(Cliente cliente) {

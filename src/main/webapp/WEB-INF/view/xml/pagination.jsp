@@ -46,16 +46,14 @@
             <c:param name="page" value="${ultimaPagina}"/>
         </c:url>
         <li class="page-item">
-        <li class="page-item">
             <div class="col-auto">
-                <label class="mr-sm-2 sr-only" for="numberOfRows">Preference</label>
-                <select class="custom-select m-0" id="numberOfRows" onchange="changeNumberOfRows()">
-                    <option value="25" ${rows == 25 ? 'selected' : ''}>25</option>
-                    <option value="50" ${rows == 50 ? 'selected' : ''}>50</option>
-                    <option value="75" ${rows == 75 ? 'selected' : ''}>75</option>
-                    <option value="100" ${rows == 100 ? 'selected' : ''}>100</option>
-                    <option value="125" ${rows == 125 ? 'selected' : ''}>125</option>
-                    <option value="150" ${rows == 150 ? 'selected' : ''}>150</option>
+                <select class="form-select text-left btn-primary" id="numberOfRows" onchange="changeNumberOfRows()">
+                    <option class="bg-white text-dark" value="25" ${rows == 25 ? 'selected' : ''}>25</option>
+                    <option class="bg-white text-dark" value="50" ${rows == 50 ? 'selected' : ''}>50</option>
+                    <option class="bg-white text-dark" value="75" ${rows == 75 ? 'selected' : ''}>75</option>
+                    <option class="bg-white text-dark" value="100" ${rows == 100 ? 'selected' : ''}>100</option>
+                    <option class="bg-white text-dark" value="125" ${rows == 125 ? 'selected' : ''}>125</option>
+                    <option class="bg-white text-dark" value="150" ${rows == 150 ? 'selected' : ''}>150</option>
                 </select>
             </div>
         </li>

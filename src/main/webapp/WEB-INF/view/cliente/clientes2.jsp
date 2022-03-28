@@ -1,8 +1,10 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<!DOCTYPE html>
-<html>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<jsp:include page="/WEB-INF/view/comunes/Lang.jsp"></jsp:include>
+    <!DOCTYPE html>
+    <html lang="${language}">
     <head>
         <jsp:include page="/WEB-INF/paginas/comunes/contenidoHead.jsp"></jsp:include>
         </head>
@@ -10,7 +12,21 @@
             <!--Cabecero-->
         <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp"></jsp:include>
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <div class="container">${mensaje}</div>
+                <div class="container">
+                <c:choose>
+                    <c:when test="${param.sinvalor != null}"><fmt:message key="error.sinvalor"/></c:when>
+                    <c:when test="${param.sinregistro != null}">
+                        <fmt:message key="error.sinregistro">
+                            <fmt:param value="${param.v}"/>
+                            <fmt:param value="${param.f}"/>
+                        </fmt:message>
+                    </c:when>
+                    <c:when test="${param.unknown != null}">
+                        <fmt:message key="error.unknown"></fmt:message>
+                    </c:when>
+                    <c:otherwise>${mensaje}</c:otherwise>
+                </c:choose>
+            </div>
         </div>
 
         <div class="container">
@@ -22,7 +38,7 @@
                             <h2 class="m-0"><a href="${pageContext.request.contextPath}/">
                                     <i class="fas fa-arrow-circle-left text-success"></i></a> 
                                     ${tablaTitulo} 
-                                <span class="badge badge-success">
+                                <span class="badge bg-success">
                                     <c:choose>
                                         <c:when test="${paginaActual < ultimaPagina}">
                                             ${registrosMostrados} / ${totalRegistros}
@@ -70,7 +86,8 @@
                                 <c:param name="idCliente" value="${cliente.idCliente}"/>
                             </c:url>
                             <c:url var="detalles" value="/clientes/detalles">
-                                <c:param name="idCliente" value="${cliente.idCliente}"/>
+                                <c:param name="valor" value="${cliente.idCliente}"/>
+                                <c:param name="filtro" value="id"/>
                             </c:url>
                             <tr>
                                 <th scope="row">${cliente.idCliente}</th>

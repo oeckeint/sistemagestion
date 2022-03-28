@@ -22,7 +22,7 @@
                     <h2 class="m-0"><a href="${pageContext.request.contextPath}/">
                             <i class="fas fa-arrow-circle-left text-success"></i></a> 
                             ${tablaTitulo} 
-                        <span class="badge badge-success">
+                        <span class="badge bg-success">
                             <c:choose>
                                 <c:when test="${paginaActual != ultimaPagina}">
                                     ${registrosMostrados} / ${totalRegistros}
