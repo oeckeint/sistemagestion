@@ -21,7 +21,7 @@
                     <div class="col-6">
                         <h2 class="m-0"><a href="${pageContext.request.contextPath}/clientes"><i class="fas fa-arrow-circle-left text-success"></i></a> Detalles cliente</h2>
                     </div>
-                    <div class="col-6 row  justify-content-end">
+                    <div class="row col-12 col-lg-6 justify-content-sm-evenly mt-3 mt-md-0">
                         <jsp:include page="../comunes/busquedaCliente.jsp" />
                     </div>
                 </div>
@@ -181,6 +181,6 @@
 
             </div>
         </c:if>    
-        <jsp:include page="/WEB-INF/paginas/comunes/piePagina.jsp"></jsp:include>
+        <jsp:include page="/WEB-INF/view/comunes/footerFormularios.jsp"></jsp:include>
     </body>
 </html>

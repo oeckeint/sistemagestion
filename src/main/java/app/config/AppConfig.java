@@ -46,7 +46,7 @@ public class AppConfig {
         return cmr;
     }
 
-    @Bean
+    @Bean(destroyMethod = "")
     public DataSource securityDataSource() throws PropertyVetoException {
         ComboPooledDataSource cpds = new ComboPooledDataSource();
         

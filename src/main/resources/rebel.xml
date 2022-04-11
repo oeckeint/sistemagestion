@@ -4,16 +4,21 @@
   This is the JRebel configuration file. It maps the running application to your IDE workspace, enabling JRebel reloading for this project.
   Refer to https://manuals.jrebel.com/jrebel/standalone/config.html for more information.
 -->
-<application generated-by="netbeans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.zeroturnaround.com" xsi:schemaLocation="http://www.zeroturnaround.com http://update.zeroturnaround.com/jrebel/rebel-2_1.xsd">
+<application generated-by="eclipse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.zeroturnaround.com" xsi:schemaLocation="http://www.zeroturnaround.com http://update.zeroturnaround.com/jrebel/rebel-2_1.xsd">
 
 	<classpath>
-		<dir name="C:\NetBeansProjects\sistemagestion\target\classes">
+		<dir name="C:/Users/Oecke/git/sistemagestion/target/classes">
 		</dir>
 	</classpath>
 
 	<web>
 		<link target="/">
-			<dir name="C:\NetBeansProjects\sistemagestion\src\main\webapp">
+			<dir name="C:/Users/Oecke/git/sistemagestion/target/m2e-wtp/web-resources">
+				<exclude name="/"/>
+			</dir>
+		</link>
+		<link target="/">
+			<dir name="C:/Users/Oecke/git/sistemagestion/src/main/webapp">
 			</dir>
 		</link>
 	</web>

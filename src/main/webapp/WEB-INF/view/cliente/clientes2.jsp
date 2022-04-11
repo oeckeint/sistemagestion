@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row justify-content-between p-0">
-                        <div class="col-md-12 col-lg-5">
+                        <div class="col-12 col-lg-5">
                             <h2 class="m-0"><a href="${pageContext.request.contextPath}/">
                                     <i class="fas fa-arrow-circle-left text-success"></i></a> 
                                     ${tablaTitulo} 
@@ -50,7 +50,7 @@
                                 </span>
                             </h2>
                         </div>
-                        <div class="col-6 row  justify-content-end">
+                        <div class="row col-12 col-lg-6 justify-content-end mt-3 mt-md-0">
                             <jsp:include page="../comunes/busquedaCliente.jsp" />
                         </div>
                     </div>

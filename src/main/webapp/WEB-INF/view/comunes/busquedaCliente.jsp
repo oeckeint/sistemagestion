@@ -9,11 +9,11 @@
 <fmt:message var="busqueda" key="customers.search"/>
 
 <security:authorize access="hasRole('ADMIN')">
-    <div class="col-3">
+    <div class="col-4 col-md-3">
         <a href="${pageContext.request.contextPath}/clientes/formulario" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> <fmt:message key="customers.add"/></a>
     </div>
 </security:authorize>
-<div class="col-9">
+<div class="col-8 col-md-9">
     <form:form action="${pageContext.request.contextPath}/clientes/busqueda" modelAttribute="busquedaCliente" method="post" id="myForm">
         <div class="input-group">
             <button class="btn btn-primary btn-block" type="button" id="btnSubmit" onclick="buscarCliente();">

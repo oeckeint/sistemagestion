@@ -6,11 +6,8 @@
 <footer id="pie-pagina" class="bg-warning text-white mt-3 p-5">
     <div class="container">
         <div class="row justify-content-md-between">
-            <div class="col-12 col-md-4">
+            <div class="col">
                 <p class="lead text-center"><fmt:message key="footer.copyright" /> &COPY; <fmt:message key="footer.company" /> <fmt:message key="footer.year" /> <fmt:message key="footer.version" /></p>
-            </div>
-            <div class="col-12 col-md-3">
-                <p id="reloj" class="lead text-center bg-secondary"></p>
             </div>
         </div>
     </div>
@@ -42,41 +39,6 @@
         parser.search = '?' + list.join('&');
         location.href = parser.href;
     }
-
-    function startTime() {
-        today = new Date();
-        var mesok = new Array(12);
-        mesok[0] = "<fmt:message key='footer.month.0'/>";
-        mesok[1] = "<fmt:message key='footer.month.1'/>";
-        mesok[2] = "<fmt:message key='footer.month.2'/>";
-        mesok[3] = "<fmt:message key='footer.month.3'/>";
-        mesok[4] = "<fmt:message key='footer.month.4'/>";
-        mesok[5] = "<fmt:message key='footer.month.5'/>";
-        mesok[6] = "<fmt:message key='footer.month.6'/>";
-        mesok[7] = "<fmt:message key='footer.month.7'/>";
-        mesok[8] = "<fmt:message key='footer.month.8'/>";
-        mesok[9] = "<fmt:message key='footer.month.9'/>";
-        mesok[10] = "<fmt:message key='footer.month.10'/>";
-        mesok[11] = "<fmt:message key='footer.month.11'/>";
-
-        h = today.getHours();
-        m = today.getMinutes();
-        s = today.getSeconds();
-        m = checkTime(m);
-        s = checkTime(s);
-        d = today.getDate();
-        mt = today.getMonth();
-        y = today.getFullYear();
-        document.getElementById('reloj').innerHTML = d + " " + mesok[today.getMonth()] + ", " + y + " - " + h + ":" + m + ":" + s;
-        t = setTimeout('startTime()', 500);
-    }
-    function checkTime(i)
-    {
-        if (i < 10) {
-            i = "0" + i;
-        }
-        return i;
-    }
     
     function defineTitles(){
         const url = window.location.href;
@@ -93,7 +55,6 @@
     
     window.onload = function () {
         defineTitles();
-        startTime();
     };
 </script>
 
