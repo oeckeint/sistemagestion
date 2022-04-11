@@ -2,6 +2,9 @@ package datos.service;
 
 import datos.entity.Peaje;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,9 +15,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @Service
 public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Peaje> {
 
+	private Logger logger = Logger.getLogger(getClass().getName());
+	
     @Autowired
     @Qualifier(value = "peajesImp")
-    private DocumentoXmlDao documentoXmlDao;
+    private DocumentoXmlDao<Peaje> documentoXmlDao;
 
     @Override
     @Transactional
@@ -43,7 +48,7 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
     @Override
     @Transactional
     public Peaje buscarByCodFiscal(String cod) {
-        return (Peaje) this.documentoXmlDao.buscarByCodFiscal(cod);
+        return this.documentoXmlDao.buscarByCodFiscal(cod);
     }
 
     @Override
@@ -108,6 +113,28 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
         peaje.setEaValSum(peaje.getEaValSum() * -1);
         
         peaje.setEaImpTot(peaje.getEaImpTot() * -1);
+        
+        
+        //Cargos
+        if (peaje.getCarImpTot_01() != 0) {
+        	peaje.setCar1_01(peaje.getCar1_01() * -1);
+            peaje.setCar2_01(peaje.getCar2_01() * -1);
+            peaje.setCar3_01(peaje.getCar3_01() * -1);
+            peaje.setCar4_01(peaje.getCar4_01() * -1);
+            peaje.setCar5_01(peaje.getCar5_01() * -1);
+            peaje.setCar6_01(peaje.getCar6_01() * -1);
+            peaje.setCarImpTot_01(peaje.getCarImpTot_01() * -1);
+		}
+        
+        if (peaje.getCarImpTot_02() != 0) {
+        	peaje.setCar1_02(peaje.getCar1_02() * -1);
+            peaje.setCar2_02(peaje.getCar2_02() * -1);
+            peaje.setCar3_02(peaje.getCar3_02() * -1);
+            peaje.setCar4_02(peaje.getCar4_02() * -1);
+            peaje.setCar5_02(peaje.getCar5_02() * -1);
+            peaje.setCar6_02(peaje.getCar6_02() * -1);
+            peaje.setCarImpTot_02(peaje.getCarImpTot_02() * -1);
+		}
         
         peaje.setIeImp(peaje.getIeImp() * -1);
         peaje.setaImpFac(peaje.getaImpFac() * -1);
@@ -183,6 +210,8 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
                 
         peaje.setRfIdRem(nuevaRemesa);
         this.documentoXmlDao.guardar(peaje);
+        
+        logger.log(Level.INFO, ">>> PeajeServiceImp=\"Se ha registrado una factura rectificada codFisFac = {0}\"", peaje.getCodFisFac());
     }
 
     @Override
@@ -200,7 +229,7 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
     @Override
     @Transactional
     public int contarRegistros() {
-        return this.documentoXmlDao.contarRegistros();
-    }
+		return this.documentoXmlDao.contarRegistros();
+	}
 
 }

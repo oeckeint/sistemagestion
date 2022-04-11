@@ -65,7 +65,7 @@ public class AppConfig {
         cpds.setMaxIdleTime(this.getIntProperty("connection.pool.maxIdleTime"));
         
         logger.log(Level.INFO, ">>> jdbc.url={0}", this.env.getProperty("jdbc.url"));
-        logger.log(Level.INFO, ">>> jdbc.url={0}", this.env.getProperty("jdbc.user"));
+        logger.log(Level.INFO, ">>> jdbc.user={0}", this.env.getProperty("jdbc.user"));
 
         return cpds;
     }
