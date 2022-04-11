@@ -5301,10 +5301,14 @@ public class xmlHelper {
 
     private Peaje prepareAbono(Peaje peaje) {
         peaje.setTipFac("A");
-        peaje.setEaFecDes1(peaje.getEaFecHas1());
-        peaje.setEaFecHas1(peaje.getEaFecDes1());
-        peaje.setEaFecDes2(peaje.getEaFecHas2());
-        peaje.setEaFecHas2(peaje.getEaFecDes2());
+        String fecDes1 = peaje.getEaFecDes1();
+        String fecHas1 = peaje.getEaFecHas1();
+        String fecDes2 = peaje.getEaFecDes2();
+        String fecHas2 = peaje.getEaFecHas2();
+        peaje.setEaFecDes1(fecHas1);
+        peaje.setEaFecHas1(fecDes1);
+        peaje.setEaFecDes2(fecHas2);
+        peaje.setEaFecHas2(fecDes2);
         return peaje;
     }
 

@@ -99,10 +99,15 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
         peaje.setPotFac3(peaje.getPotFac3() * -1);
         peaje.setPotImpTot(peaje.getPotImpTot() * -1);
         
-        peaje.setEaFecDes1(peaje.getEaFecHas1());
-        peaje.setEaFecHas1(peaje.getEaFecDes1());
-        peaje.setEaFecDes2(peaje.getEaFecHas2());
-        peaje.setEaFecHas2(peaje.getEaFecDes2());
+        //Fechas EA
+        String fecDes1 = peaje.getEaFecDes1();
+        String fecHas1 = peaje.getEaFecHas1();
+        String fecDes2 = peaje.getEaFecDes2();
+        String fecHas2 = peaje.getEaFecHas2();
+        peaje.setEaFecDes1(fecHas1);
+        peaje.setEaFecHas1(fecDes1);
+        peaje.setEaFecDes2(fecHas2);
+        peaje.setEaFecHas2(fecDes2);
         
         peaje.setEaVal1(peaje.getEaVal1() * -1);
         peaje.setEaVal2(peaje.getEaVal2() * -1);
