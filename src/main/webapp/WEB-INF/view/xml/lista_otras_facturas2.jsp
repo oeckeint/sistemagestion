@@ -50,7 +50,6 @@
                         <table class="table table-hover text-center">
                             <thead>
                                 <tr class="bg-dark text-white">
-                                    <th>#Reg</th>
                                     <th>Cliente</th>
                                     <th>Cups</th>
                                     <th>CodFiscal</th>
@@ -79,7 +78,6 @@
                                         <c:param name="idCliente" value="${documento.idCliente}"/>
                                     </c:url>
                                     <tr>
-                                        <td>${id.count}</td>
                                         <td><a href="${detallesCliente}" class="btn btn-success">${documento.idCliente}</i></a></td>
                                         <td>${documento.cups}</td>
                                         <td>${documento.codFisFac}</td>

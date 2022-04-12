@@ -18,6 +18,9 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.persistence.NonUniqueResultException;
 import utileria.StringHelper;
 
@@ -39,6 +42,7 @@ public class xmlHelper {
     private String nombreArchivo;
     private String codigoRemesa;
     private boolean existeEnergiaExcedentaria;
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService) {
         this.doc = doc;
@@ -78,154 +82,140 @@ public class xmlHelper {
 
     /**
      * Realiza el proceso de pago para los Peajes
+     * @throws PeajeMasDeUnRegistroException 
      */
-    public void procesarRemesaPagoPeaje() {
-        try {
-            HashMap<String, String> elementos = new HashMap<String, String>();
-
-            NodeList flowList = doc.getElementsByTagName("Factura");
-            for (int i = 0; i < flowList.getLength(); i++) {
-                NodeList childList = flowList.item(i).getChildNodes();
-                for (int j = 0; j < childList.getLength(); j++) {
-                    Node childNode = childList.item(j);
-                    if (null != childNode.getNodeName()) {
-                        switch (childNode.getNodeName()) {
-                            case "CodigoFiscalFactura":
-                                elementos.put("codFisFac", childList.item(j).getTextContent().trim());
-                                this.EmpresaEmisora = childList.item(j).getTextContent().trim();
-                                break;
-                            case "Importe":
-                                elementos.put("Importe", childList.item(j).getTextContent().trim());
-                                break;
-                            case "Estado":
-                                elementos.put("Estado", childList.item(j).getTextContent().trim());
-                                break;
-                            default:
-                                break;
-                        }
+    public void procesarRemesaPagoPeaje() throws PeajeMasDeUnRegistroException {
+        HashMap<String, String> elementos = new HashMap<String, String>();
+        NodeList flowList = doc.getElementsByTagName("Factura");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "CodigoFiscalFactura":
+                            elementos.put("codFisFac", childList.item(j).getTextContent().trim());
+                            this.EmpresaEmisora = childList.item(j).getTextContent().trim();
+                            break;
+                        case "Importe":
+                            elementos.put("Importe", childList.item(j).getTextContent().trim());
+                            break;
+                        case "Estado":
+                            elementos.put("Estado", childList.item(j).getTextContent().trim());
+                            break;
+                        default:
+                            break;
                     }
-                }
-
-                Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(elementos.get("codFisFac"));
-                if (peaje != null) {
-                    if (peaje.getEstadoPago() == 0) {
-                        NumberFormat nf = NumberFormat.getInstance(Locale.FRANCE);
-                        double importe = (double) nf.parse(elementos.get("Importe"));
-                        if (importe != peaje.getImpTotFac()) {
-                            utileria.ArchivoTexto.escribirError("contenido_xml. El importe total " + peaje.getImpTotFac() + " del registro con el codFisFac " + elementos.get("codFisFac") + " no coincide con el indicado en el archivo " + elementos.get("Importe") + " pero igual se proceso");
-                        }
-                        peaje.setRemesaPago(this.codigoRemesa);
-                        peaje.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
-                        this.contenidoXmlService.actualizar(peaje);
-                    } else {
-                        utileria.ArchivoTexto.escribirError("contenido_xml. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + peaje.getEstadoPago() + " por lo que no se pudo procesar");
-                    }
-                } else {
-                    utileria.ArchivoTexto.escribirError("contenido_xml. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
                 }
             }
-        } catch (ParseException ex) {
-            System.out.println("Exception");
+
+            Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(elementos.get("codFisFac"));
+            if (peaje != null) {
+                if (peaje.getEstadoPago() == 0) {
+                    double importe = Double.parseDouble(elementos.get("Importe"));
+                    if (importe != peaje.getImpTotFac()) {
+                        utileria.ArchivoTexto.escribirError("contenido_xml. El importe total " + peaje.getImpTotFac() + " del registro con el codFisFac " + elementos.get("codFisFac") + " no coincide con el indicado en el archivo " + elementos.get("Importe") + " pero igual se proceso");
+                    }
+                    peaje.setRemesaPago(this.codigoRemesa);
+                    peaje.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
+                    this.contenidoXmlService.actualizar(peaje);
+                    logger.log(Level.INFO, ">>> xmlHelper=\"Se ha cambiado el estadoDePago = {0} con el codFisFac = {1}\"", new Object[]{elementos.get("Estado"), elementos.get("codFisFac")});
+                } else {
+                    utileria.ArchivoTexto.escribirError("contenido_xml. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + peaje.getEstadoPago() + " por lo que no se pudo procesar");
+                }
+            } else {
+                utileria.ArchivoTexto.escribirError("contenido_xml. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
+            }
         }
     }
 
-    public void procesarRemesaPagoFactura() {
-        try {
-            HashMap<String, String> elementos = new HashMap<String, String>();
-
-            NodeList flowList = doc.getElementsByTagName("Factura");
-            for (int i = 0; i < flowList.getLength(); i++) {
-                NodeList childList = flowList.item(i).getChildNodes();
-                for (int j = 0; j < childList.getLength(); j++) {
-                    Node childNode = childList.item(j);
-                    if (null != childNode.getNodeName()) {
-                        switch (childNode.getNodeName()) {
-                            case "CodigoFiscalFactura":
-                                elementos.put("codFisFac", childList.item(j).getTextContent().trim());
-                                this.EmpresaEmisora = childList.item(j).getTextContent().trim();
-                                break;
-                            case "Importe":
-                                elementos.put("Importe", childList.item(j).getTextContent().trim());
-                                break;
-                            case "Estado":
-                                elementos.put("Estado", childList.item(j).getTextContent().trim());
-                                break;
-                            default:
-                                break;
-                        }
+    public void procesarRemesaPagoFactura() throws PeajeMasDeUnRegistroException {
+        HashMap<String, String> elementos = new HashMap<String, String>();
+        NodeList flowList = doc.getElementsByTagName("Factura");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "CodigoFiscalFactura":
+                            elementos.put("codFisFac", childList.item(j).getTextContent().trim());
+                            this.EmpresaEmisora = childList.item(j).getTextContent().trim();
+                            break;
+                        case "Importe":
+                            elementos.put("Importe", childList.item(j).getTextContent().trim());
+                            break;
+                        case "Estado":
+                            elementos.put("Estado", childList.item(j).getTextContent().trim());
+                            break;
+                        default:
+                            break;
                     }
-                }
-
-                Factura factura = (Factura) this.contenidoXmlService.buscarByCodFiscal(elementos.get("codFisFac"));
-                if (factura != null) {
-                    if (factura.getEstadoPago() == 0) {
-                        NumberFormat nf = NumberFormat.getInstance(Locale.FRANCE);
-                        double importe = (double) nf.parse(elementos.get("Importe"));
-                        if (importe != factura.getImpTotFac()) {
-                            utileria.ArchivoTexto.escribirError("contenido_xml_factura. El importe total " + factura.getImpTotFac() + " del registro con el codFisFac " + elementos.get("codFisFac") + " no coincide con el indicado en el archivo " + elementos.get("Importe") + " pero igual se proceso");
-                        }
-                        factura.setRemesaPago(this.codigoRemesa);
-                        factura.setEstadoPago(1);
-                        this.contenidoXmlService.actualizar(factura);
-                    } else {
-                        utileria.ArchivoTexto.escribirError("contenido_xml_factura. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + factura.getEstadoPago() + " por lo que no se pudo procesar");
-                    }
-                } else {
-                    utileria.ArchivoTexto.escribirError("contenido_xml_factura. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
                 }
             }
-        } catch (ParseException ex) {
-            System.out.println("Exception");
+
+            Factura factura = (Factura) this.contenidoXmlService.buscarByCodFiscal(elementos.get("codFisFac"));
+            if (factura != null) {
+                if (factura.getEstadoPago() == 0) {
+                	double importe = Double.parseDouble(elementos.get("Importe"));
+                    if (importe != factura.getImpTotFac()) {
+                        utileria.ArchivoTexto.escribirError("contenido_xml_factura. El importe total " + factura.getImpTotFac() + " del registro con el codFisFac " + elementos.get("codFisFac") + " no coincide con el indicado en el archivo " + elementos.get("Importe") + " pero igual se proceso");
+                    }
+                    factura.setRemesaPago(this.codigoRemesa);
+                    factura.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
+                    this.contenidoXmlService.actualizar(factura);
+                    logger.log(Level.INFO, ">>> xmlHelper=\"Se ha cambiado el estadoDePago = {0} con el codFisFac = {1}\"", new Object[]{elementos.get("Estado"), elementos.get("codFisFac")});
+                } else {
+                    utileria.ArchivoTexto.escribirError("contenido_xml_factura. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + factura.getEstadoPago() + " por lo que no se pudo procesar");
+                }
+            } else {
+                utileria.ArchivoTexto.escribirError("contenido_xml_factura. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
+            }
         }
     }
 
-    public void procesarRemesaPagoOtraFactura() {
-        try {
-            HashMap<String, String> elementos = new HashMap<String, String>();
-
-            NodeList flowList = doc.getElementsByTagName("Factura");
-            for (int i = 0; i < flowList.getLength(); i++) {
-                NodeList childList = flowList.item(i).getChildNodes();
-                for (int j = 0; j < childList.getLength(); j++) {
-                    Node childNode = childList.item(j);
-                    if (null != childNode.getNodeName()) {
-                        switch (childNode.getNodeName()) {
-                            case "CodigoFiscalFactura":
-                                elementos.put("codFisFac", childList.item(j).getTextContent().trim());
-                                this.EmpresaEmisora = childList.item(j).getTextContent().trim();
-                                break;
-                            case "Importe":
-                                elementos.put("Importe", childList.item(j).getTextContent().trim());
-                                break;
-                            case "Estado":
-                                elementos.put("Estado", childList.item(j).getTextContent().trim());
-                                break;
-                            default:
-                                break;
-                        }
+    public void procesarRemesaPagoOtraFactura() throws PeajeMasDeUnRegistroException {
+        HashMap<String, String> elementos = new HashMap<String, String>();
+        NodeList flowList = doc.getElementsByTagName("Factura");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "CodigoFiscalFactura":
+                            elementos.put("codFisFac", childList.item(j).getTextContent().trim());
+                            this.EmpresaEmisora = childList.item(j).getTextContent().trim();
+                            break;
+                        case "Importe":
+                            elementos.put("Importe", childList.item(j).getTextContent().trim());
+                            break;
+                        case "Estado":
+                            elementos.put("Estado", childList.item(j).getTextContent().trim());
+                            break;
+                        default:
+                            break;
                     }
-                }
-
-                OtraFactura factura = (OtraFactura) this.contenidoXmlService.buscarByCodFiscal(elementos.get("codFisFac"));
-                if (factura != null) {
-                    if (factura.getEstadoPago() == 0) {
-                        NumberFormat nf = NumberFormat.getInstance(Locale.FRANCE);
-                        double importe = (double) nf.parse(elementos.get("Importe"));
-                        if (importe != factura.getImpTotFac()) {
-                            utileria.ArchivoTexto.escribirError("contenido_xml_otras_facturas. El importe total " + factura.getImpTotFac() + " del registro con el codFisFac " + elementos.get("codFisFac") + " no coincide con el indicado en el archivo " + elementos.get("Importe") + " pero igual se proceso");
-                        }
-                        factura.setRemesaPago(this.codigoRemesa);
-                        factura.setEstadoPago(1);
-                        this.contenidoXmlService.actualizar(factura);
-                    } else {
-                        utileria.ArchivoTexto.escribirError("contenido_xml_otras_facturas. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + factura.getEstadoPago() + " por lo que no se pudo procesar");
-                    }
-                } else {
-                    utileria.ArchivoTexto.escribirError("contenido_xml_otras_facturas. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
                 }
             }
-        } catch (ParseException ex) {
-            System.out.println("Exception");
+
+            OtraFactura factura = (OtraFactura) this.contenidoXmlService.buscarByCodFiscal(elementos.get("codFisFac"));
+            if (factura != null) {
+                if (factura.getEstadoPago() == 0) {
+                	double importe = Double.parseDouble(elementos.get("Importe"));
+                    if (importe != factura.getImpTotFac()) {
+                        utileria.ArchivoTexto.escribirError("contenido_xml_otras_facturas. El importe total " + factura.getImpTotFac() + " del registro con el codFisFac " + elementos.get("codFisFac") + " no coincide con el indicado en el archivo " + elementos.get("Importe") + " pero igual se proceso");
+                    }
+                    factura.setRemesaPago(this.codigoRemesa);
+                    factura.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
+                    this.contenidoXmlService.actualizar(factura);
+                    logger.log(Level.INFO, ">>> xmlHelper=\"Se ha cambiado el estadoDePago = {0} con el codFisFac = {1}\"", new Object[]{elementos.get("Estado"), elementos.get("codFisFac")});
+                } else {
+                    utileria.ArchivoTexto.escribirError("contenido_xml_otras_facturas. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + factura.getEstadoPago() + " por lo que no se pudo procesar");
+                }
+            } else {
+                utileria.ArchivoTexto.escribirError("contenido_xml_otras_facturas. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
+            }
         }
     }
 
@@ -240,9 +230,10 @@ public class xmlHelper {
      * @throws excepciones.PeajeTipoFacturaNoSoportadaException
      * @throws excepciones.CodRectNoExisteException
      * @throws excepciones.MasDeUnClienteEncontrado
+     * @throws PeajeMasDeUnRegistroException 
      */
     public void procesarOtrasFacturas(String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado {
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, PeajeMasDeUnRegistroException {
         //Se verifica que el cliente exista
         this.cliente = this.clienteService.encontrarCups(this.cups);
         if (this.cliente != null) {
@@ -272,9 +263,10 @@ public class xmlHelper {
      * @throws PeajeTipoFacturaNoSoportadaException
      * @throws CodRectNoExisteException
      * @throws MasDeUnClienteEncontrado
+     * @throws PeajeMasDeUnRegistroException 
      */
     public void procesarFactura(String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException {
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException {
         //Se verifica que el cliente exista
         this.cliente = this.clienteService.encontrarCups(this.cups);
         if (this.cliente != null) {
@@ -316,9 +308,10 @@ public class xmlHelper {
      * @throws PeajeTipoFacturaNoSoportadaException
      * @throws CodRectNoExisteException
      * @throws excepciones.MasDeUnClienteEncontrado
+     * @throws PeajeMasDeUnRegistroException 
      */
     public void procesarPeaje(String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException {
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException {
         //Se verifica que el cliente exista
         this.cliente = this.clienteService.encontrarCups(this.cups);
         if (this.cliente != null) {
@@ -355,10 +348,11 @@ public class xmlHelper {
     /**
      * Busca la factura para rectificar, de lo contrario arroja una exception
      * Registra los el tipos de Peajes A
+     * @throws PeajeMasDeUnRegistroException 
      *
      * @throws CodRectNoExisteException
      */
-    private void registrarPeajeA() throws MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException {
+    private void registrarPeajeA() throws MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
         if (peaje != null) {
@@ -402,8 +396,9 @@ public class xmlHelper {
      *
      * @param nombreArchivo
      * @throws CodRectNoExisteException
+     * @throws PeajeMasDeUnRegistroException 
      */
-    private void registrarPeajeR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException {
+    private void registrarPeajeR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
         if (peaje != null) {
@@ -422,8 +417,9 @@ public class xmlHelper {
      * rectificar, de lo contrario arroja una excepcion
      *
      * @throws CodRectNoExisteException
+     * @throws PeajeMasDeUnRegistroException 
      */
-    private void registrarFacturaA() throws CodRectNoExisteException, MasDeUnClienteEncontrado {
+    private void registrarFacturaA() throws CodRectNoExisteException, MasDeUnClienteEncontrado, PeajeMasDeUnRegistroException {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         Factura factura = (Factura) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
         if (factura != null) {
@@ -483,8 +479,9 @@ public class xmlHelper {
      *
      * @param nombreArchivo
      * @throws CodRectNoExisteException
+     * @throws PeajeMasDeUnRegistroException 
      */
-    private void registrarFacturaR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException {
+    private void registrarFacturaR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException {
         String codRectificada = this.doc.getElementsByTagName("CodigoFacturaRectificadaAnulada").item(0).getTextContent();
         Factura factura = (Factura) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
         if (factura != null) {

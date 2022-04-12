@@ -1,6 +1,8 @@
 package datos.interfaces;
 
 import excepciones.NoEsUnNumeroException;
+import excepciones.PeajeMasDeUnRegistroException;
+
 import java.util.List;
 
 public interface DocumentoXmlDao<T> {
@@ -15,7 +17,7 @@ public interface DocumentoXmlDao<T> {
     
     public void eliminar(long id);
     
-    public T buscarByCodFiscal(String cod);
+    public T buscarByCodFiscal(String cod) throws PeajeMasDeUnRegistroException;
     
     public List<T> buscarByIdCliente(String idCliente) throws NoEsUnNumeroException;
     

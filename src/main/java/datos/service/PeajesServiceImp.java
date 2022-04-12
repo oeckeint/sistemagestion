@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import datos.interfaces.DocumentoXmlDao;
 import excepciones.NoEsUnNumeroException;
+import excepciones.PeajeMasDeUnRegistroException;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service
@@ -47,7 +49,7 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
 
     @Override
     @Transactional
-    public Peaje buscarByCodFiscal(String cod) {
+    public Peaje buscarByCodFiscal(String cod) throws PeajeMasDeUnRegistroException {
         return this.documentoXmlDao.buscarByCodFiscal(cod);
     }
 

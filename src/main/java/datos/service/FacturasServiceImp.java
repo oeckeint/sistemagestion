@@ -3,6 +3,8 @@ package datos.service;
 import datos.entity.Factura;
 import datos.interfaces.DocumentoXmlDao;
 import excepciones.NoEsUnNumeroException;
+import excepciones.PeajeMasDeUnRegistroException;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,7 +16,7 @@ public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<
 
     @Autowired
     @Qualifier(value = "facturaDaoImp")
-    private DocumentoXmlDao documentoXmlDao;
+    private DocumentoXmlDao<Factura> documentoXmlDao;
 
     @Override
     @Transactional
@@ -42,8 +44,8 @@ public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<
 
     @Override
     @Transactional
-    public Factura buscarByCodFiscal(String cod) {
-        return (Factura) this.documentoXmlDao.buscarByCodFiscal(cod);
+    public Factura buscarByCodFiscal(String cod) throws PeajeMasDeUnRegistroException {
+        return this.documentoXmlDao.buscarByCodFiscal(cod);
     }
 
     @Override

@@ -55,7 +55,6 @@
                         <table class="table table-hover text-center">
                             <thead>
                                 <tr class="bg-dark text-white">
-                                    <th scope="col">#Reg</th>
                                     <th scope="col">Cliente</th>
                                     <th scope="col">Cups</th>
                                     <th scope="col">FHasta</th>
@@ -77,7 +76,6 @@
                                         <c:param name="idCliente" value="${documento.idCliente}"/>
                                     </c:url>
                                     <tr>
-                                        <th scope="row">${id.count}</th>
                                         <td><a href="${detallesCliente}" class="btn btn-success">${documento.idCliente}</i></a></td>
                                         <td>${documento.cups}</td>
                                         <td>

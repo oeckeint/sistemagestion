@@ -21,6 +21,7 @@ import excepciones.MasDatosdeLosEsperadosException;
 import excepciones.MasDeUnClienteEncontrado;
 import excepciones.NoExisteElNodoException;
 import excepciones.PeajeCodRectNoExisteException;
+import excepciones.PeajeMasDeUnRegistroException;
 import excepciones.PeajeTipoFacturaNoSoportadaException;
 import excepciones.TablaBusquedaNoEspecificadaException;
 import excepciones.TablaBusquedaNoExisteException;
@@ -171,7 +172,7 @@ public class ProcesamientoXml {
 
         } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado
                 | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException | TablaBusquedaNoExisteException | TablaBusquedaNoEspecificadaException
-                | NoExisteElNodoException | ArchivoNoCumpleParaSerClasificado | MasDatosdeLosEsperadosException | TarifaNoExisteException e) {
+                | NoExisteElNodoException | ArchivoNoCumpleParaSerClasificado | MasDatosdeLosEsperadosException | TarifaNoExisteException | PeajeMasDeUnRegistroException e) {
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
             utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         } catch (Exception e) {
@@ -271,7 +272,7 @@ public class ProcesamientoXml {
     }
     
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    private void procesarOtraFactura(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException {
+    private void procesarOtraFactura(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException, PeajeMasDeUnRegistroException {
         if (existeNodo(doc, "TablaBusqueda")) {
             String tablaBusqueda = doc.getElementsByTagName("TablaBusqueda").item(0).getTextContent();
             if (StringHelper.isValid(tablaBusqueda)) {

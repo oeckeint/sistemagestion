@@ -2,7 +2,14 @@ package datos.dao;
 
 import datos.entity.Peaje;
 import excepciones.NoEsUnNumeroException;
+import excepciones.PeajeMasDeUnRegistroException;
+
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.persistence.NonUniqueResultException;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +17,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
+	
+	private Logger logger = Logger.getLogger(getClass().getName());
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -66,15 +75,18 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
     }
 
     @Override
-    public Peaje buscarByCodFiscal(String cod) {
+    public Peaje buscarByCodFiscal(String cod) throws PeajeMasDeUnRegistroException {
         try {
-            return this.sessionFactory.getCurrentSession()
-                    .createQuery("from Peaje p where p.codFisFac = :cod1 or p.codFisFac = :cod2 order by p.idPeaje desc", Peaje.class)
-                    .setParameter("cod1", cod)
-                    .setParameter("cod2", cod + "-A")
-                    .getResultList().get(0);
+            Peaje peaje = this.sessionFactory.getCurrentSession().createQuery("from Peaje p where p.codFisFac = :cod1", Peaje.class).setParameter("cod1", cod).getSingleResult();
+            if (peaje == null) {
+				peaje =	this.sessionFactory.getCurrentSession().createQuery("from Peaje p where p.codFisFac = :cod1", Peaje.class).setParameter("cod1", cod + "-A").getSingleResult();
+			}
+            return peaje;
+        } catch (NonUniqueResultException e) {
+        	logger.log(Level.INFO, ">>> PeajesDaoImp={0}", e.getMessage());
+        	throw new PeajeMasDeUnRegistroException(cod);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+        	e.printStackTrace(System.out);
             return null;
         }
     }

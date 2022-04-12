@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.MasDeUnClienteEncontrado;
 import excepciones.NoEsUnNumeroException;
+import excepciones.PeajeMasDeUnRegistroException;
 import excepciones.RegistroVacioException;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -83,9 +84,10 @@ public class Peajes {
             this.reiniciarVariables();
             return "xml/detalle";
         } catch (Exception e) {
-            System.out.println("(peajes) " + e.getMessage());
+        	e.printStackTrace(System.out);
+        	Etiquetas.PEAJES_MENSAJE = e.getMessage();
+            return "redirect:/peajes";
         }
-        return "redirect:/peajes";
     }
 
     @PostMapping("/busqueda")
@@ -147,26 +149,38 @@ public class Peajes {
 
     @PostMapping("/comentar")
     public String comentar(@RequestParam("comentario") String comentario, @RequestParam("codFisFac") String codFisFac) {
-        Peaje peaje = (Peaje) documentoXmlService.buscarByCodFiscal(codFisFac);
-        if (peaje != null) {
-            peaje.setComentarios(comentario);
-            documentoXmlService.guardar(peaje);
-        }
-        return "redirect:/peajes/detalles?codFisFac=" + codFisFac;
+    	try {
+    		Peaje peaje = (Peaje) documentoXmlService.buscarByCodFiscal(codFisFac);
+            if (peaje != null) {
+                peaje.setComentarios(comentario);
+                documentoXmlService.actualizar(peaje);
+            }
+            return "redirect:/peajes/detalles?codFisFac=" + codFisFac;
+    	} catch (Exception e) {
+			e.printStackTrace(System.out);
+			Etiquetas.PEAJES_MENSAJE = e.getMessage();
+			return "redirect:/peajes";
+		}
     }
 
     @GetMapping("/archivar")
     public String archivar(@RequestParam("codFisFac") String codFisFac) {
-        Peaje peaje = (Peaje) documentoXmlService.buscarByCodFiscal(codFisFac);
-        if (peaje != null) {
-            if (peaje.getIsDeleted() == 0) {
-                peaje.setIsDeleted(1);
-            } else {
-                peaje.setIsDeleted(0);
+    	try {
+    		Peaje peaje = (Peaje) documentoXmlService.buscarByCodFiscal(codFisFac);
+            if (peaje != null) {
+                if (peaje.getIsDeleted() == 0) {
+                    peaje.setIsDeleted(1);
+                } else {
+                    peaje.setIsDeleted(0);
+                }
+                documentoXmlService.actualizar(peaje);
             }
-            documentoXmlService.actualizar(peaje);
-        }
-        return "redirect:/peajes/detalles?codFisFac=" + codFisFac;
+            return "redirect:/peajes/detalles?codFisFac=" + codFisFac;
+    	} catch (Exception e) {
+			e.printStackTrace(System.out);
+			Etiquetas.PEAJES_MENSAJE = e.getMessage();
+			return "redirect:/peajes";
+		}        
     }
 
     private Peaje resumen(List<Peaje> peajes) throws MasDeUnClienteEncontrado, RegistroVacioException {
