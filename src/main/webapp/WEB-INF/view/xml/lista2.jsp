@@ -73,7 +73,8 @@
                                         <c:param name="codFisFac" value="${documento.codFisFac}"/>
                                     </c:url>
                                     <c:url var="detallesCliente" value="/clientes/detalles">
-                                        <c:param name="idCliente" value="${documento.idCliente}"/>
+                                        <c:param name="valor" value="${documento.idCliente}"/>
+                                        <c:param name="filtro" value="id"/>
                                     </c:url>
                                     <tr>
                                         <td><a href="${detallesCliente}" class="btn btn-success">${documento.idCliente}</i></a></td>

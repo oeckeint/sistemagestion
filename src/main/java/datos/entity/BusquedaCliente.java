@@ -7,9 +7,7 @@ package datos.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 /**
@@ -20,6 +18,7 @@ import javax.validation.constraints.Size;
 public class BusquedaCliente {
     
     @Size(min = 1, message = "El valor no puede estar vacío")
+    @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "Solo se aceptan valores alfanuméricos")
     private String valor;
     
     private String filtro;
@@ -30,7 +29,7 @@ public class BusquedaCliente {
         this.filtros = new ArrayList<>();
         this.filtros.add("id");
         this.filtros.add("cups");
-        this.filtros.add("cliente");
+        this.filtros.add("nombre");
     }
 
     public String getValor() {
@@ -38,7 +37,7 @@ public class BusquedaCliente {
     }
 
     public void setValor(String valor) {
-        this.valor = valor;
+		this.valor=valor.trim();
     }
     
     public String getFiltro() {

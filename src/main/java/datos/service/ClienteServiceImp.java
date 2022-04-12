@@ -43,6 +43,12 @@ public class ClienteServiceImp implements datos.interfaces.ClienteService {
     public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado{
         return this.clienteDao.encontrarCups(cups);
     }
+    
+    @Override
+    @Transactional
+	public List<Cliente> encontrarCupsParcial(String cups) {
+		return this.clienteDao.encontrarCupsParcial(cups);
+	}
 
     @Override
     @Transactional

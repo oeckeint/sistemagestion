@@ -21,6 +21,12 @@
                             <fmt:param value="${param.f}"/>
                         </fmt:message>
                     </c:when>
+                    <c:when test="${param.idnan != null}">
+                        <fmt:message key="error.idnan">
+                        	<fmt:param value="${busquedaCliente.filtro}"/>
+                        	<fmt:param value="${busquedaCliente.valor}"/>                        	
+                        </fmt:message>
+                    </c:when>
                     <c:when test="${param.unknown != null}">
                         <fmt:message key="error.unknown"></fmt:message>
                     </c:when>

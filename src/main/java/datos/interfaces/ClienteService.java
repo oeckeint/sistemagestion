@@ -15,6 +15,8 @@ public interface ClienteService {
     public List<Cliente> encontrarByNombre(String nombreCliente);
 
     public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado;
+    
+    public List<Cliente> encontrarCupsParcial(String cups);
 
     public void guardar(Cliente cliente);
 

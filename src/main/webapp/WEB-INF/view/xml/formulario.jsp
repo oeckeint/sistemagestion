@@ -16,6 +16,6 @@
         
         <jsp:include page="../comunes/mensajeError.jsp"></jsp:include>
 
-        <jsp:include page="/WEB-INF/view/comunes/footerFormularios.jsp"></jsp:include>
+        <jsp:include page="/WEB-INF/paginas/comunes/piePagina.jsp"></jsp:include>
     </body>
 </html>
