@@ -407,7 +407,7 @@ public class xmlHelper {
             this.registrarPeajeN();
         } else {
             System.out.println("(Procesar Peaje) No se encontro una factura para rectificar");
-            throw new CodRectNoExisteException(codFactura);
+            throw new CodRectNoExisteException(codRectificada);
         }
     }
 
@@ -426,7 +426,7 @@ public class xmlHelper {
             this.registrarFacturaA();
         } else {
             System.out.println("(xmlHelper - registrarFacturaA) No se encontró una factura para rectificar");
-            throw new CodRectNoExisteException(codFactura);
+            throw new CodRectNoExisteException(codRectificada);
         }
     }
 
@@ -490,7 +490,7 @@ public class xmlHelper {
             this.registrarFacturaN();
         } else {
             System.out.println("(xml Helper - registrarFacturaR) No se encontro una factura para rectificar");
-            throw new CodRectNoExisteException(codFactura);
+            throw new CodRectNoExisteException(codRectificada);
         }
     }
 
