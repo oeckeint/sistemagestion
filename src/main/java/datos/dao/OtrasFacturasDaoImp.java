@@ -46,11 +46,11 @@ public class OtrasFacturasDaoImp implements datos.interfaces.DocumentoXmlDao<Otr
     @Override
     public OtraFactura buscarByCodFiscal(String cod) {
         try {
-            return this.sessionFactory.getCurrentSession()
-                    .createQuery("from OtraFactura o where o.codFisFac = :cod1 or o.codFisFac = :cod2 order by o.idOtraFactura desc", OtraFactura.class)
-                    .setParameter("cod1", cod)
-                    .setParameter("cod2", cod + "-A")
-                    .getResultList().get(0);
+        	OtraFactura factura = this.sessionFactory.getCurrentSession().createQuery("from OtraFactura o where o.codFisFac = :cod", OtraFactura.class).setParameter("cod", cod).getSingleResult(); 
+        	if (factura == null) {
+        		factura = this.sessionFactory.getCurrentSession().createQuery("from OtraFactura o where o.codFisFac = :cod", OtraFactura.class).setParameter("cod", cod + "-A").getSingleResult();
+			}
+            return factura;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;

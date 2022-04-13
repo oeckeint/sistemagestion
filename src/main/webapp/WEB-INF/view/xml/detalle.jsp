@@ -26,10 +26,10 @@
                             <div class="col-1">
                                 <c:choose>
                                     <c:when test="${documento.isDeleted == 0}">
-                                        <a href="${pageContext.request.contextPath}/${controller}/archivar?codFisFac=${documento.codFisFac}" class="btn btn-danger m-0"><i class="fas fa-trash"></i></i></a>
+                                        <a href="${pageContext.request.contextPath}/${controller}/archivar?codFisFac=${documento.codFisFac}" class="btn btn-danger m-0"><i class="fa-solid fa-eye-slash"></i></a>
                                     </c:when>
                                     <c:when test="${documento.isDeleted == 1}">
-                                        <a href="${pageContext.request.contextPath}/${controller}/archivar?codFisFac=${documento.codFisFac}" class="btn btn-success m-0"><i class="fas fa-trash-restore"></i></a>
+                                        <a href="${pageContext.request.contextPath}/${controller}/archivar?codFisFac=${documento.codFisFac}" class="btn btn-success m-0"><i class="fa-solid fa-eye"></i></a>
                                     </c:when>
                                 </c:choose>
                             </div>

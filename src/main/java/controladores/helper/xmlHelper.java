@@ -238,7 +238,8 @@ public class xmlHelper {
         this.cliente = this.clienteService.encontrarCups(this.cups);
         if (this.cliente != null) {
             //Se revisa que la factura no exista
-            if (this.contenidoXmlService.buscarByCodFiscal(codFactura) == null) {
+        	OtraFactura factura = (OtraFactura) this.contenidoXmlService.buscarByCodFiscal(codFactura); 
+            if (factura == null) {
                 this.nombreArchivo = nombreArchivo;
                 this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
                 this.registrarOtraFactura();
@@ -246,7 +247,7 @@ public class xmlHelper {
                     System.out.println("Inconsistencia en tarifa detectada");
                 }
             } else {
-                throw new FacturaYaExisteException(codFactura);
+                throw new FacturaYaExisteException(codFactura, "otrasfacturas");
             }
         } else {
             throw new ClienteNoExisteException(cups);
@@ -292,7 +293,7 @@ public class xmlHelper {
                     System.out.println("Inconsistencia en tarifa detectada");
                 }
             } else {
-                throw new FacturaYaExisteException(codFactura);
+                throw new FacturaYaExisteException(codFactura, "facturas");
             }
         } else {
             throw new ClienteNoExisteException(cups);
@@ -337,7 +338,7 @@ public class xmlHelper {
                     System.out.println("Inconsistencia en tarifa detectada");
                 }
             } else {
-                throw new FacturaYaExisteException(codFactura);
+                throw new FacturaYaExisteException(codFactura, "peajes");
             }
         } else {
             throw new ClienteNoExisteException(cups);

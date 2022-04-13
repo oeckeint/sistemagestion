@@ -7,7 +7,7 @@
     <div class="container">
         <div class="row justify-content-md-between">
             <div class="col-12 col-md-4">
-                <p class="lead text-center"><fmt:message key="footer.copyright" /> &COPY; <fmt:message key="footer.company" /> <fmt:message key="footer.year" /> <fmt:message key="footer.version" /></p>
+                <p class="lead text-center"><fmt:message key="footer.copyright" /> &COPY; <fmt:message key="footer.company" /> <fmt:message key="footer.year" /> <fmt:message key="footer.author" /></p>
             </div>
             <div class="col-12 col-md-3">
                 <p id="reloj" class="lead text-center bg-secondary"></p>

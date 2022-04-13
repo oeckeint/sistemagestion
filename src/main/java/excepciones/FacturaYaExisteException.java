@@ -1,7 +1,13 @@
 package excepciones;
 
 public class FacturaYaExisteException extends Exception{
-    public FacturaYaExisteException(String codFactura){
-        super("la factura (<Strong>" + codFactura + "</Strong>) ya ha sido registrada.");
+    
+	private static final long serialVersionUID = 1L;
+
+	public FacturaYaExisteException(String codFactura, String tipoFactura){
+        super("la factura (<Strong>"
+        		+ "<a href=\"javascript:window.open('/sistemagestion/" + tipoFactura + "/detalles?codFisFac="+ codFactura + "', 'ventana1', 'width=1300,height=700')\">"  
+        		+ codFactura 
+        		+ "</a></Strong>) ya ha sido registrada.");
     }
 }
