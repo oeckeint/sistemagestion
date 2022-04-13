@@ -23,6 +23,7 @@ public class NombresNodos {
     public static String TAR_ATR = "TarifaATR";
     public static String TIP_FAC = "TipoFactura";
     public static String TIP_PM = "TipoPM";
+    public static String CON_FAC = "ControlFacturacion";
 
     
     /**

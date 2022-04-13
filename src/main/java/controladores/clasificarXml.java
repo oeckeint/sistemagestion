@@ -2,6 +2,7 @@ package controladores;
 
 import controladores.helper.Etiquetas;
 import controladores.helper.NombresNodos;
+import controladores.helper.Utilidades;
 import datos.entity.Cliente;
 import datos.interfaces.ClienteService;
 import excepciones.ArchivoNoCumpleParaSerClasificado;
@@ -22,6 +23,9 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -55,7 +59,9 @@ public class ClasificarXml {
     private Cliente cliente;
     private String nombreArchivo;
     private String mensajeRegistro = Etiquetas.CLASIFICAR_FORMULARIO_MENSAJE;
-
+    private boolean isValidacionPago;
+    private Logger logger = Logger.getLogger(getClass().getName());
+    
     @GetMapping("")
     public String inicio(Model model) {
         model.addAttribute("tituloPagina", Etiquetas.CLASIFICAR_FORMULARIO_TITULO_PAGINA);
@@ -103,6 +109,10 @@ public class ClasificarXml {
             elementosXml.clear();
             Document doc = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(doc);
+            if (isValidacionPago) {
+            	this.generarValidacionPagoXML(ruta);
+				return;
+			}
             this.cliente = this.clienteService.encontrarCups(elementosXml.get(NombresNodos.CUPS));
             if (this.cliente != null) {
                 this.generarXML(this.nombreArchivo, ruta);
@@ -133,7 +143,7 @@ public class ClasificarXml {
             elementosXml.put(NombresNodos.COD_PAS, xml.obtenerContenidoNodo(NombresNodos.COD_PAS, doc));
         } catch (NullPointerException e) {
             elementosXml.clear();
-            System.out.println("Parece no ser un archivo de peaje, se intentará revisar si es MensajeAceptacionModificacionDeATR");
+            logger.log(Level.INFO, ">>> Parece no ser un archivo de peaje, se intentará revisar si es MensajeAceptacionModificacionDeATR");
             this.inicializarVariables2(doc);
         }
     }
@@ -147,8 +157,28 @@ public class ClasificarXml {
             elementosXml.put(NombresNodos.COD_SOL, xml.obtenerContenidoNodo(NombresNodos.COD_SOL, doc));
             elementosXml.put(NombresNodos.COD_PAS, xml.obtenerContenidoNodo(NombresNodos.COD_PAS, doc));
         } catch (NullPointerException e) {
+        	elementosXml.clear();
+        	logger.log(Level.INFO, ">>> Parece no ser un archivo de MensajeAceptacionModificacionDeATR, se intentará revisar si es validacionPago");
+            this.reconocerValidarPago(doc);
+        }
+    }
+    
+    private void reconocerValidarPago(Document doc) throws ArchivoNoCumpleParaSerClasificado{
+    	try {
+            elementosXml.put(NombresNodos.CON_FAC, xml.obtenerContenidoNodo(NombresNodos.CON_FAC, doc));
+            this.isValidacionPago = true;
+        } catch (NullPointerException e) {
+        	elementosXml.clear();
+        	logger.log(Level.INFO, ">>> No pertenece a ningun tipo de archivo valido");
             throw new ArchivoNoCumpleParaSerClasificado();
         }
+    }
+    
+    private void generarValidacionPagoXML(String rutaOriginal) {
+    	String pathNuevoArchivo = "C:\\Peajes\\Procesados\\RemesaPago";
+    	if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
+			this.archivosCorrectos++;
+		}
     }
 
     private void generarXML(String nombreArchivoOriginal, String ruta) {
@@ -203,7 +233,7 @@ public class ClasificarXml {
                 case "M1":
                 case "C1":
                 case "C2":
-                case "A3":
+                case "A3": 	
                 case "B1":
                     subCarpeta = "X";
                     break;
@@ -221,66 +251,16 @@ public class ClasificarXml {
         if (this.elementosXml.get(NombresNodos.COD_PRO).equals("F1")) {
             finString = this.elementosXml.get(NombresNodos.COD_FIS_FAC);
         }
-        String nombreArchivoGuardado = "C:\\Peajes\\Procesados\\" + subCarpeta + "\\"
-                + formater.format(this.cliente.getIdCliente()) + "-" + this.cliente.getTarifa() + "_"
+        
+        String pathNuevoArchivo = "C:\\Peajes\\Procesados\\" + subCarpeta;
+        String nombreNuevoArchivo = formater.format(this.cliente.getIdCliente()) + "-" + this.cliente.getTarifa() + "_"
                 + this.elementosXml.get(NombresNodos.EMP_EMI) + "_" + this.elementosXml.get(NombresNodos.EMP_DES) + "_" + this.elementosXml.get(NombresNodos.COD_PRO) + "_"
                 + this.elementosXml.get(NombresNodos.COD_PAS) + "_" + this.elementosXml.get(NombresNodos.CUPS) + "_" + finString
-                + ".xml";
-        File f = new File(nombreArchivoGuardado);
-
-        FileWriter fichero = null;
-        PrintWriter pw;
-        try {
-            f.createNewFile();
-            fichero = new FileWriter(nombreArchivoGuardado);
-            pw = new PrintWriter(fichero);
-
-            //---------------------Escritura en el archivo-------------------------
-            File archivo = null;
-            FileReader fr = null;
-            BufferedReader br = null;
-
-            try {
-                // Apertura del fichero y creacion de BufferedReader para poder
-                // hacer una lectura comoda (disponer del metodo readLine()).
-                archivo = new File(ruta);
-                fr = new FileReader(archivo);
-                br = new BufferedReader(fr);
-
-                // Lectura del fichero
-                String linea;
-                while ((linea = br.readLine()) != null) {
-                    pw.println(linea);
-                }
-            } catch (Exception e) {
-                e.printStackTrace(System.out);
-            } finally {
-                // En el finally cerramos el fichero, para asegurarnos
-                // que se cierra tanto si todo va bien como si salta 
-                // una excepcion.
-                try {
-                    if (null != fr) {
-                        fr.close();
-                    }
-                } catch (Exception e2) {
-                    e2.printStackTrace(System.out);
-                }
-            }
-            //---------------------Fin de escritura en el archivo-------------------------
-            this.archivosCorrectos++;
-        } catch (IOException e) {
-
-        } finally {
-            try {
-                // Nuevamente aprovechamos el finally para 
-                // asegurarnos que se cierra el fichero.
-                if (null != fichero) {
-                    fichero.close();
-                }
-            } catch (IOException e2) {
-
-            }
-        }
+                + ".xml"; 
+        
+        if (Utilidades.crearArchivo(nombreNuevoArchivo, ruta, pathNuevoArchivo)) {
+        	this.archivosCorrectos++;
+		}
     }
 
     /**
@@ -321,6 +301,7 @@ public class ClasificarXml {
         this.elementosXml = new HashMap<String, String>();
         this.archivosErroneos = new ArrayList<>();
         this.nombreArchivo = null;
+        this.isValidacionPago = false;
     }
     
 }
