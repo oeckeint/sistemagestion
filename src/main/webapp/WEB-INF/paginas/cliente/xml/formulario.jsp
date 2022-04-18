@@ -14,8 +14,7 @@
                 </button>
             </div>
             <div class="custom-file" id="archivosAEnviar">
-                <input type="file" name="archivosxml" accept=".xml" multiple="true" class="custom-file-input" aria-describedby="inputGroupFileAddon03" id="xmlFiles" required>
-                <label class="custom-file-label" for="inputGroupFile03">Seleccione sus archivos</label>
+                <input type="file" name="archivosxml" accept=".xml" multiple="true" class="form-control" aria-describedby="inputGroupFileAddon03" id="xmlFiles" required>
             </div>
         </div>
         <div id="nombreArchivos"></div>
