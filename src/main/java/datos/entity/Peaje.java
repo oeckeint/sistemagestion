@@ -468,7 +468,7 @@ public class Peaje {
     @Column(name = "estado_pago")
     private int estadoPago;
     
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_energia_excedentaria")
     private EnergiaExcedentaria energiaExcedentaria;
 
