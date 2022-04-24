@@ -11,15 +11,20 @@ import excepciones.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.w3c.dom.*;
 import utileria.texto.Cadenas;
 import datos.interfaces.DocumentoXmlService;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.persistence.NonUniqueResultException;
 import utileria.StringHelper;
@@ -369,11 +374,12 @@ public class xmlHelper {
      * Registra el peaje de tipo N
      */
     private void registrarPeajeN() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
+    	TIPO_FACTURA tp = TIPO_FACTURA.N_NORMAL;
         Peaje peaje = new Peaje(
                 this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
                 this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
                 this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
-                this.Cargos01(), this.Cargos02(), this.ImporteTotalCargo01(), this.ImporteTotalCargo02(),
+                this.Cargos("01", tp), this.Cargos("02", tp), this.ImporteTotalCargos("01", tp), this.ImporteTotalCargos("02", tp),
                 this.impuestoElectrico(), this.alquileres(), this.iva(),
                 this.aeConsumo(), this.aeLecturaDesde(), this.aeLecturaHasta(), this.aeProcedenciaDesde(), this.aeProcedenciaHasta(),
                 this.rConsumo(), this.rLecturaDesde(), this.rLecturaHasta(), this.rImporteTotal(),
@@ -436,11 +442,12 @@ public class xmlHelper {
      * y los importes totales
      */
     private void registrarPeajeNA() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
+    	TIPO_FACTURA tp = TIPO_FACTURA.A_ABONO;
         Peaje peaje = new Peaje(
                 this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
                 this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal_A(),
                 this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal_A(),
-                this.Cargos01_A(), this.Cargos02_A(), this.ImporteTotalCargo01_A(), this.ImporteTotalCargo02_A(),
+                this.Cargos("01", tp), this.Cargos("02", tp), this.ImporteTotalCargos("01", tp), this.ImporteTotalCargos("02", tp),
                 this.impuestoElectrico(), this.alquileres(), this.iva(),
                 this.aeConsumo_A(), this.aeLecturaDesde_A(), this.aeLecturaHasta_A(), this.aeProcedenciaDesde_A(), this.aeProcedenciaHasta_A(),
                 this.rConsumo_A(), this.rLecturaDesde_A(), this.rLecturaHasta_A(), this.rImporteTotal_A(),
@@ -1210,39 +1217,45 @@ public class xmlHelper {
         return new EnergiaExcedentaria(elementos);
     }
 
-    //Cargos
-    private Cargos Cargos01() {
-
-        elementos = new ArrayList<>(6);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-
-        int indice = 0;
+    /**
+     * Looks for PrecioCargo node in a xmlFile
+     * Maximum values of nodes expected is 12 
+     * @param tipoCargoValue value that belongs to TotalImporteTipoCargo Node used to identify a block
+     * @param tp TipoFactura value that changes the tipe of operation that is going to use
+     */
+    private Cargos Cargos(String tipoCargoValue, TIPO_FACTURA tp) {
+        elementos =  (ArrayList) IntStream.range(0, 12).mapToDouble(i -> 0.0).boxed().collect(Collectors.toList());
         boolean continuar = true;
+        int indice = 0;
+        //List of blocks of parent nodes
         NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
-        //Se iteran los nodos correspondan con el flowList
         for (int i = 0; i < flowListPeriodo.getLength(); i++) {
-            //Se obtienen los nodos internos
+            //internal nodes
             NodeList childList = flowListPeriodo.item(i).getChildNodes();
-            //Se recorren los nodos internos
             for (int j = 0; j < childList.getLength(); j++) {
-                if (indice > elementos.size()) {
+                if (indice > 11) {
                     continuar = false;
                     this.agregarError("23");
                     break;
                 }
                 Node childNode = childList.item(j);
+                //Looking for specific node
                 if ("PrecioCargo".equals(childNode.getNodeName())) {
+                	//Going through previous sibling nodes till "TipoCargo" node is found
                     Node tipoCargo = childNode.getParentNode().getParentNode().getPreviousSibling();
-                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
+                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE || !tipoCargo.getNodeName().equals("TipoCargo")) {
                         tipoCargo = tipoCargo.getPreviousSibling();
                     }
-                    if (tipoCargo.getTextContent().equals("01")) {
-                        elementos.set(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
+                    if (tipoCargo.getTextContent().equals(tipoCargoValue)) {
+                		switch (tp) {
+							case N_NORMAL:
+								elementos.set(indice ,Double.parseDouble(childList.item(j).getTextContent().trim()));
+								break;
+							case A_ABONO:
+								elementos.set(indice, Double.parseDouble(childList.item(j).getTextContent().trim()) * - 1);
+								break;
+						}
+                		indice++;
                     }
                 }
             }
@@ -1250,42 +1263,50 @@ public class xmlHelper {
                 break;
             }
         }
-        this.imprimirResultado("Cargos01", elementos);
+        this.imprimirResultado("Cargos" + tipoCargoValue + ", " + tp, elementos);
         return new Cargos(elementos);
     }
-
-    private CargoImporteTotal ImporteTotalCargo01() {
-        elementos = new ArrayList<>(1);
-        elementos.add(0.0);
+    
+    /**
+     * Looks for TotalImporteTipoCargo node in a xmlFile
+     * Maximum values of nodes expected is 4  
+     * @param tipoCargoValue value that belongs to TotalImporteTipoCargo Node used to identify a block
+     * @param tp TipoFactura value that changes the type of operation that is going to use
+     */
+    private CargoImporteTotal ImporteTotalCargos(String tipoCargoValue, TIPO_FACTURA tp) {
+    	elementos =  (ArrayList) IntStream.range(0, 1).mapToDouble(i -> 0.0).boxed().collect(Collectors.toList());
 
         int indice = 0;
         boolean continuar = true;
+        //List of blocks of parent nodes
         NodeList flowListPeriodo = this.doc.getElementsByTagName("Cargo");
-        //Se iteran los nodos correspondan con el flowList
         for (int i = 0; i < flowListPeriodo.getLength(); i++) {
-            //Se obtienen los nodos internos
+            //Child Nodes into the block
             NodeList childList = flowListPeriodo.item(i).getChildNodes();
-            //Se recorren los nodos internos
             for (int j = 0; j < childList.getLength(); j++) {
-                if (indice > elementos.size()) {
+                if (indice > 3) {
                     continuar = false;
                     this.agregarError("25");
                     break;
                 }
+                //Looking for a specific node
                 Node childNode = childList.item(j);
                 if ("TotalImporteTipoCargo".equals(childNode.getNodeName())) {
-                    Node terminoCargo = childNode.getPreviousSibling();
-                    while (null != terminoCargo && terminoCargo.getNodeType() != Node.ELEMENT_NODE) {
-                        terminoCargo = terminoCargo.getPreviousSibling();
-                    }
-
-                    Node tipoCargo = terminoCargo.getPreviousSibling();
-                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
+                	//Going through previous sibling nodes till "TipoCargo" node is foundk
+                    Node tipoCargo = childNode.getPreviousSibling();
+                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE || !tipoCargo.getNodeName().equals("TipoCargo")) {
                         tipoCargo = tipoCargo.getPreviousSibling();
                     }
-
-                    if (tipoCargo.getTextContent().equals("01")) {
-                        elementos.set(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
+                    if (tipoCargo.getTextContent().equals(tipoCargoValue)) {
+                    	switch (tp) {
+							case N_NORMAL:
+								elementos.set(0, (Double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+								break;
+							case A_ABONO:
+								elementos.set(0, (Double) elementos.get(0) - Double.parseDouble(childList.item(j).getTextContent().trim()));
+								break;
+						}
+                        indice++;
                     }
                 }
             }
@@ -1293,266 +1314,7 @@ public class xmlHelper {
                 break;
             }
         }
-        this.imprimirResultado("TotalImporteTipoCargo01", elementos);
-        return new CargoImporteTotal(elementos);
-    }
-
-    private Cargos Cargos02() {
-
-        elementos = new ArrayList<>(6);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-
-        int indice = 0;
-        boolean continuar = true;
-        NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
-        //Se iteran los nodos correspondan con el flowList
-        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
-            //Se obtienen los nodos internos
-            NodeList childList = flowListPeriodo.item(i).getChildNodes();
-            //Se recorren los nodos internos
-            for (int j = 0; j < childList.getLength(); j++) {
-                if (indice > elementos.size()) {
-                    continuar = false;
-                    this.agregarError("24");
-                    break;
-                }
-                Node childNode = childList.item(j);
-                if ("PrecioCargo".equals(childNode.getNodeName())) {
-                    Node tipoCargo = childNode.getParentNode().getParentNode().getPreviousSibling();
-                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
-                        tipoCargo = tipoCargo.getPreviousSibling();
-                    }
-                    if (tipoCargo.getTextContent().equals("02")) {
-                        elementos.set(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
-                    }
-                }
-            }
-            if (!continuar) {
-                break;
-            }
-        }
-        this.imprimirResultado("Cargos02", elementos);
-        return new Cargos(elementos);
-    }
-
-    private CargoImporteTotal ImporteTotalCargo02() {
-        elementos = new ArrayList<>(1);
-        elementos.add(0.0);
-
-        int indice = 0;
-        boolean continuar = true;
-        NodeList flowListPeriodo = this.doc.getElementsByTagName("Cargo");
-        //Se iteran los nodos correspondan con el flowList
-        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
-            //Se obtienen los nodos internos
-            NodeList childList = flowListPeriodo.item(i).getChildNodes();
-            //Se recorren los nodos internos
-            for (int j = 0; j < childList.getLength(); j++) {
-                if (indice > elementos.size()) {
-                    continuar = false;
-                    this.agregarError("26");
-                    break;
-                }
-                Node childNode = childList.item(j);
-                if ("TotalImporteTipoCargo".equals(childNode.getNodeName())) {
-                    Node terminoCargo = childNode.getPreviousSibling();
-                    while (null != terminoCargo && terminoCargo.getNodeType() != Node.ELEMENT_NODE) {
-                        terminoCargo = terminoCargo.getPreviousSibling();
-                    }
-
-                    Node tipoCargo = terminoCargo.getPreviousSibling();
-                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
-                        tipoCargo = tipoCargo.getPreviousSibling();
-                    }
-
-                    if (tipoCargo.getTextContent().equals("02")) {
-                        elementos.set(indice++, Double.parseDouble(childList.item(j).getTextContent().trim()));
-                    }
-                }
-            }
-            if (!continuar) {
-                break;
-            }
-        }
-        this.imprimirResultado("TotalImporteTipoCargo02", elementos);
-        return new CargoImporteTotal(elementos);
-    }
-
-    //Cargos - A
-    private Cargos Cargos01_A() {
-
-        elementos = new ArrayList<>(6);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-
-        int indice = 0;
-        boolean continuar = true;
-        NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
-        //Se iteran los nodos correspondan con el flowList
-        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
-            //Se obtienen los nodos internos
-            NodeList childList = flowListPeriodo.item(i).getChildNodes();
-            //Se recorren los nodos internos
-            for (int j = 0; j < childList.getLength(); j++) {
-                if (indice > elementos.size()) {
-                    continuar = false;
-                    this.agregarError("23");
-                    break;
-                }
-                Node childNode = childList.item(j);
-                if ("PrecioCargo".equals(childNode.getNodeName())) {
-                    Node tipoCargo = childNode.getParentNode().getParentNode().getPreviousSibling();
-                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
-                        tipoCargo = tipoCargo.getPreviousSibling();
-                    }
-                    if (tipoCargo.getTextContent().equals("01")) {
-                        elementos.set(indice++, -Double.parseDouble(childList.item(j).getTextContent().trim()));
-                    }
-                }
-            }
-            if (!continuar) {
-                break;
-            }
-        }
-        this.imprimirResultado("Cargos01_A", elementos);
-        return new Cargos(elementos);
-    }
-
-    private CargoImporteTotal ImporteTotalCargo01_A() {
-        elementos = new ArrayList<>(1);
-        elementos.add(0.0);
-
-        int indice = 0;
-        boolean continuar = true;
-        NodeList flowListPeriodo = this.doc.getElementsByTagName("Cargo");
-        //Se iteran los nodos correspondan con el flowList
-        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
-            //Se obtienen los nodos internos
-            NodeList childList = flowListPeriodo.item(i).getChildNodes();
-            //Se recorren los nodos internos
-            for (int j = 0; j < childList.getLength(); j++) {
-                if (indice > elementos.size()) {
-                    continuar = false;
-                    this.agregarError("25");
-                    break;
-                }
-                Node childNode = childList.item(j);
-                if ("TotalImporteTipoCargo".equals(childNode.getNodeName())) {
-                    Node terminoCargo = childNode.getPreviousSibling();
-                    while (null != terminoCargo && terminoCargo.getNodeType() != Node.ELEMENT_NODE) {
-                        terminoCargo = terminoCargo.getPreviousSibling();
-                    }
-
-                    Node tipoCargo = terminoCargo.getPreviousSibling();
-                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
-                        tipoCargo = tipoCargo.getPreviousSibling();
-                    }
-
-                    if (tipoCargo.getTextContent().equals("01")) {
-                        elementos.set(indice++, -Double.parseDouble(childList.item(j).getTextContent().trim()));
-                    }
-                }
-            }
-            if (!continuar) {
-                break;
-            }
-        }
-        this.imprimirResultado("TotalImporteTipoCargo01_A", elementos);
-        return new CargoImporteTotal(elementos);
-    }
-
-    private Cargos Cargos02_A() {
-
-        elementos = new ArrayList<>(6);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-        elementos.add(0.0);
-
-        int indice = 0;
-        boolean continuar = true;
-        NodeList flowListPeriodo = this.doc.getElementsByTagName("Periodo");
-        //Se iteran los nodos correspondan con el flowList
-        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
-            //Se obtienen los nodos internos
-            NodeList childList = flowListPeriodo.item(i).getChildNodes();
-            //Se recorren los nodos internos
-            for (int j = 0; j < childList.getLength(); j++) {
-                if (indice > elementos.size()) {
-                    continuar = false;
-                    this.agregarError("24");
-                    break;
-                }
-                Node childNode = childList.item(j);
-                if ("PrecioCargo".equals(childNode.getNodeName())) {
-                    Node tipoCargo = childNode.getParentNode().getParentNode().getPreviousSibling();
-                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
-                        tipoCargo = tipoCargo.getPreviousSibling();
-                    }
-                    if (tipoCargo.getTextContent().equals("02")) {
-                        elementos.set(indice++, -Double.parseDouble(childList.item(j).getTextContent().trim()));
-                    }
-                }
-            }
-            if (!continuar) {
-                break;
-            }
-        }
-        this.imprimirResultado("Cargos02", elementos);
-        return new Cargos(elementos);
-    }
-
-    private CargoImporteTotal ImporteTotalCargo02_A() {
-        elementos = new ArrayList<>(1);
-        elementos.add(0.0);
-
-        int indice = 0;
-        boolean continuar = true;
-        NodeList flowListPeriodo = this.doc.getElementsByTagName("Cargo");
-        //Se iteran los nodos correspondan con el flowList
-        for (int i = 0; i < flowListPeriodo.getLength(); i++) {
-            //Se obtienen los nodos internos
-            NodeList childList = flowListPeriodo.item(i).getChildNodes();
-            //Se recorren los nodos internos
-            for (int j = 0; j < childList.getLength(); j++) {
-                if (indice > elementos.size()) {
-                    continuar = false;
-                    this.agregarError("26");
-                    break;
-                }
-                Node childNode = childList.item(j);
-                if ("TotalImporteTipoCargo".equals(childNode.getNodeName())) {
-                    Node terminoCargo = childNode.getPreviousSibling();
-                    while (null != terminoCargo && terminoCargo.getNodeType() != Node.ELEMENT_NODE) {
-                        terminoCargo = terminoCargo.getPreviousSibling();
-                    }
-
-                    Node tipoCargo = terminoCargo.getPreviousSibling();
-                    while (null != tipoCargo && tipoCargo.getNodeType() != Node.ELEMENT_NODE) {
-                        tipoCargo = tipoCargo.getPreviousSibling();
-                    }
-
-                    if (tipoCargo.getTextContent().equals("02")) {
-                        elementos.set(indice++, -Double.parseDouble(childList.item(j).getTextContent().trim()));
-                    }
-                }
-            }
-            if (!continuar) {
-                break;
-            }
-        }
-        this.imprimirResultado("TotalImporteTipoCargo02_A", elementos);
+        this.imprimirResultado("TotalImporteTipoCargos" + tipoCargoValue + ", " + tp, elementos);
         return new CargoImporteTotal(elementos);
     }
 
@@ -5308,6 +5070,12 @@ public class xmlHelper {
         peaje.setEaFecDes2(fecHas2);
         peaje.setEaFecHas2(fecDes2);
         return peaje;
+    }
+    
+    enum TIPO_FACTURA{
+    	A_ABONO, 
+    	N_NORMAL, 
+    	R_RECTIFICADA;
     }
 
 }

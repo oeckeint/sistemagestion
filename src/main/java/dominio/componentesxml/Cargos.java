@@ -10,17 +10,19 @@ public class Cargos {
     private double c4;
     private double c5;
     private double c6;
+    private double total;
 
     public Cargos() {
     }
 
     public Cargos(List<Double> datos) {
-        this.c1 = datos.get(0);
-        this.c2 = datos.get(1);
-        this.c3 = datos.get(2);
-        this.c4 = datos.get(3);
-        this.c5 = datos.get(4);
-        this.c6 = datos.get(5);
+		this.c1 = datos.get(0) + datos.get(6);
+        this.c2 = datos.get(1) + datos.get(7);
+        this.c3 = datos.get(2) + datos.get(8);
+        this.c4 = datos.get(3) + datos.get(9);
+        this.c5 = datos.get(4) + datos.get(10);
+        this.c6 = datos.get(5) + datos.get(11);
+        this.total = datos.stream().reduce(0.0, Double::sum);
     }
 
     public double getC1() {
@@ -71,9 +73,18 @@ public class Cargos {
         this.c6 = c6;
     }
 
-    @Override
-    public String toString() {
-        return "Cargos{" + "c1=" + c1 + ", c2=" + c2 + ", c3=" + c3 + ", c4=" + c4 + ", c5=" + c5 + ", c6=" + c6 + '}';
-    }
+    public double getTotal() {
+		return total;
+	}
+
+	public void setTotal(double total) {
+		this.total = total;
+	}
+
+	@Override
+	public String toString() {
+		return "Cargos [c1=" + c1 + ", c2=" + c2 + ", c3=" + c3 + ", c4=" + c4 + ", c5=" + c5 + ", c6=" + c6
+				+ ", total=" + total + "]";
+	}
 
 }
