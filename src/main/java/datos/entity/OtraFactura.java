@@ -4,12 +4,17 @@ import dominio.componentesxml.ConceptoRepercutible;
 import dominio.componentesxml.DatosCabecera;
 import dominio.componentesxml.DatosFinDeRegistro;
 import dominio.componentesxml.DatosGeneralesFactura;
+
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -89,6 +94,20 @@ public class OtraFactura {
     
     @Column(name = "estado_pago")
     private int estadoPago;
+    
+    @Temporal(TemporalType.DATE)
+    @Column(name = "created_on")
+    private Date createdOn;
+    
+    @Column(name = "created_by")
+    private String createdBy;
+    
+    @Temporal(TemporalType.DATE)
+    @Column(name = "updated_on")
+    private Date updatedOn;
+    
+    @Column(name = "updated_by")
+    private String updatedBy;
 
     public OtraFactura() {
     }
@@ -178,7 +197,7 @@ public class OtraFactura {
         return idCliente;
     }
 
-    public void setIdCliente(int idCliente) {
+    public void setIdCliente(long idCliente) {
         this.idCliente = idCliente;
     }
 
@@ -302,9 +321,36 @@ public class OtraFactura {
         this.estadoPago = estadoPago;
     }
 
-    @Override
-    public String toString() {
-        return "OtraFactura{" + "idOtraFactura=" + idOtraFactura + ", isDeleted=" + isDeleted + ", codEmpEmi=" + codEmpEmi + ", codEmpDes=" + codEmpDes + ", codPro=" + codPro + ", codPas=" + codPas + ", codSol=" + codSol + ", idCliente=" + idCliente + ", cups=" + cups + ", codFisFac=" + codFisFac + ", tipFac=" + tipFac + ", motFac=" + motFac + ", fecFac=" + fecFac + ", com=" + com + ", rfImpTot=" + rfImpTot + ", conRep=" + conRep + ", impTotConRep=" + impTotConRep + ", idRem=" + idRem + ", comDev=" + comDev + ", idErr=" + idErr + ", remesaPago=" + remesaPago + ", estadoPago=" + estadoPago + '}';
-    }
+    public Date getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(Date createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Date getUpdatedOn() {
+		return updatedOn;
+	}
+
+	public void setUpdatedOn(Date updatedOn) {
+		this.updatedOn = updatedOn;
+	}
+
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
     
 }

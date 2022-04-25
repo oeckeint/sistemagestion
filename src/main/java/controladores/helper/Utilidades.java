@@ -12,6 +12,9 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
 public class Utilidades {
 	
 	private static Logger logger = Logger.getLogger("Utilidades");
@@ -121,6 +124,11 @@ public class Utilidades {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    public static String currentUser() {
+    	Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	return (principal instanceof UserDetails) ? ((UserDetails)principal).getUsername() : principal.toString(); 
     }
 
 }

@@ -5,11 +5,14 @@ import datos.interfaces.DocumentoXmlDao;
 import excepciones.NoEsUnNumeroException;
 import excepciones.PeajeMasDeUnRegistroException;
 
+import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import controladores.helper.Utilidades;
 
 @Service
 public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<Factura> {
@@ -33,6 +36,8 @@ public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<
     @Override
     @Transactional
     public void guardar(Factura documentoXml) {
+    	documentoXml.setCreatedOn(new Date());
+    	documentoXml.setCreatedBy(Utilidades.currentUser());
         this.documentoXmlDao.guardar(documentoXml);
     }
 
@@ -69,6 +74,8 @@ public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<
     @Override
     @Transactional
     public void actualizar(Factura documento) {
+    	documento.setUpdatedOn(new Date());
+    	documento.setUpdatedBy(Utilidades.currentUser());
         this.documentoXmlDao.actualizar(documento);
     }
 

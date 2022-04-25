@@ -2,6 +2,8 @@ package datos.service;
 
 import datos.entity.EnergiaExcedentaria;
 import datos.entity.Peaje;
+
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,6 +11,8 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import controladores.helper.Utilidades;
 import datos.interfaces.DocumentoXmlDao;
 import excepciones.NoEsUnNumeroException;
 import excepciones.PeajeMasDeUnRegistroException;
@@ -39,6 +43,8 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
     @Override
     @Transactional
     public void guardar(Peaje documento) {
+    	documento.setCreatedOn(new Date());
+    	documento.setCreatedBy(Utilidades.currentUser());
         this.documentoXmlDao.guardar(documento);
     }
 
@@ -224,7 +230,7 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
         eE.setValorTotalEnergiaExcedentaria(peaje.getEnergiaExcedentaria().getValorTotalEnergiaExcedentaria() * - 1);
         peaje.setEnergiaExcedentaria(eE);
         
-        this.documentoXmlDao.guardar(peaje);
+        this.guardar(peaje);
         
         logger.log(Level.INFO, ">>> PeajeServiceImp=\"Se ha registrado una factura rectificada codFisFac = {0}\"", peaje.getCodFisFac());
     }
@@ -232,6 +238,8 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
     @Override
     @Transactional
     public void actualizar(Peaje documento) {
+    	documento.setUpdatedOn(new Date());
+    	documento.setUpdatedBy(Utilidades.currentUser());
         this.documentoXmlDao.actualizar(documento);
     }
 
