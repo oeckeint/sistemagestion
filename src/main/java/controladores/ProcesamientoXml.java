@@ -1,5 +1,6 @@
 package controladores;
 
+import controladores.helper.ArchivarFactura;
 import controladores.helper.CambiodeComercializador;
 import controladores.helper.Etiquetas;
 import controladores.helper.ProcesarFactura;
@@ -8,6 +9,7 @@ import controladores.helper.ProcesarPeaje;
 import controladores.helper.ProcesarRemesaPagoFactura;
 import controladores.helper.ProcesarRemesaPagoOtrasFacturas;
 import controladores.helper.ProcesarRemesaPagoPeaje;
+import controladores.helper.Utilidades;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
 import datos.interfaces.DocumentoXmlService;
@@ -78,6 +80,7 @@ public class ProcesamientoXml {
     List<String> archivosErroneos;
     private boolean isFactura;
     private boolean isRemesaPago;
+    private boolean isArchivarFactura;
     private boolean isOtrasFacturas;
     private boolean isMACCConCambios;
     private boolean isMACCSinCambios;
@@ -111,6 +114,7 @@ public class ProcesamientoXml {
     @PostMapping(path = "/procesar", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String procesamiento(@RequestParam("archivosxml") MultipartFile[] files) throws IOException {
         for (MultipartFile file : files) {
+        	this.reiniciarVariablesBooleanas();
             archivosTotales++;
             File f;
             FileOutputStream ous;
@@ -132,7 +136,6 @@ public class ProcesamientoXml {
             this.procesar(f, file.getOriginalFilename());
             //Eliminación del archivo temporal
             f.deleteOnExit();
-            this.reiniciarVariablesBooleanas();
         }
         Etiquetas.PROCESAMIENTO_FORMULARIO_MENSAJE = "Archivos Procesados (" + archivosCorrectos + " de " + archivosTotales + ")";
         return "redirect:/procesar";
@@ -145,7 +148,6 @@ public class ProcesamientoXml {
      * @param archivo Archivo xml recibido
      * @param nombreArchivo Nombre del archivo xml recibido
      */
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void procesar(File archivo, String nombreArchivo) {
         System.out.println("(Ini)************************-----------------------------" + nombreArchivo);
 
@@ -160,7 +162,9 @@ public class ProcesamientoXml {
             } else if (isOtrasFacturas) {
                 new ProcesarOtrasFacturas(documento, contenidoXmlServiceOtrasFacturas, clienteService, nombreArchivo);
             } else if (isRemesaPago) {
-                this.procesarOtraFactura(documento);
+                this.procesarRemesaPago(documento);
+            } else if (isArchivarFactura) {
+            	new ArchivarFactura(this.definirTablaBusqueda(documento), documento);
             } else if (isFactura) {
                 new ProcesarFactura(documento, contenidoXmlServiceFacturas, clienteService, nombreArchivo);
             } else if (isPeaje){
@@ -219,22 +223,33 @@ public class ProcesamientoXml {
      * @param doc es el archivo xml a tratar
      */
     private void initializarVariables(Document doc) {
-        if (existeNodo(doc, "MensajeActivacionCambiodeComercializadorConCambios")) {
+        if (Utilidades.existeNodo(doc, "MensajeActivacionCambiodeComercializadorConCambios")) {
             this.isMACCConCambios = true;
-        } else if (existeNodo(doc, "MensajeActivacionCambiodeComercializadorSinCambios")) {
+            return;
+        } else if (Utilidades.existeNodo(doc, "MensajeActivacionCambiodeComercializadorSinCambios")) {
             this.isMACCSinCambios = true;
+            return;
         }
         
-        if (existeNodo(doc, "CodigoREEEmpresaEmisora")) {
+        if (Utilidades.existeNodo(doc, "CodigoREEEmpresaEmisora")) {
             this.isFactura = StringHelper.toInteger(doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent()) == 894;
+            if (this.isFactura) {
+				return;
+			}
         }
         
-        if (existeNodo(doc, "RemesaPago")) {
+        if (Utilidades.existeNodo(doc, "RemesaPago")) {
             this.isRemesaPago = true;
-        } else if (existeNodo(doc, "OtrasFacturas")) {
+            return;
+        } else if (Utilidades.existeNodo(doc, "isDeleted")) {
+			this.isArchivarFactura = true;
+			return;
+		} else if (Utilidades.existeNodo(doc, "OtrasFacturas")) {
             this.isOtrasFacturas = true;
-        } else if (existeNodo(doc, "MensajeFacturacion")) {
+            return;
+        } else if (Utilidades.existeNodo(doc, "MensajeFacturacion")) {
             this.isPeaje = true;
+            return;
         }
     }
     
@@ -244,6 +259,7 @@ public class ProcesamientoXml {
         this.isMACCSinCambios = false;
         this.isFactura = false;
         this.isRemesaPago = false;
+        this.isArchivarFactura = false;
         this.isPeaje = false;
     }
 
@@ -256,36 +272,32 @@ public class ProcesamientoXml {
         this.archivosTotales = 0;
         this.archivosErroneos = new ArrayList<>();
     }
-
-    /**
-     * Revisa si existe un nodo especificado
-     *
-     * @param nodo
-     * @return
-     */
-    private boolean existeNodo(Document documento, String nodo) {
-        try {
-            return documento.getElementsByTagName(nodo).getLength() != 0;
-        } catch (Exception e) {
-            return false;
+    
+    private void procesarRemesaPago(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException, PeajeMasDeUnRegistroException {
+        switch (this.definirTablaBusqueda(doc)) {
+            case peajes:
+                new ProcesarRemesaPagoPeaje(doc, contenidoXmlServicePeajes);
+                break;
+            case facturas:
+                new ProcesarRemesaPagoFactura(doc, contenidoXmlServiceFacturas);
+                break;
+            case otrasFacturas:
+                new ProcesarRemesaPagoOtrasFacturas(doc, contenidoXmlServiceOtrasFacturas);
+                break;
         }
     }
     
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    private void procesarOtraFactura(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException, PeajeMasDeUnRegistroException {
-        if (existeNodo(doc, "TablaBusqueda")) {
+    private TablaBusqueda definirTablaBusqueda(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException {
+    	if (Utilidades.existeNodo(doc, "TablaBusqueda")) {
             String tablaBusqueda = doc.getElementsByTagName("TablaBusqueda").item(0).getTextContent();
             if (StringHelper.isValid(tablaBusqueda)) {
                 switch (tablaBusqueda) {
                     case "contenido_xml":
-                        new ProcesarRemesaPagoPeaje(doc, contenidoXmlServicePeajes);
-                        break;
+                        return TablaBusqueda.peajes;
                     case "contenido_xml_factura":
-                        new ProcesarRemesaPagoFactura(doc, contenidoXmlServiceFacturas);
-                        break;
+                    	return TablaBusqueda.facturas;
                     case "contenido_xml_otras_facturas":
-                        new ProcesarRemesaPagoOtrasFacturas(doc, contenidoXmlServiceOtrasFacturas);
-                        break;
+                    	return TablaBusqueda.otrasFacturas;
                     default:
                         throw new TablaBusquedaNoExisteException(tablaBusqueda);
                 }
@@ -297,4 +309,8 @@ public class ProcesamientoXml {
         }
     }
 
+    public enum TablaBusqueda{
+    	peajes, facturas, otrasFacturas;
+    }
+    
 }

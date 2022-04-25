@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.w3c.dom.Document;
 
 public class Utilidades {
 	
@@ -129,6 +130,20 @@ public class Utilidades {
     public static String currentUser() {
     	Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     	return (principal instanceof UserDetails) ? ((UserDetails)principal).getUsername() : principal.toString(); 
+    }
+    
+    /**
+     * Revisa si existe un nodo especificado
+     *
+     * @param nodo
+     * @return
+     */
+    public static boolean existeNodo(Document documento, String nodo) {
+        try {
+            return documento.getElementsByTagName(nodo).getLength() != 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

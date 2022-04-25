@@ -10,14 +10,10 @@ import excepciones.ArchivoVacioException;
 import excepciones.ClienteNoExisteException;
 import excepciones.ErrorDesconocidoException;
 import excepciones.MasDeUnClienteEncontrado;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -60,6 +56,7 @@ public class ClasificarXml {
     private String nombreArchivo;
     private String mensajeRegistro = Etiquetas.CLASIFICAR_FORMULARIO_MENSAJE;
     private boolean isValidacionPago;
+    private boolean isArchivarFactura;
     private Logger logger = Logger.getLogger(getClass().getName());
     
     @GetMapping("")
@@ -77,6 +74,8 @@ public class ClasificarXml {
     @PostMapping("/procesar")
     public String evaluar(@RequestParam("archivosxml") MultipartFile[] files) throws IOException {
         for (MultipartFile file : files) {
+        	this.reiniciarVariables();
+        	this.elementosXml.clear();
             archivosTotales++;
             File f;
             FileOutputStream ous;
@@ -106,11 +105,14 @@ public class ClasificarXml {
 
     private void procesar(File archivo, String ruta) {
         try {
-            elementosXml.clear();
             Document doc = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(doc);
             if (isValidacionPago) {
             	this.generarValidacionPagoXML(ruta);
+				return;
+			}
+            if (this.isArchivarFactura) {
+            	this.generarArchivarFacturaXML(ruta);
 				return;
 			}
             this.cliente = this.clienteService.encontrarCups(elementosXml.get(NombresNodos.CUPS));
@@ -165,17 +167,36 @@ public class ClasificarXml {
     
     private void reconocerValidarPago(Document doc) throws ArchivoNoCumpleParaSerClasificado{
     	try {
-            elementosXml.put(NombresNodos.CON_FAC, xml.obtenerContenidoNodo(NombresNodos.CON_FAC, doc));
+			elementosXml.put(NombresNodos.REM_PAG, xml.obtenerContenidoNodo(NombresNodos.REM_PAG, doc));
             this.isValidacionPago = true;
         } catch (NullPointerException e) {
         	elementosXml.clear();
-        	logger.log(Level.INFO, ">>> No pertenece a ningun tipo de archivo valido");
-            throw new ArchivoNoCumpleParaSerClasificado();
+        	logger.log(Level.INFO, ">>> No es un archivo del tipo Validar Pago");
+            this.isArchivarFactura(doc);
         }
+    }
+    
+    public boolean isArchivarFactura(Document doc) throws ArchivoNoCumpleParaSerClasificado{
+    	try {
+    		elementosXml.put(NombresNodos.IS_DEL, xml.obtenerContenidoNodo(NombresNodos.IS_DEL, doc));
+    		this.isArchivarFactura = true;
+		} catch (Exception e) {
+			elementosXml.clear();
+        	logger.log(Level.INFO, ">>> No es un archivo del tipo ArchivarFactura");
+        	throw new ArchivoNoCumpleParaSerClasificado();
+		}
+    	return true;
     }
     
     private void generarValidacionPagoXML(String rutaOriginal) {
     	String pathNuevoArchivo = "C:\\Peajes\\Procesados\\RemesaPago";
+    	if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
+			this.archivosCorrectos++;
+		}
+    }
+    
+    private void generarArchivarFacturaXML(String rutaOriginal) {
+    	String pathNuevoArchivo = "C:\\Peajes\\Procesados\\ArchivarFactura";
     	if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
 			this.archivosCorrectos++;
 		}
@@ -302,6 +323,7 @@ public class ClasificarXml {
         this.archivosErroneos = new ArrayList<>();
         this.nombreArchivo = null;
         this.isValidacionPago = false;
+        this.isArchivarFactura = false;
     }
     
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
 import org.hibernate.SessionFactory;
@@ -85,6 +86,8 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
         } catch (NonUniqueResultException e) {
         	logger.log(Level.INFO, ">>> PeajesDaoImp={0}", e.getMessage());
         	throw new PeajeMasDeUnRegistroException(cod);
+        } catch (NoResultException e) {
+        	return null;
         } catch (Exception e) {
         	e.printStackTrace(System.out);
             return null;

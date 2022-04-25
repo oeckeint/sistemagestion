@@ -24,6 +24,8 @@ public class NombresNodos {
     public static String TIP_FAC = "TipoFactura";
     public static String TIP_PM = "TipoPM";
     public static String CON_FAC = "ControlFacturacion";
+    public static String REM_PAG = "RemesaPago";
+    public static String IS_DEL = "isDeleted";
 
     
     /**
