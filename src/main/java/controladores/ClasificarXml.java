@@ -74,8 +74,7 @@ public class ClasificarXml {
     @PostMapping("/procesar")
     public String evaluar(@RequestParam("archivosxml") MultipartFile[] files) throws IOException {
         for (MultipartFile file : files) {
-        	this.reiniciarVariables();
-        	this.elementosXml.clear();
+        	reiniciarVariablesFlujo();
             archivosTotales++;
             File f;
             FileOutputStream ous;
@@ -317,13 +316,16 @@ public class ClasificarXml {
      */
     private void reiniciarVariables() {
         mensajeRegistro = Etiquetas.CLASIFICAR_FORMULARIO_MENSAJE;
+        this.archivosErroneos = new ArrayList<>();
         this.archivosCorrectos = 0;
         this.archivosTotales = 0;
-        this.elementosXml = new HashMap<String, String>();
-        this.archivosErroneos = new ArrayList<>();
-        this.nombreArchivo = null;
-        this.isValidacionPago = false;
+    }
+    
+    private void reiniciarVariablesFlujo() {
+    	this.isValidacionPago = false;
         this.isArchivarFactura = false;
+        this.elementosXml = new HashMap<String, String>();
+        this.nombreArchivo = null;
     }
     
 }
