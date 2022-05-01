@@ -220,15 +220,17 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
                 
         peaje.setRfIdRem(nuevaRemesa);
         
-        EnergiaExcedentaria eE = new EnergiaExcedentaria();
-        eE.setEnergiaExcedentaria01(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria01() * -1);
-        eE.setEnergiaExcedentaria02(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria02() * -1);
-        eE.setEnergiaExcedentaria03(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria03() * -1);
-        eE.setEnergiaExcedentaria04(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria04() * -1);
-        eE.setEnergiaExcedentaria05(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria05() * -1);
-        eE.setEnergiaExcedentaria06(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria06() * -1);
-        eE.setValorTotalEnergiaExcedentaria(peaje.getEnergiaExcedentaria().getValorTotalEnergiaExcedentaria() * - 1);
-        peaje.setEnergiaExcedentaria(eE);
+        if (peaje.getEnergiaExcedentaria() != null) {
+        	EnergiaExcedentaria eE = new EnergiaExcedentaria();
+            eE.setEnergiaExcedentaria01(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria01() * -1);
+            eE.setEnergiaExcedentaria02(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria02() * -1);
+            eE.setEnergiaExcedentaria03(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria03() * -1);
+            eE.setEnergiaExcedentaria04(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria04() * -1);
+            eE.setEnergiaExcedentaria05(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria05() * -1);
+            eE.setEnergiaExcedentaria06(peaje.getEnergiaExcedentaria().getEnergiaExcedentaria06() * -1);
+            eE.setValorTotalEnergiaExcedentaria(peaje.getEnergiaExcedentaria().getValorTotalEnergiaExcedentaria() * - 1);
+            peaje.setEnergiaExcedentaria(eE);
+		}
         
         this.guardar(peaje);
         
