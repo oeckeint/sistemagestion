@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
@@ -26,7 +28,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @EnableTransactionManagement
 @ComponentScan(basePackages = {"app", "controladores", "datos"})
 @PropertySource("classpath:persistence-mysql.properties")
-public class AppConfig {
+public class AppConfig implements WebMvcConfigurer{
 
     @Autowired
     private Environment env;
@@ -42,7 +44,7 @@ public class AppConfig {
     public CommonsMultipartResolver multipartResolver() {
         CommonsMultipartResolver cmr = new CommonsMultipartResolver();
         cmr.setDefaultEncoding("UTF-8");
-        cmr.setMaxUploadSize(5242880);
+        cmr.setMaxUploadSize(52428800);
         return cmr;
     }
 
@@ -96,5 +98,10 @@ public class AppConfig {
     private int getIntProperty(String propName) {
         return Integer.parseInt(env.getProperty(propName));
     }
-
+    
+    @Override
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
+    }
+    
 }

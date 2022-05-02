@@ -26,10 +26,10 @@
                             <div class="col-1">
                                 <c:choose>
                                     <c:when test="${documento.isDeleted == 0}">
-                                        <a href="${pageContext.request.contextPath}/${controller}/archivar?codFisFac=${documento.codFisFac}" class="btn btn-danger m-0"><i class="fa-solid fa-eye-slash"></i></a>
+                                        <a href="${pageContext.request.contextPath}/${controller}/archivar?codFisFac=${documento.codFisFac}" class="btn btn-danger m-0" id="linkClasify"><i class="fa-solid fa-eye-slash"></i></a>
                                     </c:when>
                                     <c:when test="${documento.isDeleted == 1}">
-                                        <a href="${pageContext.request.contextPath}/${controller}/archivar?codFisFac=${documento.codFisFac}" class="btn btn-success m-0"><i class="fa-solid fa-eye"></i></a>
+                                        <a href="${pageContext.request.contextPath}/${controller}/archivar?codFisFac=${documento.codFisFac}" class="btn btn-success m-0" id="linkClasify"><i class="fa-solid fa-eye"></i></a>
                                     </c:when>
                                 </c:choose>
                             </div>
@@ -42,7 +42,7 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item"><h3>Comentarios</h3> ${documento.comentarios}</li>
                         <security:authorize access="hasRole('ADMIN')">
-                            <form:form  action="${pageContext.request.contextPath}/${controller}/comentar" method="post">
+                            <form:form  action="${pageContext.request.contextPath}/${controller}/comentar" method="post" id="form-coment">
                                 <li class="list-group-item">
                                     <h3 class="m-2"><button class="btn btn-success" type="submit" id="btnSubmit" value="comentar"><i class="fas fa-check-circle"></i> Actualizar comentario</button></h3>
                                     <textarea name="comentario" cols="80" rows="5">${documento.comentarios}</textarea>
@@ -107,7 +107,9 @@
                                     <dt class="list-group-item px-1">Fecha</dt>
                                     <dt class="list-group-item px-1">ProcedenciaD</dt>
                                     <dt class="list-group-item px-1">ProcedenciaH</dt>
-                                    <dt class="list-group-item px-1">CodRec</dt>
+                                    <c:if test="${documento.codFacRecAnu ne ''}">
+                                   		<dt class="list-group-item px-1">Factura que rectifica</dt>
+                                    </c:if>
                                 </ul>
                             </div>
                             <div class="col-7">
@@ -183,7 +185,14 @@
                                             <li class="list-group-item px-1">Sin Lectura</li>
                                             </c:otherwise>
                                         </c:choose>
-                                    <li class="list-group-item px-1">${documento.codFacRecAnu}</li>
+                                    <c:if test="${documento.codFacRecAnu ne ''}">
+	                                    <c:url var="detalles" value="/${controller}/detalles">
+					                        <c:param name="codFisFac" value="${documento.codFacRecAnu}"/>
+					                    </c:url>
+                                   		<li class="list-group-item px-1">
+                                   			<a href="${detalles}">${documento.codFacRecAnu}</a>
+                                   		</li>
+                                    </c:if>
                                 </ul>
                             </div>
                         </div>
@@ -861,7 +870,8 @@
                         </div>
                     </div>
                     <c:url var="detalles" value="/clientes/detalles">
-                        <c:param name="idCliente" value="${cliente.idCliente}"/>
+                        <c:param name="valor" value="${cliente.idCliente}"/>
+                        <c:param name="filtro" value="id"/>
                     </c:url>
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
                         <h3 class="list-group-item list-group-item-action active text-center h4">Cliente <a href="${detalles}" class="btn btn-danger"><i class="fas fa-eye"></i></a></h3>
@@ -923,3 +933,11 @@
         <jsp:include page="/WEB-INF/paginas/comunes/piePagina.jsp"></jsp:include>
     </body>
 </html>
+<script>
+	<security:authorize access="hasRole('ADMIN')">
+		Mousetrap.bind(['alt+shift+1'], function(){location.href= path + "/clasificar";});
+		Mousetrap.bind(['alt+shift+2'], function(){location.href= path + "/procesar";});
+		Mousetrap.bind(['alt+shift+3'], function(){document.getElementById('form-coment').submit();});
+		Mousetrap.bind(['alt+shift+4'], function(){document.getElementById('linkClasify').click();});
+	</security:authorize>
+</script>

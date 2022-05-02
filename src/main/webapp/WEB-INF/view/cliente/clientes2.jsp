@@ -149,4 +149,7 @@
         detailButton.appendChild(spanDetail);
         window.location = url;
     }
+    <security:authorize access="hasRole('ADMIN')">
+		Mousetrap.bind(['alt+shift+1', 'a g'], function(){location.href= path + "/clientes/formulario";});
+	</security:authorize>
 </script>

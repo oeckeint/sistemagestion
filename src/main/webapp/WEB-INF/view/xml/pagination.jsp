@@ -83,11 +83,11 @@
 								<li class="page-item"><a class="page-link"
 									href="${pagIni2}">2</a></li>
 								<li class="page-item"><a class="page-link"
-									href="${nextPage}">Siguiente</a></li>
+									href="${nextPage}" id="next-page">Siguiente</a></li>
 							</c:when>
 							<c:when test="${paginaActual >= 2}">
 								<li class="page-item"><a class="page-link"
-									href="${prevPage}" tabindex="-1" aria-disabled="true">Anterior</a>
+									href="${prevPage}" id="previous-page" tabindex="-1" aria-disabled="true">Anterior</a>
 								</li>
 								<li class="page-item"><a class="page-link"
 									href="${pagIni1}">1</a></li>
@@ -106,11 +106,11 @@
 								<li class="page-item"><a class="page-link"
 									href="${pagIni3}">3</a></li>
 								<li class="page-item"><a class="page-link"
-									href="${nextPage}">Siguiente</a></li>
+									href="${nextPage}" id="next-page">Siguiente</a></li>
 							</c:when>
 							<c:when test="${paginaActual == 2}">
 								<li class="page-item"><a class="page-link"
-									href="${prevPage}" tabindex="-1" aria-disabled="true">Anterior</a>
+									href="${prevPage}" id="previous-page" tabindex="-1" aria-disabled="true">Anterior</a>
 								</li>
 								<li class="page-item"><a class="page-link"
 									href="${pagIni1}">1</a></li>
@@ -119,11 +119,11 @@
 								<li class="page-item"><a class="page-link"
 									href="${pagIni1}">3</a></li>
 								<li class="page-item"><a class="page-link"
-									href="${nextPage}">Siguiente</a></li>
+									href="${nextPage}" id="next-page">Siguiente</a></li>
 							</c:when>
 							<c:when test="${paginaActual >= 3}">
 								<li class="page-item"><a class="page-link"
-									href="${prevPage}" tabindex="-1" aria-disabled="true">Anterior</a>
+									href="${prevPage}" id="previous-page" tabindex="-1" aria-disabled="true">Anterior</a>
 								</li>
 								<li class="page-item"><a class="page-link"
 									href="${pagIni1}">1</a></li>
@@ -143,11 +143,11 @@
 						<li class="page-item"><a class="page-link" href="${pagFin1}">${ultimaPagina - 2}</a></li>
 						<li class="page-item"><a class="page-link" href="${pagFin2}">${ultimaPagina - 1}</a></li>
 						<li class="page-item"><a class="page-link" href="${pagFin3}">${ultimaPagina}</a></li>
-						<li class="page-item"><a class="page-link" href="${nextPage}">Siguiente</a>
+						<li class="page-item"><a class="page-link" href="${nextPage}" id="next-page">Siguiente</a>
 						</li>
 					</c:when>
 					<c:when test="${paginaActual == 2}">
-						<li class="page-item"><a class="page-link" href="${prevPage}"
+						<li class="page-item"><a class="page-link" href="${prevPage}" id="previous-page"
 							tabindex="-1" aria-disabled="true">Anterior</a></li>
 						<li class="page-item"><a class="page-link" href="${pagIni1}">${paginaActual - 1}</a></li>
 						<li class="page-item disabled"><a class="page-link">${paginaActual}</a></li>
@@ -156,11 +156,11 @@
 						<li class="page-item"><a class="page-link" href="${pagFin1}">${ultimaPagina - 2}</a></li>
 						<li class="page-item"><a class="page-link" href="${pagFin2}">${ultimaPagina - 1}</a></li>
 						<li class="page-item"><a class="page-link" href="${pagFin3}">${ultimaPagina}</a></li>
-						<li class="page-item"><a class="page-link" href="${nextPage}">Siguiente</a>
+						<li class="page-item"><a class="page-link" href="${nextPage}" id="next-page">Siguiente</a>
 						</li>
 					</c:when>
 					<c:when test="${paginaActual >= ultimaPagina}">
-						<li class="page-item"><a class="page-link" href="${prevPage}"
+						<li class="page-item"><a class="page-link" href="${prevPage}" id="previous-page"
 							tabindex="-1" aria-disabled="true">Anterior</a></li>
 						<li class="page-item"><a class="page-link" href="${pagIni1}">1</a></li>
 						<li class="page-item"><a class="page-link" href="${pagIni2}">2</a></li>
@@ -171,7 +171,7 @@
 						<li class="page-item disabled"><a class="page-link">${ultimaPagina}</a></li>
 					</c:when>
 					<c:when test="${paginaActual == ultimaPagina}">
-						<li class="page-item"><a class="page-link" href="${prevPage}"
+						<li class="page-item"><a class="page-link" href="${prevPage}" id="previous-page"
 							tabindex="-1" aria-disabled="true">Anterior</a></li>
 						<li class="page-item"><a class="page-link" href="${pagIni1}">1</a></li>
 						<li class="page-item"><a class="page-link" href="${pagIni2}">2</a></li>
@@ -182,7 +182,7 @@
 						<li class="page-item disabled"><a class="page-link">${paginaActual}</a></li>
 					</c:when>
 					<c:when test="${paginaActual == ultimaPagina - 1}">
-						<li class="page-item"><a class="page-link" href="${prevPage}"
+						<li class="page-item"><a class="page-link" href="${prevPage}" id="previous-page"
 							tabindex="-1" aria-disabled="true">Anterior</a></li>
 						<li class="page-item"><a class="page-link" href="${pagIni1}">1</a></li>
 						<li class="page-item"><a class="page-link" href="${pagIni2}">2</a></li>
@@ -191,11 +191,11 @@
 						<li class="page-item"><a class="page-link" href="${pagFin1}">${ultimaPagina - 2}</a></li>
 						<li class="page-item disabled"><a class="page-link">${paginaActual}</a></li>
 						<li class="page-item"><a class="page-link" href="${pagFin3}">${ultimaPagina}</a></li>
-						<li class="page-item"><a class="page-link" href="${nextPage}">Siguiente</a>
+						<li class="page-item"><a class="page-link" href="${nextPage}" id="next-page">Siguiente</a>
 						</li>
 					</c:when>
 					<c:when test="${paginaActual == ultimaPagina - 2}">
-						<li class="page-item"><a class="page-link" href="${prevPage}"
+						<li class="page-item"><a class="page-link" href="${prevPage}" id="previous-page"
 							tabindex="-1" aria-disabled="true">Anterior</a></li>
 						<li class="page-item"><a class="page-link" href="${pagIni1}">1</a></li>
 						<li class="page-item"><a class="page-link" href="${pagIni2}">2</a></li>
@@ -204,11 +204,11 @@
 						<li class="page-item disabled"><a class="page-link">${paginaActual}</a></li>
 						<li class="page-item"><a class="page-link" href="${pagFin2}">${ultimaPagina - 1}</a></li>
 						<li class="page-item"><a class="page-link" href="${pagFin3}">${ultimaPagina}</a></li>
-						<li class="page-item"><a class="page-link" href="${nextPage}">Siguiente</a>
+						<li class="page-item"><a class="page-link" href="${nextPage}" id="next-page">Siguiente</a>
 						</li>
 					</c:when>
 					<c:otherwise>
-						<li class="page-item"><a class="page-link" href="${prevPage}"
+						<li class="page-item"><a class="page-link" href="${prevPage}" id="previous-page"
 							tabindex="-1" aria-disabled="true">Anterior</a></li>
 						<li class="page-item"><a class="page-link" href="${pag2}">${paginaActual - 2 }</a></li>
 						<li class="page-item"><a class="page-link" href="${pag3}">${paginaActual - 1}</a></li>
@@ -217,7 +217,7 @@
 						<li class="page-item"><a class="page-link" href="${pagFin1}">${ultimaPagina - 2}</a></li>
 						<li class="page-item"><a class="page-link" href="${pagFin2}">${ultimaPagina - 1}</a></li>
 						<li class="page-item"><a class="page-link" href="${pagFin3}">${ultimaPagina}</a></li>
-						<li class="page-item"><a class="page-link" href="${nextPage}">Siguiente</a>
+						<li class="page-item"><a class="page-link" href="${nextPage}" id="next-page">Siguiente</a>
 						</li>
 					</c:otherwise>
 				</c:choose>
@@ -258,3 +258,7 @@
 		</script>
 	</c:otherwise>
 </c:choose>
+<script>
+	Mousetrap.bind([ 'right' ], function() {document.getElementById('next-page').click();});
+	Mousetrap.bind([ 'left' ], function() {document.getElementById('previous-page').click();});
+</script>

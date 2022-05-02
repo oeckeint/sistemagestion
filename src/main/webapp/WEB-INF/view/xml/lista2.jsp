@@ -1,5 +1,6 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <c:set var="language" value="${not empty param.language ? param.language : not empty language ? language : 'es'}" scope="session"/>
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="labels"/>
@@ -119,4 +120,9 @@
         detailButton.appendChild(spanDetail);
         window.location = url;
     }
+    
+    <security:authorize access="hasRole('ADMIN')">
+		Mousetrap.bind(['alt+shift+1'], function(){location.href= path + "/clasificar";});
+		Mousetrap.bind(['alt+shift+2'], function(){location.href= path + "/procesar";});
+	</security:authorize>
 </script>

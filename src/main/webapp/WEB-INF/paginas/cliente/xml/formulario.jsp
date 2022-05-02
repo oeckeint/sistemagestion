@@ -1,4 +1,5 @@
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
     <div class="container">
         <strong>${mensajeRegistro}</strong>
@@ -72,4 +73,9 @@
         button.appendChild(span);
         document.getElementById("filesInput").submit();
     }
+    
+    <security:authorize access="hasRole('ADMIN')">
+		Mousetrap.bind(['alt+shift+1'], function(){location.href= path + "/clasificar";});
+		Mousetrap.bind(['alt+shift+2'], function(){location.href= path + "/procesar";});
+	</security:authorize>
 </script>

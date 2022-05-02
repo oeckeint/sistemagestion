@@ -1,4 +1,5 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <div class="container">
     <a href="javascript:languageLink('es');"><fmt:message key="lang.es"/></a> | 
     <a href="javascript:languageLink('en');"><fmt:message key="lang.en"/></a>
@@ -16,6 +17,8 @@
     </div>
 </footer>
 <script type="text/javascript">
+	const path = "${pageContext.request.contextPath}";
+
     function languageLink(lang) {
         var hash = {};
         var parser = document.createElement('a');
@@ -95,5 +98,16 @@
         defineTitles();
         startTime();
     };
+    
+    Mousetrap.bind(['alt+shift+0', 'i n', '0 enter'], function(){location.href= path + "/";});
+    Mousetrap.bind(['alt+shift+p', 'p e'], function(){location.href= path + "/peajes";});
+    Mousetrap.bind(['alt+shift+f', 'f a'], function(){location.href= path + "/facturas";});
+    Mousetrap.bind(['alt+shift+o', 'o f'], function(){location.href= path + "/otrasfacturas";});
+    Mousetrap.bind(['alt+shift+c', 'c l i'], function(){location.href= path + "/clientes";});
+    Mousetrap.bind(['alt+shift+b', 'b u'], function(){ document.getElementById("searchValue").focus();});
+    <security:authorize access="hasRole('ADMIN')">
+	    Mousetrap.bind(['c l a'], function(){location.href= path + "/clasificar";});
+		Mousetrap.bind(['p r'], function(){location.href= path + "/procesar";});
+    </security:authorize>
 </script>
 
