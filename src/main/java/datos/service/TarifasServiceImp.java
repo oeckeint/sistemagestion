@@ -13,13 +13,20 @@ public class TarifasServiceImp implements datos.interfaces.CrudDao<Tarifa>{
 
     @Autowired
     @Qualifier(value = "tarifaDaoImp")
-    private CrudDao tarifasDao;
+    private CrudDao<Tarifa> tarifasDao;
     
     @Override
     @Transactional
     public List<Tarifa> listar() {
         return tarifasDao.listar();
     }
+    
+    @Override
+    @Transactional
+	public List<Tarifa> listar(int rows, int page) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
     @Override
     @Transactional
@@ -38,5 +45,23 @@ public class TarifasServiceImp implements datos.interfaces.CrudDao<Tarifa>{
     public void eliminar(long id) {
         tarifasDao.eliminar(id);
     }
+
+	@Override
+	@Transactional
+	public Tarifa buscarId(long id) {
+		return null;
+	}
+
+	@Override
+	@Transactional
+	public int contarRegistros() {
+		return 0;
+	}
+
+	@Override
+	@Transactional
+	public int contarPaginacion(int rows) {
+		return 0;
+	}
 
 }

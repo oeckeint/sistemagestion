@@ -1,0 +1,85 @@
+Microsoft Windows [Versión 10.0.19043.1586]
+(c) Microsoft Corporation. Todos los derechos reservados.
+
+C:\Windows\system32>C:\Oracle\Middleware\Oracle_Home\OPatch\opatch version
+OPatch Version: 13.9.4.2.3
+
+OPatch succeeded.
+
+C:\Windows\system32>C:\Oracle\Middleware\Oracle_Home\OPatch\opatch apply C:\p32133880_141100_Generic\32133880
+Installer de Parche Temporal de Oracle versión 13.9.4.2.3
+Copyright (c) 2022, Oracle Corporation. Todos los Derechos Reservados.
+
+
+Directorio raÝz de Oracle       : C:\Oracle\MIDDLE~1\ORACLE~1
+Inventario central: C:\Program Files\Oracle\Inventory
+   de           :
+Versi¾n de OPatch    : 13.9.4.2.3
+Versi¾n de OUI       : 13.9.4.0.0
+Ubicaci¾n del archivo log : C:\Oracle\MIDDLE~1\ORACLE~1\cfgtoollogs\opatch\opatch2022-04-12_17-49-48p. m._1.log
+
+
+OPatch detects the Middleware Home as "C:\Oracle\Middleware\Oracle_Home"
+
+Verifying environment and performing prerequisite checks...
+OPatch continues with these patches:   32133880
+
+┐Desea continuar? [y|n]
+y
+User Responded with: Y
+All checks passed.
+
+Cierre las instancias Oracle que se estÚn ejecutando fuera de este ORACLE_HOME en el sistema local.
+(Directorio RaÝz de Oracle = 'C:\Oracle\MIDDLE~1\ORACLE~1')
+
+
+┐Estß el sistema local listo para aplicarle un parche? [y|n]
+y
+User Responded with: Y
+Backing up files...
+Aplicando el parche temporal '32133880' al directorio raÝz de Oracle 'C:\Oracle\MIDDLE~1\ORACLE~1'
+
+Aplicando parche a componente oracle.wls.libraries, 14.1.1.0.0...
+Patch 32133880 successfully applied.
+Log file location: C:\Oracle\MIDDLE~1\ORACLE~1\cfgtoollogs\opatch\opatch2022-04-12_17-49-48p. m._1.log
+
+OPatch succeeded.
+
+C:\Windows\system32>C:\Oracle\Middleware\Oracle_Home\OPatch\opatch lsinventory
+Installer de Parche Temporal de Oracle versión 13.9.4.2.3
+Copyright (c) 2022, Oracle Corporation. Todos los Derechos Reservados.
+
+
+Directorio raÝz de Oracle       : C:\Oracle\MIDDLE~1\ORACLE~1
+Inventario central: C:\Program Files\Oracle\Inventory
+   de           :
+Versi¾n de OPatch    : 13.9.4.2.3
+Versi¾n de OUI       : 13.9.4.0.0
+Ubicaci¾n del archivo log : C:\Oracle\MIDDLE~1\ORACLE~1\cfgtoollogs\opatch\opatch2022-04-12_17-53-38p. m._1.log
+
+
+OPatch detects the Middleware Home as "C:\Oracle\Middleware\Oracle_Home"
+
+Lsinventory Output file location : C:\Oracle\MIDDLE~1\ORACLE~1\cfgtoollogs\opatch\lsinv\lsinventory2022-04-12_17-53-38p. m..txt
+
+--------------------------------------------------------------------------------
+Local Machine Information::
+Hostname: DESKTOP-JSNOH03
+ARU platform id: 233
+ARU platform description:: Microsoft Windows Server 2003 (64-bit AMD)
+
+
+Parches temporales (1) :
+
+Patch  32133880     : applied on Tue Apr 12 17:51:06 CDT 2022
+Unique Patch ID:  23987559
+Patch description:  "One-off"
+   Created on 24 Dec 2020, 12:03:22 hrs PST8PDT
+   Bugs fixed:
+     32133880
+
+
+
+--------------------------------------------------------------------------------
+
+OPatch succeeded.

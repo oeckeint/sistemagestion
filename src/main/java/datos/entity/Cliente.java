@@ -1,21 +1,32 @@
 package datos.entity;
 
 import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import datos.entity.cliente.tickets.ClienteTicket;
 
 @Entity
 @Table(name = "cliente")
 public class Cliente implements Serializable {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cliente")
     private long idCliente;
@@ -43,6 +54,9 @@ public class Cliente implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_cliente_contrato")
     private ClienteContrato clienteContrato;
+    
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ClienteTicket> clienteTickets;
     
     public Cliente() {
     }
@@ -127,9 +141,20 @@ public class Cliente implements Serializable {
         this.clienteContrato = clienteContrato;
     }
     
-    @Override
-    public String toString() {
-        return "Cliente{" + "idCliente=" + idCliente + ", cups=" + cups + ", nombreCliente=" + nombreCliente + ", tarifa=" + tarifa + ", isDeleted=" + isDeleted + '}';
-    }
+    public List<ClienteTicket> getClienteTickets() {
+		return clienteTickets;
+	}
+
+	public void setClienteTickets(List<ClienteTicket> clienteTickets) {
+		this.clienteTickets = clienteTickets;
+	}
+
+	@Override
+	public String toString() {
+		return "Cliente [idCliente=" + idCliente + ", cups=" + cups + ", nombreCliente=" + nombreCliente + ", tarifa="
+				+ tarifa + ", isDeleted=" + isDeleted + ", clientePuntoSuministro=" + clientePuntoSuministro
+				+ ", clienteDatosGenerales=" + clienteDatosGenerales + ", clienteContrato=" + clienteContrato
+				+ ", clienteTickets=" + clienteTickets + "]";
+	}
 
 }

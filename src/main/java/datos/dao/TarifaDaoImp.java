@@ -18,6 +18,11 @@ public class TarifaDaoImp implements datos.interfaces.CrudDao<Tarifa>{
                 .createQuery("from Tarifa t where t.status = 1 order by t.nombreTarifa asc", Tarifa.class)
                 .getResultList();
     }
+    
+    @Override
+	public List<Tarifa> listar(int rows, int page) {
+		return null;
+	}
 
     @Override
     public void guardar(Tarifa object) {
@@ -33,5 +38,21 @@ public class TarifaDaoImp implements datos.interfaces.CrudDao<Tarifa>{
     public void eliminar(long id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+	@Override
+	public Tarifa buscarId(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int contarRegistros() {
+		return 0;
+	}
+
+	@Override
+	public int contarPaginacion(int rows) {
+		return 0;
+	}
 
 }

@@ -55,7 +55,7 @@ public class AppConfig implements WebMvcConfigurer{
         try {
             cpds.setDriverClass(this.env.getProperty("jdbc.driver"));
         } catch (PropertyVetoException e) {
-            throw new RuntimeException(e);
+   throw new RuntimeException(e);
         }
 
         cpds.setJdbcUrl(this.env.getProperty("jdbc.url"));

@@ -18,6 +18,7 @@
                                     <li><a class="dropdown-item" href="${pageContext.request.contextPath}/clientes"><fmt:message key="customers.list"/></a></li>
                                     <security:authorize access="hasRole('ADMIN')">
                                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/clientes/formulario"><fmt:message key="customers.add"/></a></li>
+                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/clientes/tickets"><fmt:message key="customers.tickets"/></a></li>
                                     </security:authorize>
                                     <!--<li><a class="dropdown-item" href="#">Búsqueda Avanzada</a></li>-->
                                 </ul>

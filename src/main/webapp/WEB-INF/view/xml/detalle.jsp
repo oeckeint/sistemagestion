@@ -1,6 +1,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -11,11 +12,30 @@
         <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp"></jsp:include>
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 <div class="container">
-                    <strong>${mensaje}</strong>
-            </div>
+                	<c:choose>
+                		<c:when test="${!clienteEncontrado}">
+            				<fmt:message key="customers.tickets.create1"></fmt:message>
+            			</c:when>
+            			<c:when test="${clienteEncontrado}">
+            				<fmt:message key="customers.tickets.create1"></fmt:message>
+            			</c:when>
+            			<c:otherwise>
+            				<fmt:message key="customers.tickets.edit"></fmt:message>
+            			</c:otherwise>
+        			</c:choose>
+            	</div>
         </div>
         <c:if test="${ documento != null }">
             <div class="container">
+                <hr>
+                <div class="row justify-content-between p-0">
+                    <div class="col-6">
+                        <h2 class="m-0"><a href="${pageContext.request.contextPath}/clientes/tickets"><i class="fas fa-arrow-circle-left text-success"></i></a> Detalles ticket</h2>
+                    </div>
+                    <div class="row col-12 col-lg-6 justify-content-sm-evenly mt-3 mt-md-0">
+                        <jsp:include page="./busqueda_ticket.jsp" />
+                    </div>
+                </div>
                 <hr>
                 <div class="row justify-content-between p-0">
                     <div class="col-6">

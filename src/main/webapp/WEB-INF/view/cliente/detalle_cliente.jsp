@@ -39,6 +39,7 @@
                                     <dt class="list-group-item px-1">Nombre</dt>
                                     <dt class="list-group-item px-1">Tarifa</dt>
                                     <dt class="list-group-item px-1">Archivado</dt>
+                                    <dt class="list-group-item px-1">No. Tickets</dt>
                                 </ul>
                             </div>
                             <div class="col-8 col-md-7">
@@ -57,6 +58,7 @@
                                             </c:when>
                                         </c:choose>
                                     </li>
+                                    <li class="list-group-item px-1">${cliente.clienteTickets.size()}</li>
                                 </ul>
                             </div>
                         </div>
