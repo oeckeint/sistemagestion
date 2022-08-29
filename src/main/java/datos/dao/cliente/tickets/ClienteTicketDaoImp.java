@@ -61,6 +61,38 @@ public class ClienteTicketDaoImp implements CrudDao<ClienteTicket>{
             return null;
         }
 	}
+	
+	@Override
+	public List<ClienteTicket> buscarFiltro(String valor, String filtro) {
+		Query<ClienteTicket> q = null;
+		try {
+			switch (filtro.toLowerCase()) {
+				case "tipo":
+					q =	this.sessionFactory.getCurrentSession()
+					.createQuery("from ClienteTicket ct where ct.ticketTipoIncidencia.id = :valor order by ct.idTicket desc", ClienteTicket.class)
+					.setParameter("valor", Long.parseLong(valor));
+					break;
+				case "estado":
+					q =	this.sessionFactory.getCurrentSession()
+					.createQuery("from ClienteTicket ct where ct.ticketEstadoIncidencia.id = :valor order by ct.idTicket desc", ClienteTicket.class)
+					.setParameter("valor", Long.parseLong(valor));
+					break;
+				case "cliente":
+					q =	this.sessionFactory.getCurrentSession()
+					.createQuery("from ClienteTicket ct where ct.cliente.idCliente = :valor order by ct.idTicket desc", ClienteTicket.class)
+					.setParameter("valor", Long.parseLong(valor));
+					break;
+				case "cups":
+					q =	this.sessionFactory.getCurrentSession()
+					.createQuery("from ClienteTicket ct where ct.cliente.cups like :valor order by ct.idTicket desc", ClienteTicket.class)
+					.setParameter("valor", "%" + valor + "%");
+					break;
+			}
+			return q.getResultList();
+        } catch (NoResultException e) {
+            return null;
+        }
+	}
 
 	@Override
 	public int contarRegistros() {
@@ -77,6 +109,6 @@ public class ClienteTicketDaoImp implements CrudDao<ClienteTicket>{
 		Long a = Long.parseLong(query.uniqueResult().toString());
         Double b = Math.ceil((double) a / rows);
         return b.intValue();
-	}
+	}	
 
 }

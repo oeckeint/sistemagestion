@@ -2,8 +2,6 @@ package datos.interfaces;
 
 import java.util.List;
 
-import datos.entity.Cliente;
-
 public interface CrudDao<T> {
 
     public List<T> listar();
@@ -17,6 +15,14 @@ public interface CrudDao<T> {
     public List<T> listar(int rows, int page);
     
     public T buscarId(long id);
+    
+    /**
+     * List records using a filter
+     * @param valor value that is going to be looked for on the database
+     * @param filtro filter that is going to be used on the query
+     * @return list of values found
+     */
+    public List<T> buscarFiltro(String valor, String filtro);
 
     public void guardar(T object);
 

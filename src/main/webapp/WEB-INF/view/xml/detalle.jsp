@@ -30,15 +30,6 @@
                 <hr>
                 <div class="row justify-content-between p-0">
                     <div class="col-6">
-                        <h2 class="m-0"><a href="${pageContext.request.contextPath}/clientes/tickets"><i class="fas fa-arrow-circle-left text-success"></i></a> Detalles ticket</h2>
-                    </div>
-                    <div class="row col-12 col-lg-6 justify-content-sm-evenly mt-3 mt-md-0">
-                        <jsp:include page="./busqueda_ticket.jsp" />
-                    </div>
-                </div>
-                <hr>
-                <div class="row justify-content-between p-0">
-                    <div class="col-6">
                         <h2 class="m-0"><a id="backList" href="${pageContext.request.contextPath}/facturas"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura</h2>
                     </div>
                     <div class="col-6 row justify-content-end">

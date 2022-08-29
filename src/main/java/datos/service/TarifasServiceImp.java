@@ -37,7 +37,7 @@ public class TarifasServiceImp implements datos.interfaces.CrudDao<Tarifa>{
     @Override
     @Transactional
     public void actualizar(Tarifa tarifa) {
-        tarifasDao.actualizar(tarifa);
+        tarifasDao.guardar(tarifa);
     }
 
     @Override
@@ -51,6 +51,12 @@ public class TarifasServiceImp implements datos.interfaces.CrudDao<Tarifa>{
 	public Tarifa buscarId(long id) {
 		return null;
 	}
+	
+	@Override
+	@Transactional
+	public List<Tarifa> buscarFiltro(String valor, String filtro) {
+		return this.tarifasDao.buscarFiltro(valor, filtro);
+	}
 
 	@Override
 	@Transactional
@@ -62,6 +68,6 @@ public class TarifasServiceImp implements datos.interfaces.CrudDao<Tarifa>{
 	@Transactional
 	public int contarPaginacion(int rows) {
 		return 0;
-	}
+	}	
 
 }

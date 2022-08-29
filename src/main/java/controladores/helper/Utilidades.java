@@ -9,6 +9,11 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -146,4 +151,40 @@ public class Utilidades {
         }
     }
 
+    /**
+     * Agrega dias a una fecha de referencia
+     * @param dateRef Fecha de referencia a la que se le agregaran los días
+     * @param numeroDeDias Numero de dias que serán agregados a la fecha de referencia
+     * @return retorna la fecha de refencia con la operacion realizada
+     * @throws ParseException 
+     */
+    public static Date agregarDias(Date dateRef, int numeroDeDias) {
+    	dateRef = formatearDate(dateRef, 1);
+    	LocalDateTime today = LocalDateTime.ofInstant(dateRef.toInstant(), ZoneId.systemDefault());
+    	return Date.from(today.plusDays(numeroDeDias).atZone(ZoneId.systemDefault()).toInstant());
+    }
+    
+    /**
+     * Reformatea un date extraido de la base de datos a un tipo date 
+     * @param date String that is going to be assigned to the Date
+     * @param format int that selects the type of format 1 = yyyy-MM-dd
+     * @return formatted date
+     * @throws ParseException 
+     */
+    public static Date formatearDate(Date date, int format) {
+    	SimpleDateFormat formatter = null;
+    	switch (format) {
+			case 1:
+				formatter = new SimpleDateFormat("yyyy-MM-dd");
+				break;
+		}
+    	String strDate = formatter.format(date);
+    	try {
+			date = formatter.parse(strDate);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+    	return date;
+    }
+    
 }

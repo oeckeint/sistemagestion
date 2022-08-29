@@ -32,7 +32,7 @@
                 	<hr>
 	                <div class="row justify-content-between p-0">
 	                    <div class="col-6">
-	                        <h2 class="m-0"><a href="${pageContext.request.contextPath}/clientes/tickets"><i class="fas fa-arrow-circle-left text-success"></i></a> Nuevo Ticket</h2>
+	                        <h2 class="m-0"><a href="${pageContext.request.contextPath}/clientes/tickets"><i class="fas fa-arrow-circle-left text-success"></i></a> Datos del Ticket</h2>
 	                    </div>
 	                </div>
 	                <hr>
@@ -89,6 +89,8 @@
 	                                   			</form:select>
 	                                   		</div>
 	                                   		<form:hidden path="idTicket"></form:hidden>
+	                                   		<form:hidden path="createdOn"></form:hidden>
+	                                   		<form:hidden path="createdBy"></form:hidden>
 	                                   		<div class="mb-3 col-5">
 	                                   			<br/>
 	                                   			<button class="btn btn-danger">Enviar</button>

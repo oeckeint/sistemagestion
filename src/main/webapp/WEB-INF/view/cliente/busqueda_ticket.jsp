@@ -4,11 +4,11 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <security:authorize access="hasRole('ADMIN')">
-    <div class="col-4 col-md-3">
+    <div class="col-3">
         <a href="${pageContext.request.contextPath}/clientes/tickets/agregar" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Agregar</a>
     </div>
 </security:authorize>
-<div class="col-8 col-md-9">
+<div class="col-7">
     <form:form action="${pageContext.request.contextPath}/clientes/tickets/busqueda" modelAttribute="busquedaTicket" method="post" id="myForm">
         <div class="input-group">
             <button class="btn btn-primary btn-block" type="button" id="btnSubmit" onclick="buscarTicket();">

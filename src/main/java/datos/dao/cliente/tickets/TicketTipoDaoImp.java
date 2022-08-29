@@ -36,6 +36,12 @@ public class TicketTipoDaoImp implements CrudDao<TicketTipoIncidencia>{
 	}
 
 	@Override
+	public List<TicketTipoIncidencia> buscarFiltro(String valor, String filtro) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
 	public void guardar(TicketTipoIncidencia object) {
 		// TODO Auto-generated method stub
 		

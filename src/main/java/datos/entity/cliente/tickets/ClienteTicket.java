@@ -1,5 +1,11 @@
 package datos.entity.cliente.tickets;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,9 +16,18 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import controladores.helper.Utilidades;
 import datos.entity.Cliente;
 
+/**
+ * @author Oecke
+ *
+ */
 @Entity
 @Table(name = "cliente_tickets")
 public class ClienteTicket {
@@ -42,6 +57,22 @@ public class ClienteTicket {
 	
 	@Column(name = "is_deleted")
 	private int isDeleted;
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@Temporal(TemporalType.DATE)
+    @Column(name = "created_on")
+    private Calendar createdOn;
+    
+    @Column(name = "created_by")
+    private String createdBy;
+    
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
+    @Column(name = "updated_on")
+    private Calendar updatedOn;
+    
+    @Column(name = "updated_by")
+    private String updatedBy;
 	
 	public ClienteTicket(){
 	}
@@ -100,6 +131,38 @@ public class ClienteTicket {
 
 	public void setIsDeleted(int isDeleted) {
 		this.isDeleted = isDeleted;
+	}
+
+	public Calendar getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(Calendar createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Calendar getUpdatedOn() {
+		return updatedOn;
+	}
+
+	public void setUpdatedOn(Calendar updatedOn) {
+		this.updatedOn = updatedOn;
+	}
+
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
 	}
 	
 }

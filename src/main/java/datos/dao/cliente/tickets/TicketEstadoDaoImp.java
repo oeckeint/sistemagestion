@@ -35,6 +35,12 @@ public class TicketEstadoDaoImp implements CrudDao<TicketEstadoIncidencia>{
 				.setParameter("id", id)
 				.getSingleResult();
 	}
+	
+	@Override
+	public List<TicketEstadoIncidencia> buscarFiltro(String valor, String filtro) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public void guardar(TicketEstadoIncidencia object) {

@@ -34,6 +34,12 @@ public class TicketEstadoServiceImp implements CrudDao<TicketEstadoIncidencia>{
 	public TicketEstadoIncidencia buscarId(long id) {
 		return this.ticketsDao.buscarId(id);
 	}
+	
+	@Override
+	@Transactional
+	public List<TicketEstadoIncidencia> buscarFiltro(String valor, String filtro) {
+		return this.ticketsDao.buscarFiltro(valor, filtro);
+	}
 
 	@Override
 	@Transactional

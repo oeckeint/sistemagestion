@@ -41,8 +41,12 @@ public class TarifaDaoImp implements datos.interfaces.CrudDao<Tarifa>{
 
 	@Override
 	public Tarifa buscarId(long id) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
+	
+	@Override
+	public List<Tarifa> buscarFiltro(String valor, String filtro) {
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
 	@Override
