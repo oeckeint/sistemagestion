@@ -137,7 +137,30 @@
         <hr/>
 	</div>
 	
+	<c:if test="${ticketGuardado != null}">
+		<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="exampleModalLabel">¡Éxito! <i class="fa-solid fa-heart"></i></h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		      </div>
+		      <div class="modal-body">
+		        El ticket se ha guardado correctamente con el id #${ticketGuardado.idTicket}
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+	</c:if>
+	
 	<script>
+		$(window).on('load', function() {
+	        $('#exampleModal').modal('show');
+	    });
+	
 		function loadData(id, url) {
 			window.location = url;
 		}

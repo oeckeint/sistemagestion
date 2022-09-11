@@ -46,6 +46,8 @@ public class ClientesTickets extends Operaciones{
 
 	private Logger logger = Logger.getLogger(getClass().getName());
 	
+	private ClienteTicket ticketGuardado = null;
+	
 	@Autowired
 	private ClienteService clienteService;
 	
@@ -69,6 +71,11 @@ public class ClientesTickets extends Operaciones{
 		super.mv.addObject("busquedaTicket", new BusquedaTicket());
 		super.mv.addObject("titulo", "Tickets");
 		super.mv.addObject("controller", "clientes/tickets");
+		if (this.ticketGuardado != null) {
+			ClienteTicket aux = this.ticketGuardado;
+			super.mv.addObject("ticketGuardado", aux);
+			ticketGuardado = null;
+		}
 		//Paginacion
 		paginaActual = Utilidades.revisarPaginaActual(paginaActual);
 		int ultimaPagina = this.ticketsService.contarPaginacion(rows);
@@ -171,6 +178,8 @@ public class ClientesTickets extends Operaciones{
 			clienteTicket.setTicketTipoIncidencia(tt);
 			this.ticketsService.guardar(clienteTicket);
 			this.listar(1, 50);
+			this.ticketGuardado = clienteTicket;
+			super.mv = new ModelAndView("redirect:/clientes/tickets");
 		} else {
 			super.mv = new ModelAndView("/cliente/ticket_formulario");
 			super.mv.addObject("clienteEncontrado", ticket.getCliente().getIdCliente() != 0);
