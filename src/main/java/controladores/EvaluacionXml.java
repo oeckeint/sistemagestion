@@ -16,13 +16,19 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import javax.xml.parsers.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
+@PropertySource("classpath:cfg/path.properties")
 @WebServlet("/EvaluacionXML")
 @MultipartConfig
 public class EvaluacionXml extends HttpServlet {
-    
+
+    @Autowired
+    private Environment env;
+
     @Autowired
     ClienteDao clienteDao;
     
@@ -422,7 +428,8 @@ public class EvaluacionXml extends HttpServlet {
 
             String subCarpeta = "NoProcesados";
 
-            String nuevoArchivo = "C:\\Peajes\\Procesados\\" + subCarpeta + "\\" + nombreArchivo;
+            String nuevoArchivo =
+                    System.getProperty("user.dir") + env.getProperty("peajes.procesados") + subCarpeta + "/" + nombreArchivo;
             File f = new File(nuevoArchivo);
             f.createNewFile();
 

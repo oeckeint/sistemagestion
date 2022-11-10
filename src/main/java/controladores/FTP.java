@@ -2,17 +2,12 @@ package controladores;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
 import controladores.helper.Etiquetas;
 import excepciones.CredencialesIncorrectasException;
 import excepciones.ErrorAlConectarConElServidorException;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,11 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.stream.Collectors;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -196,7 +189,7 @@ public class FTP {
             this.channelSftp.cd("/");
             is = this.channelSftp.get(pathArchivo + "/" + nombreArchivo);
             byte[] bytes = IOUtils.toByteArray(is);
-            File f = new File("C:\\Peajes\\ftp\\" + nombreArchivo);
+            File f = new File(System.getProperty("user.dir") + env.getProperty("peajes.ftp") + nombreArchivo);
             fw = new FileWriter(f);
             fw.write(new String(bytes));
 

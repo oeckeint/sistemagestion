@@ -12,6 +12,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +24,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+@PropertySource("classpath:cfg/path.properties")
 @Controller
 @RequestMapping("/configuraciones")
 public class Configuraciones {
+
+    @Autowired
+    private Environment env;
 
     @GetMapping("")
     public String inicio(Model model) {
@@ -38,7 +46,7 @@ public class Configuraciones {
     public String respaldarDB(Model model) throws IOException {
         String rutaMySqlDump = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe";
         String rutaMySql = "C:\\Archivos de programa\\MySQL\\MySQL Server 5.0\\bin\\mysql.exe";
-        String rutaRespaldoDefault = "C:\\Peajes\\Backups\\" + this.momentoActual() + ".sql";
+        String rutaRespaldoDefault = System.getProperty("user.dir") + env.getProperty("sql.backup") + this.momentoActual() + ".sql";
 
         //Revisión de que exista el directorio de Backups de lo contrario lo creará
         Process p = Runtime.getRuntime().exec("C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump -u root -padmin sge");
@@ -72,12 +80,12 @@ public class Configuraciones {
 
     @PostMapping("/procesar")
     public String restaurarDB(@RequestParam("archivosql") MultipartFile file, Model model) throws IOException {
-        File f = new File("C:\\Peajes\\Backups\\HistorialDeRestauraciones\\" + file.getOriginalFilename());
+        File f = new File(System.getProperty("user.dir") + env.getProperty("sql.restauraciones") + file.getOriginalFilename());
         file.transferTo(f);
         Process p = Runtime.getRuntime().exec("C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysql -u root -padmin sge");
         //Process p = Runtime.getRuntime().exec("mysql -u root -padmin sge");
         OutputStream os = p.getOutputStream();
-        FileInputStream fis = new FileInputStream("C:\\Peajes\\Backups\\HistorialDeRestauraciones\\" + file.getOriginalFilename());
+        FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + env.getProperty("sql.restauraciones") + file.getOriginalFilename());
 
         byte[] buffer = new byte[1000];
         int leido = fis.read(buffer);
@@ -100,7 +108,7 @@ public class Configuraciones {
 
     public void creacionDirectorios() {
         try {
-            String fileName = "C:\\Peajes\\Backups\\HistorialDeRestauraciones";
+            String fileName = System.getProperty("user.dir") + env.getProperty("sql.restauraciones");
             Path pathDB = Paths.get(fileName);
             if (!Files.exists(pathDB)) {
                 Files.createDirectories(pathDB);

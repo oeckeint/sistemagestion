@@ -26,6 +26,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,9 +43,13 @@ import utileria.xml;
  *
  * @author Jesus Sanchez <j.sanchez at dataWorkshop>
  */
+@PropertySource("classpath:cfg/path.properties")
 @Controller
 @RequestMapping("/clasificar")
 public class ClasificarXml {
+
+    @Autowired
+    private Environment env;
 
     @Autowired
     ClienteService clienteService;
@@ -188,14 +194,14 @@ public class ClasificarXml {
     }
     
     private void generarValidacionPagoXML(String rutaOriginal) {
-    	String pathNuevoArchivo = "C:\\Peajes\\Procesados\\RemesaPago";
+    	String pathNuevoArchivo = System.getProperty("user.dir") + env.getProperty("peajes.remesa");;
     	if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
 			this.archivosCorrectos++;
 		}
     }
     
     private void generarArchivarFacturaXML(String rutaOriginal) {
-    	String pathNuevoArchivo = "C:\\Peajes\\Procesados\\ArchivarFactura";
+    	String pathNuevoArchivo = System.getProperty("user.dir") + env.getProperty("peajes.archivarfactura");
     	if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
 			this.archivosCorrectos++;
 		}
@@ -271,8 +277,8 @@ public class ClasificarXml {
         if (this.elementosXml.get(NombresNodos.COD_PRO).equals("F1")) {
             finString = this.elementosXml.get(NombresNodos.COD_FIS_FAC);
         }
-        
-        String pathNuevoArchivo = "C:\\Peajes\\Procesados\\" + subCarpeta;
+
+        String pathNuevoArchivo = System.getProperty("user.dir") + env.getProperty("peajes.procesados") + subCarpeta;
         String nombreNuevoArchivo = formater.format(this.cliente.getIdCliente()) + "-" + this.cliente.getTarifa() + "_"
                 + this.elementosXml.get(NombresNodos.EMP_EMI) + "_" + this.elementosXml.get(NombresNodos.EMP_DES) + "_" + this.elementosXml.get(NombresNodos.COD_PRO) + "_"
                 + this.elementosXml.get(NombresNodos.COD_PAS) + "_" + this.elementosXml.get(NombresNodos.CUPS) + "_" + finString

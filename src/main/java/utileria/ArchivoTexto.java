@@ -1,5 +1,6 @@
 package utileria;
 
+import controladores.helper.Utilidades;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -7,7 +8,9 @@ import java.util.Date;
 public class ArchivoTexto {
 
     public static void escribirError(String contenido) {
-        File file = new File("C:/Peajes/Procesados/errores.txt");
+        String path = System.getProperty("user.dir") + "/resources/Peajes/";
+        Utilidades.creacionDirectorios(path);
+        File file = new File(path + "errores.txt");
         try {
             if (!file.exists()) {
                 file.createNewFile();
@@ -30,7 +33,9 @@ public class ArchivoTexto {
     }
 
     public static void escribirAdvertencia(String nombreArchivo, String codAdvertencia) {
-        File file = new File("C:/Peajes/Procesados/advertencias.txt");
+        String path = System.getProperty("user.dir") + "/resources/Peajes/";
+        Utilidades.creacionDirectorios(path);
+        File file = new File(path + "advertencias.txt");
         try {
             if (!file.exists()) {
                 file.createNewFile();

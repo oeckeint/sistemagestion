@@ -60,7 +60,7 @@ public class Utilidades {
      */
 	public static boolean crearArchivo(String nombreNuevoArchivo, String rutaArchivoOriginal, String pathNuevoArchivo) {
     	boolean generado = false;
-    	String pathArchivoNuevo = pathNuevoArchivo + "\\" + nombreNuevoArchivo;
+    	String pathArchivoNuevo = pathNuevoArchivo + "/" + nombreNuevoArchivo;
     	creacionDirectorios(pathNuevoArchivo);
     	File f = new File(pathArchivoNuevo);
         FileWriter fichero = null;
