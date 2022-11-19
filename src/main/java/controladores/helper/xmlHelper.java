@@ -31,7 +31,7 @@ import utileria.StringHelper;
 
 public class xmlHelper {
 
-    private DocumentoXmlService contenidoXmlService;
+    public DocumentoXmlService contenidoXmlService;
     ClienteService clienteService;
     private ArrayList elementos;
     Document doc;

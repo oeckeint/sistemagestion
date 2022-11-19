@@ -472,6 +472,9 @@ public class Peaje {
     @Column(name = "estado_pago")
     private int estadoPago;
     
+    @Column(name = "filtro")
+    private int filtro; 
+    
     @Temporal(TemporalType.DATE)
     @Column(name = "created_on")
     private Date createdOn;
@@ -485,6 +488,9 @@ public class Peaje {
     
     @Column(name = "updated_by")
     private String updatedBy;
+    
+    
+    
     
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_energia_excedentaria")
@@ -1887,7 +1893,14 @@ public class Peaje {
     public void setEstadoPago(int estadoPago) {
         this.estadoPago = estadoPago;
     }
-
+    
+    public int getFiltro() {
+    	return this.filtro;
+    }
+    public void setFiltro(int filtro) {
+    	this.filtro = filtro;
+    }
+    
     public EnergiaExcedentaria getEnergiaExcedentaria() {
         return energiaExcedentaria;
     }

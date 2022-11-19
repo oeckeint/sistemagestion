@@ -26,8 +26,10 @@ public class NombresNodos {
     public static String CON_FAC = "ControlFacturacion";
     public static String REM_PAG = "RemesaPago";
     public static String IS_DEL = "isDeleted";
-
     
+    /** My declarations **/
+    public static String FIL = "Filtro";
+    public static String FAC = "Factura";
     /**
      * Valores disponibles para los diferentes status
      */

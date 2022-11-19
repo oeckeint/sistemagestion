@@ -3,6 +3,8 @@ package controladores;
 import controladores.helper.ArchivarFactura;
 import controladores.helper.CambiodeComercializador;
 import controladores.helper.Etiquetas;
+import controladores.helper.NombresNodos;
+import controladores.helper.ProcesarConsultaFacturaPeaje;
 import controladores.helper.ProcesarFactura;
 import controladores.helper.ProcesarOtrasFacturas;
 import controladores.helper.ProcesarPeaje;
@@ -33,7 +35,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -50,7 +55,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import com.mchange.v2.cfg.DelayedLogItem.Level;
+
 import utileria.StringHelper;
+import utileria.xml;
 
 @Controller
 @RequestMapping("/procesar")
@@ -84,7 +93,10 @@ public class ProcesamientoXml {
     private boolean isOtrasFacturas;
     private boolean isMACCConCambios;
     private boolean isMACCSinCambios;
+    private boolean isConsultaFacturacion;
     private boolean isPeaje;
+    private HashMap<String, String> elementosCF;
+	private ResultSet rs;
 
     /**
      * Muestra el fomulario que procesa los archivos
@@ -164,12 +176,15 @@ public class ProcesamientoXml {
             } else if (isRemesaPago) {
                 this.procesarRemesaPago(documento);
             } else if (isArchivarFactura) {
-            	new ArchivarFactura(this.definirTablaBusqueda(documento), documento);
-            } else if (isFactura) {
-                new ProcesarFactura(documento, contenidoXmlServiceFacturas, clienteService, nombreArchivo);
+            	new ArchivarFactura(this.definirTablaBusqueda(documento), documento);      	
+            }   else if (isFactura) {
+                new ProcesarFactura(documento, contenidoXmlServiceFacturas, clienteService, nombreArchivo);    
             } else if (isPeaje){
                 new ProcesarPeaje(documento, contenidoXmlServicePeajes, clienteService, nombreArchivo);
-            } else {
+            } else if(isConsultaFacturacion) {
+            	this.procesarConsultaFactura(documento);
+            }
+            else {
                 throw new XmlNoSoportado();
             }
             archivosCorrectos++;
@@ -187,7 +202,24 @@ public class ProcesamientoXml {
 
         System.out.println("(Fin)************************-----------------------------" + nombreArchivo);
     }
-
+    
+    public void initializarConsultaFacturacion(Document doc) throws ArchivoNoCumpleParaSerClasificado, SQLException {
+    	rs = null;
+    			
+    	try {
+    		if(rs.next()) {
+    			elementosCF = new HashMap<String, String>();
+    			do {
+    				elementosCF.put(NombresNodos.COD_FIS_FAC, xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, doc));
+    				elementosCF.put(NombresNodos.FIL, xml.obtenerContenidoNodo(NombresNodos.FIL , doc));
+    			} while(rs.next());
+    		}
+		} catch (NullPointerException e){
+			elementosCF.clear();
+		}
+    }
+    
+    
     /**
      * Lectura y formateo del archivo xml recibido
      *
@@ -250,6 +282,9 @@ public class ProcesamientoXml {
         } else if (Utilidades.existeNodo(doc, "MensajeFacturacion")) {
             this.isPeaje = true;
             return;
+        } else if(Utilidades.existeNodo(doc, "ConsultaFacturacion")) {
+        	this.isConsultaFacturacion = true;
+        	return;
         }
     }
     
@@ -261,6 +296,7 @@ public class ProcesamientoXml {
         this.isRemesaPago = false;
         this.isArchivarFactura = false;
         this.isPeaje = false;
+        this.isConsultaFacturacion = false;
     }
 
     /**
@@ -287,6 +323,21 @@ public class ProcesamientoXml {
         }
     }
     
+    private void procesarConsultaFactura(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException, PeajeMasDeUnRegistroException {
+    	switch(this.definirTablaBusqueda(doc)) {
+	    	case peajes:
+	    		new ProcesarConsultaFacturaPeaje(doc, contenidoXmlServicePeajes, TablaBusqueda.peajes);
+	    		break;
+	    	case facturas:
+	    		System.out.println("Dentro del metodo de procesarConsultaFactura - Facturas");
+	    		break;
+	    	case otrasFacturas:
+	    		System.out.println("Dentro del metodo de procesarConsultaFactura - Otras Facturas");
+	    		break;
+    	}
+    }
+    
+    
     private TablaBusqueda definirTablaBusqueda(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException {
     	if (Utilidades.existeNodo(doc, "TablaBusqueda")) {
             String tablaBusqueda = doc.getElementsByTagName("TablaBusqueda").item(0).getTextContent();
@@ -298,6 +349,7 @@ public class ProcesamientoXml {
                     	return TablaBusqueda.facturas;
                     case "contenido_xml_otras_facturas":
                     	return TablaBusqueda.otrasFacturas;
+
                     default:
                         throw new TablaBusquedaNoExisteException(tablaBusqueda);
                 }

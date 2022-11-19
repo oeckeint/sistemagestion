@@ -95,6 +95,9 @@ public class OtraFactura {
     @Column(name = "estado_pago")
     private int estadoPago;
     
+    @Column(name = "filtro")
+    private int filtro;
+    
     @Temporal(TemporalType.DATE)
     @Column(name = "created_on")
     private Date createdOn;
@@ -325,6 +328,14 @@ public class OtraFactura {
 		return createdOn;
 	}
 
+    public int getFiltro() {
+    	return this.filtro;
+    }
+    
+    public void setFiltro(int filtro) {
+    	this.filtro = filtro;
+    }
+    
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;
 	}
