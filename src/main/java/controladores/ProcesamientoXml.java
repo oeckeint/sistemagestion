@@ -4,7 +4,7 @@ import controladores.helper.ArchivarFactura;
 import controladores.helper.CambiodeComercializador;
 import controladores.helper.Etiquetas;
 import controladores.helper.NombresNodos;
-import controladores.helper.ProcesarConsultaFacturaPeaje;
+import controladores.helper.ConsultaFacturacion;
 import controladores.helper.ProcesarFactura;
 import controladores.helper.ProcesarOtrasFacturas;
 import controladores.helper.ProcesarPeaje;
@@ -15,22 +15,8 @@ import controladores.helper.Utilidades;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
 import datos.interfaces.DocumentoXmlService;
-import excepciones.ArchivoNoCumpleParaSerClasificado;
-import excepciones.ArchivoVacioException;
-import excepciones.ClienteNoExisteException;
-import excepciones.CodRectNoExisteException;
-import excepciones.ErrorDesconocidoException;
-import excepciones.FacturaYaExisteException;
-import excepciones.MasDatosdeLosEsperadosException;
-import excepciones.MasDeUnClienteEncontrado;
-import excepciones.NoExisteElNodoException;
-import excepciones.PeajeCodRectNoExisteException;
-import excepciones.PeajeMasDeUnRegistroException;
-import excepciones.PeajeTipoFacturaNoSoportadaException;
-import excepciones.TablaBusquedaNoEspecificadaException;
-import excepciones.TablaBusquedaNoExisteException;
-import excepciones.TarifaNoExisteException;
-import excepciones.XmlNoSoportado;
+import excepciones.*;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -182,7 +168,7 @@ public class ProcesamientoXml {
             } else if (isPeaje){
                 new ProcesarPeaje(documento, contenidoXmlServicePeajes, clienteService, nombreArchivo);
             } else if(isConsultaFacturacion) {
-            	this.procesarConsultaFactura(documento);
+            	this.procesarConsultaFactura(documento, nombreArchivo);
             }
             else {
                 throw new XmlNoSoportado();
@@ -309,7 +295,7 @@ public class ProcesamientoXml {
         this.archivosErroneos = new ArrayList<>();
     }
     
-    private void procesarRemesaPago(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException, PeajeMasDeUnRegistroException {
+    private void procesarRemesaPago(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException, PeajeMasDeUnRegistroException, RegistroVacioException {
         switch (this.definirTablaBusqueda(doc)) {
             case peajes:
                 new ProcesarRemesaPagoPeaje(doc, contenidoXmlServicePeajes);
@@ -323,18 +309,21 @@ public class ProcesamientoXml {
         }
     }
     
-    private void procesarConsultaFactura(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException, PeajeMasDeUnRegistroException {
-    	switch(this.definirTablaBusqueda(doc)) {
+    private void procesarConsultaFactura(Document doc, String nombreArchivo) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException, PeajeMasDeUnRegistroException {
+        ConsultaFacturacion cf = null;
+        TablaBusqueda ref = this.definirTablaBusqueda(doc);
+    	switch(ref) {
 	    	case peajes:
-	    		new ProcesarConsultaFacturaPeaje(doc, contenidoXmlServicePeajes, TablaBusqueda.peajes);
+	    		cf = new ConsultaFacturacion(doc, nombreArchivo, contenidoXmlServicePeajes);
 	    		break;
 	    	case facturas:
-	    		System.out.println("Dentro del metodo de procesarConsultaFactura - Facturas");
+                cf = new ConsultaFacturacion(doc, nombreArchivo, contenidoXmlServiceFacturas);
 	    		break;
 	    	case otrasFacturas:
-	    		System.out.println("Dentro del metodo de procesarConsultaFactura - Otras Facturas");
+                cf = new ConsultaFacturacion(doc, nombreArchivo, contenidoXmlServiceOtrasFacturas);
 	    		break;
     	}
+        cf.actualizarFiltro(ref);
     }
     
     

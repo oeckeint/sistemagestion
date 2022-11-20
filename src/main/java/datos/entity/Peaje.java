@@ -1900,6 +1900,10 @@ public class Peaje {
     public void setFiltro(int filtro) {
     	this.filtro = filtro;
     }
+
+    public void setFiltro(String filtro){
+        this.filtro = Integer.parseInt(filtro);
+    }
     
     public EnergiaExcedentaria getEnergiaExcedentaria() {
         return energiaExcedentaria;

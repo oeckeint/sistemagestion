@@ -1718,6 +1718,10 @@ public class Factura {
     public void setFiltro(int filtro) {
     	this.filtro = filtro;
     }
+
+    public void setFiltro(String filtro){
+        this.filtro = Integer.parseInt(filtro);
+    }
         
 	public Date getCreatedOn() {
 		return createdOn;

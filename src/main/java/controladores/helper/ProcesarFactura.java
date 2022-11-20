@@ -2,13 +2,7 @@ package controladores.helper;
 
 import datos.interfaces.ClienteService;
 import datos.interfaces.DocumentoXmlService;
-import excepciones.ClienteNoExisteException;
-import excepciones.CodRectNoExisteException;
-import excepciones.FacturaYaExisteException;
-import excepciones.MasDeUnClienteEncontrado;
-import excepciones.PeajeMasDeUnRegistroException;
-import excepciones.PeajeTipoFacturaNoSoportadaException;
-import excepciones.TarifaNoExisteException;
+import excepciones.*;
 import org.w3c.dom.Document;
 
 /**
@@ -18,7 +12,7 @@ import org.w3c.dom.Document;
 public class ProcesarFactura extends xmlHelper {
 
     public ProcesarFactura(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService, String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException {
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException, RegistroVacioException {
         super(doc, contenidoXmlService, clienteService);
         super.procesarFactura(nombreArchivo);
     }

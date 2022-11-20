@@ -3,7 +3,9 @@ package controladores.helper;
 public class NombresNodos {
 
     public static String COD_CONT = "CodContrato";
-    public static String COD_FIS_FAC = "CodigoFiscalFactura";
+    public static final String COD_FIS_FAC = "CodigoFiscalFactura";
+    public static final String COD_FAC_REC_ANU = "CodigoFacturaRectificadaAnulada";
+    public static final String ID_REM = "IdRemesa";
     public static String COD_PAS = "CodigoDePaso";
     public static String COD_PRO = "CodigoDelProceso";
     public static String COD_SOL = "CodigoDeSolicitud";
@@ -28,7 +30,7 @@ public class NombresNodos {
     public static String IS_DEL = "isDeleted";
     
     /** My declarations **/
-    public static String FIL = "Filtro";
+    public static final String FIL = "Filtro";
     public static String FAC = "Factura";
     /**
      * Valores disponibles para los diferentes status

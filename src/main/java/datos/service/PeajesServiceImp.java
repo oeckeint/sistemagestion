@@ -1,6 +1,7 @@
 package datos.service;
 
 import datos.entity.EnergiaExcedentaria;
+import datos.entity.OtraFactura;
 import datos.entity.Peaje;
 
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import excepciones.RegistroVacioException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,8 +58,14 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
 
     @Override
     @Transactional
-    public Peaje buscarByCodFiscal(String cod) throws PeajeMasDeUnRegistroException {
+    public Peaje buscarByCodFiscal(String cod) throws PeajeMasDeUnRegistroException, RegistroVacioException {
         return this.documentoXmlDao.buscarByCodFiscal(cod);
+    }
+
+    @Override
+    @Transactional
+    public Peaje buscarByCodFiscalEspecifico(String cod) throws PeajeMasDeUnRegistroException, RegistroVacioException {
+        return this.documentoXmlDao.buscarByCodFiscalEspecifico(cod);
     }
 
     @Override

@@ -335,6 +335,10 @@ public class OtraFactura {
     public void setFiltro(int filtro) {
     	this.filtro = filtro;
     }
+
+    public void setFiltro(String filtro){
+        this.filtro = Integer.parseInt(filtro);
+    }
     
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;

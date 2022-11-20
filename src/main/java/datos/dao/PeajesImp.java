@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
+import excepciones.RegistroVacioException;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,21 +76,53 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
                 .executeUpdate();
     }
 
+    /**
+     * Busca un codigo fiscal factura específico o su homologo del tipo -A
+     * @param cod
+     * @return
+     * @throws PeajeMasDeUnRegistroException
+     */
     @Override
-    public Peaje buscarByCodFiscal(String cod) throws PeajeMasDeUnRegistroException {
+    public Peaje buscarByCodFiscal(String cod) throws PeajeMasDeUnRegistroException, RegistroVacioException {
         try {
-            Peaje peaje = this.sessionFactory.getCurrentSession().createQuery("from Peaje p where p.codFisFac = :cod1", Peaje.class).setParameter("cod1", cod).getSingleResult();
-            if (peaje == null) {
-				peaje =	this.sessionFactory.getCurrentSession().createQuery("from Peaje p where p.codFisFac = :cod1", Peaje.class).setParameter("cod1", cod + "-A").getSingleResult();
-			}
-            return peaje;
+            return this.sessionFactory.getCurrentSession()
+                    .createQuery("from Peaje p where p.codFisFac = :cod1 or p.codFisFac = :cod2", Peaje.class)
+                    .setParameter("cod1", cod)
+                    .setParameter("cod2", cod + "-A")
+                    .getSingleResult();
         } catch (NonUniqueResultException e) {
         	logger.log(Level.INFO, ">>> PeajesDaoImp={0}", e.getMessage());
         	throw new PeajeMasDeUnRegistroException(cod);
         } catch (NoResultException e) {
-        	return null;
+            logger.log(Level.INFO, ">>> PeajesDaoImp={0}", "No se encontró algún registro con el cod " + cod + " / " + cod + "-A");
+            throw new RegistroVacioException();
         } catch (Exception e) {
         	e.printStackTrace(System.out);
+            return null;
+        }
+    }
+
+    /**
+     * Busca un registro con codigo fiscal especifico
+     * @param cod
+     * @return
+     * @throws PeajeMasDeUnRegistroException
+     */
+    @Override
+    public Peaje buscarByCodFiscalEspecifico(String cod) throws PeajeMasDeUnRegistroException, RegistroVacioException {
+        try {
+            return this.sessionFactory.getCurrentSession()
+                    .createQuery("from Peaje p where p.codFisFac = :cod1", Peaje.class)
+                    .setParameter("cod1", cod)
+                    .getSingleResult();
+        } catch (NonUniqueResultException e) {
+            logger.log(Level.INFO, ">>> PeajesDaoImp={0}", e.getMessage());
+            throw new PeajeMasDeUnRegistroException(cod);
+        } catch (NoResultException e) {
+            logger.log(Level.INFO, ">>> PeajesDaoImp={0}", "No se encontró algún registro con el codFisFac especifico " + cod);
+            throw new RegistroVacioException();
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
             return null;
         }
     }

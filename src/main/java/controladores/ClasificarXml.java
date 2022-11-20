@@ -1,4 +1,4 @@
-package controladores;
+ package controladores;
 
 import controladores.helper.Etiquetas;
 import controladores.helper.NombresNodos;
@@ -64,7 +64,7 @@ public class ClasificarXml {
     private boolean isValidacionPago;
     private boolean isArchivarFactura;
     private Logger logger = Logger.getLogger(getClass().getName());
-    
+
     @GetMapping("")
     public String inicio(Model model) {
         model.addAttribute("tituloPagina", Etiquetas.CLASIFICAR_FORMULARIO_TITULO_PAGINA);
@@ -80,7 +80,7 @@ public class ClasificarXml {
     @PostMapping("/procesar")
     public String evaluar(@RequestParam("archivosxml") MultipartFile[] files) throws IOException {
         for (MultipartFile file : files) {
-        	reiniciarVariablesFlujo();
+            reiniciarVariablesFlujo();
             archivosTotales++;
             File f;
             FileOutputStream ous;
@@ -113,13 +113,13 @@ public class ClasificarXml {
             Document doc = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(doc);
             if (isValidacionPago) {
-            	this.generarValidacionPagoXML(ruta);
-				return;
-			}
+                this.generarValidacionPagoXML(ruta);
+                return;
+            }
             if (this.isArchivarFactura) {
-            	this.generarArchivarFacturaXML(ruta);
-				return;
-			}
+                this.generarArchivarFacturaXML(ruta);
+                return;
+            }
             this.cliente = this.clienteService.encontrarCups(elementosXml.get(NombresNodos.CUPS));
             if (this.cliente != null) {
                 this.generarXML(this.nombreArchivo, ruta);
@@ -164,47 +164,47 @@ public class ClasificarXml {
             elementosXml.put(NombresNodos.COD_SOL, xml.obtenerContenidoNodo(NombresNodos.COD_SOL, doc));
             elementosXml.put(NombresNodos.COD_PAS, xml.obtenerContenidoNodo(NombresNodos.COD_PAS, doc));
         } catch (NullPointerException e) {
-        	elementosXml.clear();
-        	logger.log(Level.INFO, ">>> Parece no ser un archivo de MensajeAceptacionModificacionDeATR, se intentará revisar si es validacionPago");
+            elementosXml.clear();
+            logger.log(Level.INFO, ">>> Parece no ser un archivo de MensajeAceptacionModificacionDeATR, se intentará revisar si es validacionPago");
             this.reconocerValidarPago(doc);
         }
     }
-    
+
     private void reconocerValidarPago(Document doc) throws ArchivoNoCumpleParaSerClasificado{
-    	try {
-			elementosXml.put(NombresNodos.REM_PAG, xml.obtenerContenidoNodo(NombresNodos.REM_PAG, doc));
+        try {
+            elementosXml.put(NombresNodos.REM_PAG, xml.obtenerContenidoNodo(NombresNodos.REM_PAG, doc));
             this.isValidacionPago = true;
         } catch (NullPointerException e) {
-        	elementosXml.clear();
-        	logger.log(Level.INFO, ">>> No es un archivo del tipo Validar Pago");
+            elementosXml.clear();
+            logger.log(Level.INFO, ">>> No es un archivo del tipo Validar Pago");
             this.isArchivarFactura(doc);
         }
     }
-    
+
     public boolean isArchivarFactura(Document doc) throws ArchivoNoCumpleParaSerClasificado{
-    	try {
-    		elementosXml.put(NombresNodos.IS_DEL, xml.obtenerContenidoNodo(NombresNodos.IS_DEL, doc));
-    		this.isArchivarFactura = true;
-		} catch (Exception e) {
-			elementosXml.clear();
-        	logger.log(Level.INFO, ">>> No es un archivo del tipo ArchivarFactura");
-        	throw new ArchivoNoCumpleParaSerClasificado();
-		}
-    	return true;
+        try {
+            elementosXml.put(NombresNodos.IS_DEL, xml.obtenerContenidoNodo(NombresNodos.IS_DEL, doc));
+            this.isArchivarFactura = true;
+        } catch (Exception e) {
+            elementosXml.clear();
+            logger.log(Level.INFO, ">>> No es un archivo del tipo ArchivarFactura");
+            throw new ArchivoNoCumpleParaSerClasificado();
+        }
+        return true;
     }
-    
+
     private void generarValidacionPagoXML(String rutaOriginal) {
-    	String pathNuevoArchivo = System.getProperty("user.dir") + env.getProperty("peajes.remesa");;
-    	if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
-			this.archivosCorrectos++;
-		}
+        String pathNuevoArchivo = System.getProperty("user.dir") + env.getProperty("peajes.remesa");;
+        if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
+            this.archivosCorrectos++;
+        }
     }
-    
+
     private void generarArchivarFacturaXML(String rutaOriginal) {
-    	String pathNuevoArchivo = System.getProperty("user.dir") + env.getProperty("peajes.archivarfactura");
-    	if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
-			this.archivosCorrectos++;
-		}
+        String pathNuevoArchivo = System.getProperty("user.dir") + env.getProperty("peajes.archivarfactura");
+        if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
+            this.archivosCorrectos++;
+        }
     }
 
     private void generarXML(String nombreArchivoOriginal, String ruta) {
@@ -259,7 +259,7 @@ public class ClasificarXml {
                 case "M1":
                 case "C1":
                 case "C2":
-                case "A3": 	
+                case "A3":
                 case "B1":
                     subCarpeta = "X";
                     break;
@@ -282,11 +282,11 @@ public class ClasificarXml {
         String nombreNuevoArchivo = formater.format(this.cliente.getIdCliente()) + "-" + this.cliente.getTarifa() + "_"
                 + this.elementosXml.get(NombresNodos.EMP_EMI) + "_" + this.elementosXml.get(NombresNodos.EMP_DES) + "_" + this.elementosXml.get(NombresNodos.COD_PRO) + "_"
                 + this.elementosXml.get(NombresNodos.COD_PAS) + "_" + this.elementosXml.get(NombresNodos.CUPS) + "_" + finString
-                + ".xml"; 
-        
+                + ".xml";
+
         if (Utilidades.crearArchivo(nombreNuevoArchivo, ruta, pathNuevoArchivo)) {
-        	this.archivosCorrectos++;
-		}
+            this.archivosCorrectos++;
+        }
     }
 
     /**
@@ -326,12 +326,12 @@ public class ClasificarXml {
         this.archivosCorrectos = 0;
         this.archivosTotales = 0;
     }
-    
+
     private void reiniciarVariablesFlujo() {
-    	this.isValidacionPago = false;
+        this.isValidacionPago = false;
         this.isArchivarFactura = false;
         this.elementosXml = new HashMap<String, String>();
         this.nombreArchivo = null;
     }
-    
+
 }

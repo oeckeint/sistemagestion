@@ -1,10 +1,17 @@
 package datos.dao;
 
 import datos.entity.Factura;
+import datos.entity.OtraFactura;
 import datos.entity.Peaje;
 import excepciones.NoEsUnNumeroException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
+
+import excepciones.PeajeMasDeUnRegistroException;
+import excepciones.RegistroVacioException;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +19,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> {
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -62,17 +71,48 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
     }
 
     @Override
-    public Factura buscarByCodFiscal(String cod) {
+    public Factura buscarByCodFiscal(String cod) throws PeajeMasDeUnRegistroException, RegistroVacioException {
         try {
             return this.sessionFactory.getCurrentSession()
-                    .createQuery("from Factura f where f.codFisFac = :cod1 or f.codFisFac = :cod2 order by f.idFactura desc", Factura.class)
+                    .createQuery("from Factura f where f.codFisFac = :cod1 or f.codFisFac = :cod2", Factura.class)
                     .setParameter("cod1", cod)
                     .setParameter("cod2", cod + "-A")
                     .getSingleResult();
+        } catch (NonUniqueResultException e) {
+            logger.log(Level.INFO, ">>> FacturaDaoImp={0}", e.getMessage());
+            throw new PeajeMasDeUnRegistroException(cod);
         } catch (NoResultException e) {
+            logger.log(Level.INFO, ">>> FacturaDaoImp={0}", "No se encontró algún registro con el cod " + cod + " / " + cod + "-A");
+            throw  new RegistroVacioException();
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
             return null;
         }
+    }
 
+    /**
+     * Busca un registro con codigo fiscal especifico
+     * @param cod
+     * @return
+     * @throws PeajeMasDeUnRegistroException
+     */
+    @Override
+    public Factura buscarByCodFiscalEspecifico(String cod) throws PeajeMasDeUnRegistroException, RegistroVacioException {
+        try {
+            return this.sessionFactory.getCurrentSession()
+                    .createQuery("from Factura f where f.codFisFac = :cod1", Factura.class)
+                    .setParameter("cod1", cod)
+                    .getSingleResult();
+        } catch (NonUniqueResultException e) {
+            logger.log(Level.INFO, ">>> FacturaDaoImp={0}", e.getMessage());
+            throw new PeajeMasDeUnRegistroException(cod);
+        } catch (NoResultException e) {
+            logger.log(Level.INFO, ">>> FacturaDaoImp={0}", "No se encontró algún registro con el codFisFac especifico " + cod);
+            throw new RegistroVacioException();
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+            return null;
+        }
     }
 
     @Override
