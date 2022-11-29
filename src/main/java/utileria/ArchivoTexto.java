@@ -150,6 +150,9 @@ public class ArchivoTexto {
             case "28":
                 advertencia.append("Los valores de EnergiaExcedentaria no corresponden con el total");
                 break;
+            case "29":
+            	advertencia.append("Hay mas de dos fechas en <TerminoPotencia> de <FechaDesde> o <FechaHasta>");
+            	break;
             default:
                 advertencia.append("No se reconoce la advertencia con el código, contacte con el adminstrador del sistema");
                 break;

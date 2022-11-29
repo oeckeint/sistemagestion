@@ -387,7 +387,7 @@ public class xmlHelper {
     private void registrarPeajeN() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
     	TIPO_FACTURA tp = TIPO_FACTURA.N_NORMAL;
         Peaje peaje = new Peaje(
-                this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
+                this.cliente, this.cabecera(), this.datosGenerales(), this.datosTerminoPotencia(), this.datosFacturaAtr(),
                 this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
                 this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
                 this.Cargos("01", tp), this.Cargos("02", tp), this.ImporteTotalCargos("01", tp), this.ImporteTotalCargos("02", tp),
@@ -455,7 +455,7 @@ public class xmlHelper {
     private void registrarPeajeNA() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
     	TIPO_FACTURA tp = TIPO_FACTURA.A_ABONO;
         Peaje peaje = new Peaje(
-                this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
+                this.cliente, this.cabecera(), this.datosGenerales(), this.datosTerminoPotencia(), this.datosFacturaAtr(),
                 this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal_A(),
                 this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal_A(),
                 this.Cargos("01", tp), this.Cargos("02", tp), this.ImporteTotalCargos("01", tp), this.ImporteTotalCargos("02", tp),
@@ -623,6 +623,48 @@ public class xmlHelper {
 
         this.imprimirResultado("datosGenerales", elementos);
         return new DatosGeneralesFactura(elementos);
+    }
+    
+    private DatosTerminoPotencia datosTerminoPotencia() {
+        elementos = new ArrayList<String>(2);
+        elementos.add("");
+        elementos.add("");
+
+        int indice = 0;
+        boolean continuar = true;
+        NodeList flowList = doc.getElementsByTagName("TerminoPotencia");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                	if (indice > 1) {
+						continuar = false;
+						this.agregarError("29");
+                        break;
+					}
+                	
+                    switch (childNode.getNodeName()) {
+                        case "FechaDesde":
+                            elementos.set(0, childList.item(j).getTextContent().trim());
+                            indice++;
+                            break;
+                        case "FechaHasta":
+                            elementos.set(1, childList.item(j).getTextContent().trim());
+                            indice++;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            if (!continuar) {
+                break;
+            }
+        }
+
+        this.imprimirResultado("datosTerminoPotencia", elementos);
+        return new DatosTerminoPotencia(elementos);
     }
 
     private DatosFacturaAtr datosFacturaAtr() throws MasDeUnClienteEncontrado, TarifaNoExisteException {

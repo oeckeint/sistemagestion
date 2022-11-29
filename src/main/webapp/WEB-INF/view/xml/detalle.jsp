@@ -379,6 +379,25 @@
                             </div>
                         </div>
                     </div>
+                	<div class="row justify-content-around">
+				    <div class="list-group col-12 col-md-5 col-lg-4 p-2">
+                        <h3 class="list-group-item list-group-item-action active text-center h4">Termino Potencia</h3>
+                        <div class="row">
+                            <div class="col-5">
+                                <ul class="list-group list-group-flush text-right">
+                                    <dt class="list-group-item px-1">Fecha Desde</dt>
+                                    <dt class="list-group-item px-1">Fecha Hasta</dt>
+                                </ul>
+                            </div>
+                            <div class="col-7">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item px-1">${documento.tpFechaDesde}</li>
+                                    <li class="list-group-item px-1">${documento.tpFechaHasta}</li>
+                                </ul>
+                            </div>      
+                        </div>
+                    </div>
+					</div>
                 </div>
                 <!--Cuarto Renglón-->
                 <hr>

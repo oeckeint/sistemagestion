@@ -474,6 +474,12 @@ public class Peaje {
     
     @Column(name = "filtro")
     private int filtro; 
+ 
+    @Column(name = "tp_fecha_desde") 
+    private String tpFechaDesde;
+    
+    @Column(name = "tp_fecha_hasta")
+    private String tpFechaHasta;
     
     @Temporal(TemporalType.DATE)
     @Column(name = "created_on")
@@ -500,7 +506,7 @@ public class Peaje {
     }
 
     public Peaje(
-            Cliente cliente, DatosCabecera datosCabecera, DatosGeneralesFactura datosGeneralesFactura, DatosFacturaAtr datosFacturaAtr,
+            Cliente cliente, DatosCabecera datosCabecera, DatosGeneralesFactura datosGeneralesFactura, DatosTerminoPotencia datosTerminoPotencia, DatosFacturaAtr datosFacturaAtr,
             DatosExcesoPotencia datosExcesoPotencia, DatosPotenciaContratada datosPotenciaContratada, DatosPotenciaMaxDemandada datosPotenciaMaxDemandada, DatosPotenciaAFacturar datosPotenciaAFacturar, DatosPotenciaPrecio datosPotenciaPrecio, DatosPotenciaImporteTotal datosPotenciaImporteTotal,
             DatosEnergiaActiva datosEnergiaActiva, DatosEnergiaActivaValores datosEnergiaActivaValores, DatosEnergiaActivaPrecio datosEnergiaActivaPrecio, DatosEnergiaActivaImporteTotal datosEnergiaActivaImporteTotal,
             Cargos cargos1, Cargos cargos2, CargoImporteTotal cargoImporteTotal1, CargoImporteTotal cargoImporteTotal2,
@@ -527,7 +533,11 @@ public class Peaje {
         this.motFac = datosGeneralesFactura.getMotivoFacturacion();
         this.codFacRecAnu = datosGeneralesFactura.getCodigoFacturaRectificadaAnulada();
         this.fecFac = datosGeneralesFactura.getFechaFactura();
-
+        
+        //DatosTerminoPotencia
+        this.tpFechaDesde = datosTerminoPotencia.getFechaDesde();
+        this.tpFechaHasta = datosTerminoPotencia.getFechaHasta();
+        
         //FacturaATR
         this.tarAtrFac = datosFacturaAtr.getTarifaAtrFact();
         this.modConPot = datosFacturaAtr.getModoControlPotencia();
@@ -1901,7 +1911,23 @@ public class Peaje {
     	this.filtro = filtro;
     }
 
-    public void setFiltro(String filtro){
+    public String getTpFechaDesde() {
+		return tpFechaDesde;
+	}
+
+	public void setTpFechaDesde(String tpFechaDesde) {
+		this.tpFechaDesde = tpFechaDesde;
+	}
+
+	public String getTpFechaHasta() {
+		return tpFechaHasta;
+	}
+
+	public void setTpFechaHasta(String tpFechaHasta) {
+		this.tpFechaHasta = tpFechaHasta;
+	}
+
+	public void setFiltro(String filtro){
         this.filtro = Integer.parseInt(filtro);
     }
     
