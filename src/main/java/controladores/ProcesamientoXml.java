@@ -148,7 +148,6 @@ public class ProcesamientoXml {
      */
     private void procesar(File archivo, String nombreArchivo) {
         System.out.println("(Ini)************************-----------------------------" + nombreArchivo);
-
         try {
             Document documento = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(documento);

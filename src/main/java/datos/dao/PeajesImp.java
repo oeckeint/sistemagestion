@@ -42,20 +42,26 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
 
     @Override
     public List<Peaje> listar(int rows, int page) {
-        return this.sessionFactory.getCurrentSession()
-                .createQuery("from Peaje p "
-                        + "where (p.isDeleted = 0) "
-                        + "order by "
-                        + "     case p.eaFecHas2 "
-                        + "         when '' then "
-                        + "             p.eaFecHas1 "
-                        + "         else "
-                        + "             p.eaFecHas2 "
-                        + "     end "
-                        + "desc", Peaje.class)
-                .setFirstResult(rows * page)
-                .setMaxResults(rows)
-                .getResultList();
+        try {
+            return this.sessionFactory.getCurrentSession()
+                    .createQuery("from Peaje p "
+                            + "where (p.isDeleted = 0) "
+                            + "order by "
+                            + "     case p.eaFecHas2 "
+                            + "         when '' then "
+                            + "             p.eaFecHas1 "
+                            + "         else "
+                            + "             p.eaFecHas2 "
+                            + "     end "
+                            + "desc", Peaje.class)
+                    .setFirstResult(rows * page)
+                    .setMaxResults(rows)
+                    .getResultList();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+
     }
 
     @Override

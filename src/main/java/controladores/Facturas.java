@@ -64,11 +64,10 @@ public class Facturas {
 		model.addAttribute("totalRegistros", this.documentoXmlService.contarRegistros());
 		model.addAttribute("paginaActual", paginaActual);
 		model.addAttribute("ultimaPagina", ultimaPagina);
-		;
 		model.addAttribute("controller", Etiquetas.FACTURAS_CONTROLLER);
 		model.addAttribute("rows", rows);
-
 		this.reiniciarVariables();
+		System.out.println("Se eliminaron varias comillas");
 		return "xml/lista2";
 	}
 

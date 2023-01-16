@@ -11,16 +11,12 @@ import excepciones.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.w3c.dom.*;
 import utileria.texto.Cadenas;
 import datos.interfaces.DocumentoXmlService;
-import java.text.NumberFormat;
-import java.text.ParseException;
+
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -294,6 +290,7 @@ public class xmlHelper {
 
             this.nombreArchivo = nombreArchivo;
             this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
+            logger.log(Level.INFO, ">>> Tipo Factura {0}", this.tipoFactura);
             switch (this.tipoFactura) {
                 case "A":
                     this.registrarFacturaA();
@@ -308,7 +305,6 @@ public class xmlHelper {
                 default:
                     throw new PeajeTipoFacturaNoSoportadaException(tipoFactura);
             }
-
         } else {
             throw new ClienteNoExisteException(cups);
         }
@@ -431,21 +427,43 @@ public class xmlHelper {
 
     /*------------------------Registro de Facturas--------------------------------------*/
     /**
-     * Registra los el tipos de Factura A busca que exista el cod para
-     * rectificar, de lo contrario arroja una excepcion
+     * Registra los el tipos de Factura A (Abono)
+     * Se obtienen todos los valores absolutos y se registran con valores negativos en la tabla de contenido_xml_facturas
+     * No se necesita un registro existente para ejecutar esta factura
      *
      * @throws CodRectNoExisteException
      * @throws PeajeMasDeUnRegistroException 
      */
     private void registrarFacturaA() throws CodRectNoExisteException, PeajeMasDeUnRegistroException {
+        logger.log(Level.INFO, ">>> Registrando factura del tipo Abono con el codFisFac {0}", xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, this.doc));
+        try {
+            Factura f = new Factura(
+                    this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
+                    this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
+                    this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
+                    this.impuestoElectrico(), this.alquileres(), this.iva(),
+                    this.aeConsumo(), this.aeLecturaDesde(), this.aeLecturaHasta(), this.aeProcedenciaDesde(), this.aeProcedenciaHasta(),
+                    this.rConsumo(), this.rLecturaDesde(), this.rLecturaHasta(), this.rImporteTotal(),
+                    this.pmConsumo(), this.pmLecturaHasta(),
+                    this.registroFin(), this.comentarios.toString(), this.errores.toString()
+            );
+            this.prepareAbonoFactura(f);
+            //this.contenidoXmlService.guardar(f);
+            System.out.println("Registrando factura");
+        } catch (Exception e) {
+
+        }
+        /*
         String codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
         try {
             Factura f = (Factura) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
-            this.registrarFacturaA();
+            System.out.println("Se intenta realizar registro");
+            //this.registrarFacturaA();
         }catch (RegistroVacioException e) {
             logger.log(Level.INFO, ">>> No se encontró una factura para abonar con {0}", codRectificada);
             throw new CodRectNoExisteException(codRectificada);
         }
+         */
     }
 
     /**
@@ -465,7 +483,8 @@ public class xmlHelper {
                 this.pmConsumo_A(), this.pmLecturaHasta_A(),
                 this.registroFin(), this.comentarios.toString(), this.errores.toString()
         );
-        this.prepareAbono(peaje);
+        this.prepareAbonoPeaje(peaje);
+        System.out.println("preparandoAbono");
         this.contenidoXmlService.guardar(peaje);
         System.out.print("\n\nComentarios : " + comentarios.toString());
         System.out.print("Codigo Errores : " + errores.toString());
@@ -5112,7 +5131,7 @@ public class xmlHelper {
         return StringHelper.toInteger(nodeList.item(index).getTextContent()) / 1000;
     }
 
-    private Peaje prepareAbono(Peaje peaje) {
+    private Peaje prepareAbonoPeaje(Peaje peaje) {
         peaje.setTipFac("A");
         String fecDes1 = peaje.getEaFecDes1();
         String fecHas1 = peaje.getEaFecHas1();
@@ -5122,7 +5141,155 @@ public class xmlHelper {
         peaje.setEaFecHas1(fecDes1);
         peaje.setEaFecDes2(fecHas2);
         peaje.setEaFecHas2(fecDes2);
+        System.out.println(Utilidades.valorAbsoluto(-1.2));
         return peaje;
+    }
+
+    private Factura prepareAbonoFactura(Factura factura){
+        factura.setTipFac("A");
+        String fecDes1 = factura.getEaFecDes1();
+        String fecHas1 = factura.getEaFecHas1();
+        String fecDes2 = factura.getEaFecDes2();
+        String fecHas2 = factura.getEaFecHas2();
+        factura.setEaFecDes1(fecHas1);
+        factura.setEaFecHas1(fecDes1);
+        factura.setEaFecDes2(fecHas2);
+        factura.setEaFecHas2(fecDes2);
+
+        factura.setNumDias(0);
+
+        //ExcesoPotencia
+        factura.setExcPot1(0);
+        factura.setExcPot2(0);
+        factura.setExcPot3(0);
+        factura.setExcPot4(0);
+        factura.setExcPot5(0);
+        factura.setExcPot6(0);
+        factura.setExcImpTot(0);
+
+        //PotenciaContratada
+        factura.setPotCon1(0);
+        factura.setPotCon2(0);
+        factura.setPotCon3(0);
+        factura.setPotCon4(0);
+        factura.setPotCon5(0);
+        factura.setPotCon6(0);
+
+        //PotenciaMaxDemandada
+        factura.setPotMax1(0);
+        factura.setPotMax2(0);
+        factura.setPotMax3(0);
+        factura.setPotMax4(0);
+        factura.setPotMax5(0);
+        factura.setPotMax6(0);
+
+        //PotenciaAFacturar|°
+        factura.setPotFac1(0);
+        factura.setPotFac2(0);
+        factura.setPotFac3(0);
+
+        //PotenciaPrecio
+        factura.setPotPre1(0);
+        factura.setPotPre2(0);
+        factura.setPotPre3(0);
+        factura.setPotPre4(0);
+        factura.setPotPre5(0);
+        factura.setPotPre6(0);
+        factura.setPotImpTot(0);
+
+        //EnergíaActiva
+        factura.setEaVal1(0);
+        factura.setEaVal2(0);
+        factura.setEaVal3(0);
+        factura.setEaVal4(0);
+        factura.setEaVal5(0);
+        factura.setEaVal6(0);
+        factura.setEaValSum(0);
+
+        //Precios
+        factura.setEaPre1(0);
+        factura.setEaPre2(0);
+        factura.setEaPre3(0);
+        factura.setEaPre4(0);
+        factura.setEaPre5(0);
+        factura.setEaPre6(0);
+        factura.setEaImpTot(0);
+
+        factura.setIeImp(0);
+        factura.setaImpFac(0);
+        factura.setiBasImp(0);
+
+        //AEConsumo
+        factura.setAeCon1(0);
+        factura.setAeCon2(0);
+        factura.setAeCon3(0);
+        factura.setAeCon4(0);
+        factura.setAeCon5(0);
+        factura.setAeCon6(0);
+        factura.setAeConSum(0);
+
+        //AELecturasDesde
+        factura.setAeLecDes1(0);
+        factura.setAeLecDes2(0);
+        factura.setAeLecDes3(0);
+        factura.setAeLecDes4(0);
+        factura.setAeLecDes5(0);
+        factura.setAeLecDes6(0);
+
+        //AELecturasHasta
+        factura.setAeLecHas1(0);
+        factura.setAeLecHas2(0);
+        factura.setAeLecHas3(0);
+        factura.setAeLecHas4(0);
+        factura.setAeLecHas5(0);
+        factura.setAeLecHas6(0);
+
+        factura.setAeProDes(0);
+        factura.setAeProHas(0);
+
+        //Reactiva
+        factura.setrCon1(0);
+        factura.setrCon2(0);
+        factura.setrCon3(0);
+        factura.setrCon4(0);
+        factura.setrCon5(0);
+        factura.setrCon6(0);
+        factura.setrConSum(0);
+
+        factura.setrLecDes1(0);
+        factura.setrLecDes2(0);
+        factura.setrLecDes3(0);
+        factura.setrLecDes4(0);
+        factura.setrLecDes5(0);
+        factura.setrLecDes6(0);
+
+        factura.setrLecHas1(0);
+        factura.setrLecHas2(0);
+        factura.setrLecHas3(0);
+        factura.setrLecHas4(0);
+        factura.setrLecHas5(0);
+        factura.setrLecHas6(0);
+        factura.setrImpTot(0);
+
+        factura.setPmCon1(0);
+        factura.setPmCon2(0);
+        factura.setPmCon3(0);
+        factura.setPmCon4(0);
+        factura.setPmCon5(0);
+        factura.setPmCon6(0);
+        factura.setPmConSum(0);
+
+        factura.setPmLecHas1(0);
+        factura.setPmLecHas2(0);
+        factura.setPmLecHas3(0);
+        factura.setPmLecHas4(0);
+        factura.setPmLecHas5(0);
+        factura.setPmLecHas6(0);
+
+        factura.setRfImpTot(0);
+        factura.setRfSalTotFac(0);
+
+        return factura;
     }
     
     enum TIPO_FACTURA{

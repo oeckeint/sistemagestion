@@ -186,5 +186,13 @@ public class Utilidades {
 		}
     	return date;
     }
-    
+
+    public static double valorAbsoluto(double valor){
+        return valor > 0 ? valor : -valor;
+    }
+
+    public static double valorAbsolutoNegativo(double valor){
+        return valor > 0 ? -valor : valor;
+    }
+
 }
