@@ -47,7 +47,7 @@ public class ProcesamientoXml {
 
     @Autowired
     @Qualifier(value = "facturasServiceImp")
-    private DocumentoXmlService contenidoXmlServiceFacturas;
+    DocumentoXmlService contenidoXmlServiceFacturas;
 
     @Autowired
     @Qualifier(value = "otrasFacturasServiceImp")
@@ -59,6 +59,15 @@ public class ProcesamientoXml {
     @Autowired
     @Qualifier(value = "tarifasServiceImp")
     private CrudDao tarifasService;
+
+    @Autowired
+    private ProcesarFactura procesarFactura;
+
+    @Autowired
+    private ProcesarPeaje procesarPeaje;
+
+    @Autowired
+    private ProcesarOtrasFacturas procesarOtrasFacturas;
 
     int archivosCorrectos;
     int archivosTotales;
@@ -149,15 +158,15 @@ public class ProcesamientoXml {
             } else if (isMACCConCambios) {
                 System.out.println("MensajeActivacionCambiodeComercializadorConCambios ");
             } else if (isOtrasFacturas) {
-                new ProcesarOtrasFacturas(documento, contenidoXmlServiceOtrasFacturas, clienteService, nombreArchivo);
+                this.procesarOtrasFacturas.procesar(documento, nombreArchivo);
             } else if (isRemesaPago) {
                 this.procesarRemesaPago(documento);
             } else if (isArchivarFactura) {
             	new ArchivarFactura(this.definirTablaBusqueda(documento), documento);      	
             }   else if (isFactura) {
-                new ProcesarFactura(documento, contenidoXmlServiceFacturas, clienteService, nombreArchivo);    
+                this.procesarFactura.procesarFactura(documento, nombreArchivo);
             } else if (isPeaje){
-                new ProcesarPeaje(documento, contenidoXmlServicePeajes, clienteService, nombreArchivo);
+                this.procesarPeaje.procesar(documento, nombreArchivo);
             } else if(isConsultaFacturacion) {
             	this.procesarConsultaFactura(documento, nombreArchivo);
             }

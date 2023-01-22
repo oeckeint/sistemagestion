@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
@@ -32,31 +33,29 @@ import utileria.xml;
 @Component
 public class xmlHelper {
 
-    public DocumentoXmlService contenidoXmlService;
-    ClienteService clienteService;
+    private DocumentoXmlService contenidoXmlService;
+    @Autowired
+    protected ClienteService clienteService;
     private ArrayList elementos;
     Document doc;
     StringBuilder errores;
     StringBuilder comentarios;
-    private String cups;
-    private String codFactura;
+    protected String cups;
+    protected String codFactura;
     private int empEmi;
-    private String tipoFactura;
-    Cliente cliente;
+    protected String tipoFactura;
+    protected Cliente cliente;
     private String EmpresaEmisora;
     private String tarifaAtrFac;
-    private String nombreArchivo;
+    protected String nombreArchivo;
     private String codigoRemesa;
-    private boolean existeEnergiaExcedentaria;
+    protected boolean existeEnergiaExcedentaria;
+
     private Logger logger = Logger.getLogger(getClass().getName());
-    @Value("${abono.factura.validaterectificadaanulada}")
-    private boolean isValidPeajeAbonoActive;
-    @Value("${jdbc.password}")
-    String anyString;
 
     public xmlHelper(){}
 
-    public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService) {
+    public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService) throws MasDeUnClienteEncontrado {
         this.doc = doc;
         this.contenidoXmlService = contenidoXmlService;
         this.clienteService = clienteService;
@@ -236,335 +235,8 @@ public class xmlHelper {
         }
     }
 
-    /**
-     * Aplica para todos los archivos que vengan con el nodo identificador
-     * "Otras Facturas" guarda el registro en la tabla denominada
-     * "contenido_xml_otras_facturas"
-     *
-     * @param nombreArchivo referencia al nombre del archivo actual
-     * @throws excepciones.FacturaYaExisteException
-     * @throws excepciones.ClienteNoExisteException
-     * @throws excepciones.PeajeTipoFacturaNoSoportadaException
-     * @throws excepciones.CodRectNoExisteException
-     * @throws excepciones.MasDeUnClienteEncontrado
-     * @throws PeajeMasDeUnRegistroException 
-     */
-    public void procesarOtrasFacturas(String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, MasDeUnClienteEncontrado, PeajeMasDeUnRegistroException {
-        //Se verifica que el cliente exista
-        this.cliente = this.clienteService.encontrarCups(this.cups);
-        if (this.cliente != null) {
-            //Se revisa que la factura no exista
-            try {
-                this.contenidoXmlService.buscarByCodFiscal(codFactura);
-                logger.log(Level.INFO, ">>> Ya existe un registro con el codigo Fiscal {0} en OtrasFacturas", this.codFactura);
-                throw new FacturaYaExisteException(codFactura, "otraFactura");
-            }catch (RegistroVacioException e){
-                logger.log(Level.INFO, ">>> Nuevo registro en OtrasFacturas {0}", this.codFactura);
-            }
-
-            this.nombreArchivo = nombreArchivo;
-            this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
-            this.registrarOtraFactura();
-
-        } else {
-            throw new ClienteNoExisteException(cups);
-        }
-    }
-
-    /**
-     * Aplica para todos los registros que tengan 0894 como empresaEmisora Lee
-     * los datos y registra en la tabla denominada "contenido_xml_facturas"
-     *
-     * @param nombreArchivo referencia al nombre del archivo actual
-     * @throws FacturaYaExisteException
-     * @throws ClienteNoExisteException
-     * @throws PeajeTipoFacturaNoSoportadaException
-     * @throws CodRectNoExisteException
-     * @throws MasDeUnClienteEncontrado
-     * @throws PeajeMasDeUnRegistroException 
-     */
-    public void procesarFactura(String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException {
-        //Se verifica que el cliente exista
-        this.cliente = this.clienteService.encontrarCups(this.cups);
-        if (this.cliente != null) {
-            //Se revisa que la factura no exista
-            try {
-                this.contenidoXmlService.buscarByCodFiscal(codFactura);
-                logger.log(Level.INFO, ">>> Ya existe una factura con el codigo Fiscal {0}", this.codFactura);
-                throw new FacturaYaExisteException(codFactura, "factura");
-            } catch (RegistroVacioException e) {
-                logger.log(Level.INFO, ">>> Nuevo registro en Facturas {0}", this.codFactura);
-            }
-
-            this.nombreArchivo = nombreArchivo;
-            this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
-            logger.log(Level.INFO, ">>> Tipo Factura {0}", this.tipoFactura);
-            switch (this.tipoFactura) {
-                case "A":
-                    this.registrarFacturaA();
-                    break;
-                case "N":
-                case "G":
-                    this.registrarFacturaN();
-                    break;
-                case "R":
-                    this.registrarFacturaR(nombreArchivo);
-                    break;
-                default:
-                    throw new PeajeTipoFacturaNoSoportadaException(tipoFactura);
-            }
-        } else {
-            throw new ClienteNoExisteException(cups);
-        }
-    }
-
-    /**
-     * Lee los datos y registra en la tabla denominada "contenido_xml"
-     *
-     * @param nombreArchivo referencia al nombre del archivo actual
-     * @throws FacturaYaExisteException
-     * @throws ClienteNoExisteException
-     * @throws PeajeTipoFacturaNoSoportadaException
-     * @throws CodRectNoExisteException
-     * @throws excepciones.MasDeUnClienteEncontrado
-     * @throws PeajeMasDeUnRegistroException 
-     */
-    public void procesarPeaje(String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException {
-        //Se verifica que el cliente exista
-        this.cliente = this.clienteService.encontrarCups(this.cups);
-        if (this.cliente != null) {
-            //Se revisa que la factura no exista
-            try {
-                this.contenidoXmlService.buscarByCodFiscal(codFactura);
-                logger.log(Level.INFO, ">>> Ya existe un peaje con el codigo Fiscal {0}", this.codFactura);
-                throw new FacturaYaExisteException(codFactura, "peajes");
-            }catch (RegistroVacioException e){
-                logger.log(Level.INFO, ">>> Nuevo registro en Peajes {0}", this.codFactura);
-            }
-
-            this.nombreArchivo = nombreArchivo;
-            this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
-            switch (this.tipoFactura) {
-                case "A":
-                    this.registrarPeajeA();
-                    break;
-                case "N":
-                case "G":
-                    this.registrarPeajeN();
-                    break;
-                case "R":
-                    this.registrarPeajeR(nombreArchivo);
-                    break;
-                default:
-                    throw new PeajeTipoFacturaNoSoportadaException(tipoFactura);
-            }
-
-        } else {
-            throw new ClienteNoExisteException(cups);
-        }
-    }
-
-    /*------------------------Registro de Peajes--------------------------------------*/
-    /**
-     * Busca la factura para Abonar, de lo contrario arroja una exception
-     * Registra los el tipos de Peajes A
-     * @throws PeajeMasDeUnRegistroException 
-     *
-     * @throws CodRectNoExisteException
-     */
-    private void registrarPeajeA() throws MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException {
-        System.out.println(isValidPeajeAbonoActive);
-        System.out.println(anyString);
-        String codRectificada = null;
-        try {
-            codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
-            Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
-            comentarios.append(", este abono hace referencia al CodigoFacturaRectificadaAnulada <Strong> ").append(peaje.getCodFisFac()).append("</Strong>");
-            this.registrarPeajeNA();
-        }catch (RegistroVacioException e) {
-            logger.log(Level.INFO, ">>> No se encontró un Peaje para rectificar con {0}", codRectificada);
-            throw new PeajeCodRectNoExisteException(codFactura);
-        } catch (NullPointerException e) {
-            logger.log(Level.INFO, ">>> El Abono de peaje {0} no especifica un codigo de factura para rectificar", xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, this.doc));
-            throw new PeajeCodRectNoExisteException(codFactura);
-        }
-    }
-
-    /**
-     * Registra el peaje de tipo N
-     */
-    private void registrarPeajeN() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
-    	TIPO_FACTURA tp = TIPO_FACTURA.N_NORMAL;
-        Peaje peaje = new Peaje(
-                this.cliente, this.cabecera(), this.datosGenerales(), this.datosTerminoPotencia(), this.datosFacturaAtr(),
-                this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
-                this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
-                this.Cargos("01", tp), this.Cargos("02", tp), this.ImporteTotalCargos("01", tp), this.ImporteTotalCargos("02", tp),
-                this.impuestoElectrico(), this.alquileres(), this.iva(),
-                this.aeConsumo(), this.aeLecturaDesde(), this.aeLecturaHasta(), this.aeProcedenciaDesde(), this.aeProcedenciaHasta(),
-                this.rConsumo(), this.rLecturaDesde(), this.rLecturaHasta(), this.rImporteTotal(),
-                this.pmConsumo(), this.pmLecturaHasta(),
-                this.registroFin(), this.comentarios.toString(), this.errores.toString()
-        );
-        EnergiaExcedentaria energiaExcedentaria = this.energiaExcedentaria();
-        if (existeEnergiaExcedentaria) {
-            existeEnergiaExcedentaria = false;
-            peaje.setEnergiaExcedentaria(energiaExcedentaria);
-        }
-        this.contenidoXmlService.guardar(peaje);
-        System.out.print("\n\nComentarios : " + comentarios.toString());
-        System.out.print("Codigo Errores : " + errores.toString());
-    }
-
-    /**
-     * Busca que el Peaje a rectificar exista, cuando la factura ya existe
-     * arroja una excepcion, de lo contraro hara un proceso de rectificación y
-     * usara el metodo registrarN para guardar en registro en la BD
-     *
-     * @param nombreArchivo
-     * @throws CodRectNoExisteException
-     * @throws PeajeMasDeUnRegistroException 
-     */
-    private void registrarPeajeR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException {
-        String codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
-        try {
-            Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
-            String nuevaRemesa = String.valueOf(Long.parseLong(xml.obtenerContenidoNodo(NombresNodos.ID_REM, this.doc)));
-            this.contenidoXmlService.rectificar(peaje, nuevaRemesa, nombreArchivo);
-            this.registrarPeajeN();
-        } catch (RegistroVacioException e) {
-            logger.log(Level.INFO, ">>> No se encontró una factura para rectificar con {0}", codRectificada);
-            throw new CodRectNoExisteException(codRectificada);
-        }
-    }
-
-    /*------------------------Registro de Facturas--------------------------------------*/
-    /**
-     * Registra los el tipos de Factura A (Abono)
-     * Se obtienen todos los valores absolutos y se registran con valores negativos en la tabla de contenido_xml_facturas
-     * No se necesita un registro existente para ejecutar esta factura
-     *
-     * @throws CodRectNoExisteException
-     * @throws PeajeMasDeUnRegistroException 
-     */
-    private void registrarFacturaA() throws CodRectNoExisteException, PeajeMasDeUnRegistroException {
-        logger.log(Level.INFO, ">>> Registrando factura del tipo Abono con el codFisFac {0}", xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, this.doc));
-        try {
-            Factura f = new Factura(
-                    this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
-                    this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
-                    this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
-                    this.impuestoElectrico(), this.alquileres(), this.iva(),
-                    this.aeConsumo(), this.aeLecturaDesde(), this.aeLecturaHasta(), this.aeProcedenciaDesde(), this.aeProcedenciaHasta(),
-                    this.rConsumo(), this.rLecturaDesde(), this.rLecturaHasta(), this.rImporteTotal(),
-                    this.pmConsumo(), this.pmLecturaHasta(),
-                    this.registroFin(), this.comentarios.toString(), this.errores.toString()
-            );
-            this.prepareAbonoFactura(f);
-            //this.contenidoXmlService.guardar(f);
-        } catch (Exception e) {
-
-        }
-        /*
-        String codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
-        try {
-            Factura f = (Factura) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
-            System.out.println("Se intenta realizar registro");
-            //this.registrarFacturaA();
-        }catch (RegistroVacioException e) {
-            logger.log(Level.INFO, ">>> No se encontró una factura para abonar con {0}", codRectificada);
-            throw new CodRectNoExisteException(codRectificada);
-        }
-         */
-    }
-
-    /**
-     * Registra el Peaje de tipo A poniendo en negativo los valores de AE, R, PM
-     * y los importes totales
-     */
-    private void registrarPeajeNA() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
-    	TIPO_FACTURA tp = TIPO_FACTURA.A_ABONO;
-        Peaje peaje = new Peaje(
-                this.cliente, this.cabecera(), this.datosGenerales(), this.datosTerminoPotencia(), this.datosFacturaAtr(),
-                this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal_A(),
-                this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal_A(),
-                this.Cargos("01", tp), this.Cargos("02", tp), this.ImporteTotalCargos("01", tp), this.ImporteTotalCargos("02", tp),
-                this.impuestoElectrico(), this.alquileres(), this.iva(),
-                this.aeConsumo_A(), this.aeLecturaDesde_A(), this.aeLecturaHasta_A(), this.aeProcedenciaDesde_A(), this.aeProcedenciaHasta_A(),
-                this.rConsumo_A(), this.rLecturaDesde_A(), this.rLecturaHasta_A(), this.rImporteTotal_A(),
-                this.pmConsumo_A(), this.pmLecturaHasta_A(),
-                this.registroFin(), this.comentarios.toString(), this.errores.toString()
-        );
-        this.prepareAbonoPeaje(peaje);
-        System.out.println("preparandoAbono");
-        //this.contenidoXmlService.guardar(peaje);
-        System.out.print("\n\nComentarios : " + comentarios.toString());
-        System.out.print("Codigo Errores : " + errores.toString());
-    }
-
-    /**
-     * Registra el Factura de tipo N
-     */
-    private void registrarFacturaN() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
-        this.contenidoXmlService.guardar(
-                new Factura(
-                        this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
-                        this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
-                        this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
-                        this.impuestoElectrico(), this.alquileres(), this.iva(),
-                        this.aeConsumo(), this.aeLecturaDesde(), this.aeLecturaHasta(), this.aeProcedenciaDesde(), this.aeProcedenciaHasta(),
-                        this.rConsumo(), this.rLecturaDesde(), this.rLecturaHasta(), this.rImporteTotal(),
-                        this.pmConsumo(), this.pmLecturaHasta(),
-                        this.registroFin(), this.comentarios.toString(), this.errores.toString()
-                )
-        );
-        System.out.print("\n\nComentarios : " + comentarios.toString());
-        System.out.print("Codigo Errores : " + errores.toString());
-    }
-
-    /**
-     * Busca que el Factura a rectificar exista, cuando la factura ya existe
-     * arroja una excepcion, de lo contraro hara un proceso de rectificación y
-     * usara el metodo registrarN para guardar en registro en la BD
-     *
-     * @param nombreArchivo
-     * @throws CodRectNoExisteException
-     * @throws PeajeMasDeUnRegistroException 
-     */
-    private void registrarFacturaR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException {
-        String codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
-        try {
-            Factura factura = (Factura) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
-            String nuevaRemesa = String.valueOf(Long.parseLong(xml.obtenerContenidoNodo(NombresNodos.ID_REM, this.doc)));
-            this.contenidoXmlService.rectificar(factura, nuevaRemesa, nombreArchivo);
-            this.registrarFacturaN();
-        } catch (RegistroVacioException e) {
-            logger.log(Level.INFO, ">>> No se encontró una factura para rectificar con {0}", codRectificada);
-            throw new CodRectNoExisteException(codRectificada);
-        }
-    }
-
-    /*------------------------Registro de Otras Facturas--------------------------------------*/
-    /**
-     * Registra OtrasFacturas
-     */
-    private void registrarOtraFactura() throws MasDeUnClienteEncontrado {
-        this.contenidoXmlService.guardar(
-                new OtraFactura(
-                        this.cliente, this.cabecera(), this.datosGenerales(),
-                        this.conceptoRepercutible(), this.registroFin(),
-                        this.comentarios.toString(), this.errores.toString()
-                )
-        );
-        System.out.print("\n\nComentarios : " + comentarios.toString());
-        System.out.print("Codigo Errores : " + errores.toString());
-    }
-
     /*------------------------Obtencion de datos --------------------------------------*/
-    private DatosCabecera cabecera() {
+    protected DatosCabecera cabecera() {
         elementos = new ArrayList<String>(7);
         elementos.add("");
         elementos.add("");
@@ -614,7 +286,7 @@ public class xmlHelper {
         return new DatosCabecera(elementos);
     }
 
-    private DatosGeneralesFactura datosGenerales() {
+    protected DatosGeneralesFactura datosGenerales() {
         elementos = new ArrayList<String>(6);
         elementos.add("");
         elementos.add("");
@@ -659,7 +331,7 @@ public class xmlHelper {
         return new DatosGeneralesFactura(elementos);
     }
     
-    private DatosTerminoPotencia datosTerminoPotencia() {
+    protected DatosTerminoPotencia datosTerminoPotencia() {
         elementos = new ArrayList<String>(2);
         elementos.add("");
         elementos.add("");
@@ -701,7 +373,7 @@ public class xmlHelper {
         return new DatosTerminoPotencia(elementos);
     }
 
-    private DatosFacturaAtr datosFacturaAtr() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
+    protected DatosFacturaAtr datosFacturaAtr() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
         elementos = new ArrayList<String>(7);
         elementos.add(0, "0");
         elementos.add(1, "0");
@@ -761,7 +433,7 @@ public class xmlHelper {
     }
 
     //Datos de potencia
-    private DatosPotenciaContratada potenciaContratada() {
+    protected DatosPotenciaContratada potenciaContratada() {
         //Obtiene hasta 12 posibles valores y los ordena en 6 correspondientes, sumando 1+6, 2+7 ... 6+12
         elementos = new ArrayList<Double>(6);
         elementos.add(0.0);
@@ -802,7 +474,7 @@ public class xmlHelper {
         return new DatosPotenciaContratada(elementos);
     }
 
-    private DatosPotenciaMaxDemandada potenciaDemandada() {
+    protected DatosPotenciaMaxDemandada potenciaDemandada() {
 
         //Obtiene hasta 12 posibles valores y los ordena en 6 correspondientes, sumando 1+6, 2+7 ... 6+12
         elementos = new ArrayList<Double>(6);
@@ -844,7 +516,7 @@ public class xmlHelper {
         return new DatosPotenciaMaxDemandada(elementos);
     }
 
-    private DatosPotenciaAFacturar potenciaAFacturar() {
+    protected DatosPotenciaAFacturar potenciaAFacturar() {
 
         //Obtiene 6 posibles datos, organizandoles en 3 el valor máximo entre dos medidas (1:4, 2:5, 3:6)
         elementos = new ArrayList<Double>(3);
@@ -912,7 +584,7 @@ public class xmlHelper {
         return new DatosPotenciaAFacturar(elementos);
     }
 
-    private DatosPotenciaPrecio potenciaPrecio() {
+    protected DatosPotenciaPrecio potenciaPrecio() {
 
         //Obtiene hasta 12 posibles valores y los ordena en 6 correspondientes, sumando 1+6, 2+7 ... 6+12
         elementos = new ArrayList<Double>(6);
@@ -954,7 +626,7 @@ public class xmlHelper {
         return new DatosPotenciaPrecio(elementos);
     }
 
-    private DatosPotenciaImporteTotal potenciaImporteTotal() {
+    protected DatosPotenciaImporteTotal potenciaImporteTotal() {
 
         //Obtiene 1 elemento denomidado ImporteTotalTerminoPotencia en el nodo Potencia
         elementos = new ArrayList<Double>(1);
@@ -985,7 +657,7 @@ public class xmlHelper {
         return new DatosPotenciaImporteTotal(elementos);
     }
 
-    private DatosPotenciaImporteTotal potenciaImporteTotal_A() {
+    protected DatosPotenciaImporteTotal potenciaImporteTotal_A() {
 
         //Obtiene 1 elemento denomidado ImporteTotalTerminoPotencia en el nodo Potencia
         elementos = new ArrayList<Double>(1);
@@ -1016,7 +688,7 @@ public class xmlHelper {
         return new DatosPotenciaImporteTotal(elementos);
     }
 
-    private DatosExcesoPotencia potenciaExcesos() {
+    protected DatosExcesoPotencia potenciaExcesos() {
 
         //Verifica la existencia de los excesos de potencia
         if (this.doc.getElementsByTagName("ValorExcesoPotencia").getLength() != 0) {
@@ -1067,7 +739,7 @@ public class xmlHelper {
     }
 
     //EnergiaActiva
-    private DatosEnergiaActiva energiaActivaDatos() {
+    protected DatosEnergiaActiva energiaActivaDatos() {
 
         elementos = new ArrayList<>(4);
         elementos.add("");
@@ -1102,7 +774,7 @@ public class xmlHelper {
         return new DatosEnergiaActiva(elementos);
     }
 
-    private DatosEnergiaActivaValores energiaActivaValores() {
+    protected DatosEnergiaActivaValores energiaActivaValores() {
 
         //Obtiene 12 posibles valores, los organiza en 6 (1+7, 2+8 ... 6+12) y los suma en un total
         elementos = new ArrayList<Double>(7);
@@ -1150,7 +822,7 @@ public class xmlHelper {
         return new DatosEnergiaActivaValores(elementos);
     }
 
-    private DatosEnergiaActivaPrecio energiaActivaPrecio() {
+    protected DatosEnergiaActivaPrecio energiaActivaPrecio() {
 
         //Obtiene 12 posibles valores y los suma en 6 correspondiendo a pocisiones 1+7 2+8 ... 6+12
         elementos = new ArrayList<Double>(6);
@@ -1191,7 +863,7 @@ public class xmlHelper {
         return new DatosEnergiaActivaPrecio(elementos);
     }
 
-    private DatosEnergiaActivaImporteTotal energiaActivaImporteTotal() {
+    protected DatosEnergiaActivaImporteTotal energiaActivaImporteTotal() {
         //Obtiene 1 elemento denomidado ImporteTotalEnergiaActiva en el nodo EnergiaActiva
         elementos = new ArrayList<Double>(1);
         elementos.add(0.0);
@@ -1223,7 +895,7 @@ public class xmlHelper {
         return new DatosEnergiaActivaImporteTotal(elementos);
     }
 
-    private DatosEnergiaActivaImporteTotal energiaActivaImporteTotal_A() {
+    protected DatosEnergiaActivaImporteTotal energiaActivaImporteTotal_A() {
         //Obtiene 1 elemento denomidado ImporteTotalEnergiaActiva en el nodo EnergiaActiva
         elementos = new ArrayList<Double>(1);
         elementos.add(0.0);
@@ -1256,7 +928,7 @@ public class xmlHelper {
     }
 
     //EnergiaExcedentaria
-    private EnergiaExcedentaria energiaExcedentaria() {
+    protected EnergiaExcedentaria energiaExcedentaria() {
 
         elementos = new ArrayList<>(7);
         elementos.add(0.0);
@@ -1310,7 +982,7 @@ public class xmlHelper {
      * @param tipoCargoValue value that belongs to TotalImporteTipoCargo Node used to identify a block
      * @param tp TipoFactura value that changes the tipe of operation that is going to use
      */
-    private Cargos Cargos(String tipoCargoValue, TIPO_FACTURA tp) {
+    protected Cargos Cargos(String tipoCargoValue, TIPO_FACTURA tp) {
         elementos =  (ArrayList) IntStream.range(0, 12).mapToDouble(i -> 0.0).boxed().collect(Collectors.toList());
         boolean continuar = true;
         int indice = 0;
@@ -1360,7 +1032,7 @@ public class xmlHelper {
      * @param tipoCargoValue value that belongs to TotalImporteTipoCargo Node used to identify a block
      * @param tp TipoFactura value that changes the type of operation that is going to use
      */
-    private CargoImporteTotal ImporteTotalCargos(String tipoCargoValue, TIPO_FACTURA tp) {
+    protected CargoImporteTotal ImporteTotalCargos(String tipoCargoValue, TIPO_FACTURA tp) {
     	elementos =  (ArrayList) IntStream.range(0, 1).mapToDouble(i -> 0.0).boxed().collect(Collectors.toList());
 
         int indice = 0;
@@ -1406,7 +1078,7 @@ public class xmlHelper {
     }
 
     //Otros datos
-    private DatosImpuestoElectrico impuestoElectrico() {
+    protected DatosImpuestoElectrico impuestoElectrico() {
         //Se obtiene un solo dato denomidao Importe de impuesto electrico
 
         elementos = new ArrayList<Double>(1);
@@ -1441,7 +1113,7 @@ public class xmlHelper {
         return new DatosImpuestoElectrico(elementos);
     }
 
-    private DatosAlquileres alquileres() {
+    protected DatosAlquileres alquileres() {
 
         //Obtiene un unico dato
         elementos = new ArrayList<Double>(1);
@@ -1474,7 +1146,7 @@ public class xmlHelper {
         return new DatosAlquileres(elementos);
     }
 
-    private DatosIva iva() {
+    protected DatosIva iva() {
 
         //Obtiene un unico elemento
         elementos = new ArrayList<Double>(1);
@@ -1506,7 +1178,7 @@ public class xmlHelper {
     }
 
     //AE
-    private DatosAeConsumo aeConsumo() {
+    protected DatosAeConsumo aeConsumo() {
 
         //Obtiene 12 posibles valores, los organiza en 6 elementos correspondientes y los suma
         //Estos valores han sido declarados debido a que se pueden encontrar en distintos ordenes
@@ -1682,7 +1354,7 @@ public class xmlHelper {
         return new DatosAeConsumo(elementos);
     }
 
-    private DatosAeLecturaDesde aeLecturaDesde() {
+    protected DatosAeLecturaDesde aeLecturaDesde() {
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Double>(6);
         elementos.add(0.0);
@@ -1859,7 +1531,7 @@ public class xmlHelper {
         return new DatosAeLecturaDesde(elementos);
     }
 
-    private DatosAeLecturaHasta aeLecturaHasta() {
+    protected DatosAeLecturaHasta aeLecturaHasta() {
 
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Double>(6);
@@ -2043,7 +1715,7 @@ public class xmlHelper {
         return new DatosAeLecturaHasta(elementos);
     }
 
-    private DatosAeProcedenciaDesde aeProcedenciaDesde() {
+    protected DatosAeProcedenciaDesde aeProcedenciaDesde() {
 
         elementos = new ArrayList<Integer>(1);
         elementos.add(0);
@@ -2167,7 +1839,7 @@ public class xmlHelper {
         return new DatosAeProcedenciaDesde(elementos);
     }
 
-    private DatosAeProcedenciaHasta aeProcedenciaHasta() {
+    protected DatosAeProcedenciaHasta aeProcedenciaHasta() {
 
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Integer>(1);
@@ -2305,7 +1977,7 @@ public class xmlHelper {
     }
 
     //Reactiva
-    private DatosRConsumo rConsumo() {
+    protected DatosRConsumo rConsumo() {
 
         //Obtiene 12 posibles valores, los organiza en 6 elementos correspondientes y los suma
         //Estos valores han sido declarados debido a que se pueden encontrar en distintos ordenes
@@ -2481,7 +2153,7 @@ public class xmlHelper {
         return new DatosRConsumo(elementos);
     }
 
-    private DatosRLecturaDesde rLecturaDesde() {
+    protected DatosRLecturaDesde rLecturaDesde() {
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Double>(6);
         elementos.add(0.0);
@@ -2658,7 +2330,7 @@ public class xmlHelper {
         return new DatosRLecturaDesde(elementos);
     }
 
-    private DatosRLecturaHasta rLecturaHasta() {
+    protected DatosRLecturaHasta rLecturaHasta() {
 
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Double>(6);
@@ -2841,7 +2513,7 @@ public class xmlHelper {
         return new DatosRLecturaHasta(elementos);
     }
 
-    private ReactivaImporteTotal rImporteTotal() {
+    protected ReactivaImporteTotal rImporteTotal() {
 
         elementos = new ArrayList<String>(1);
 
@@ -2862,7 +2534,7 @@ public class xmlHelper {
     }
 
     //PM
-    private DatosPmConsumo pmConsumo() {
+    protected DatosPmConsumo pmConsumo() {
 
         //Obtiene 12 posibles valores, los organiza en 6 elementos correspondientes y los suma
         //Estos valores han sido declarados debido a que se pueden encontrar en distintos ordenes
@@ -3038,7 +2710,7 @@ public class xmlHelper {
         return new DatosPmConsumo(elementos);
     }
 
-    private DatosPmLecturaHasta pmLecturaHasta() {
+    protected DatosPmLecturaHasta pmLecturaHasta() {
 
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Double>(6);
@@ -3222,7 +2894,7 @@ public class xmlHelper {
     }
 
     //AE - A (Negactivos)
-    private DatosAeConsumo aeConsumo_A() {
+    protected DatosAeConsumo aeConsumo_A() {
 
         //Obtiene 12 posibles valores, los organiza en 6 elementos correspondientes y los suma
         //Estos valores han sido declarados debido a que se pueden encontrar en distintos ordenes
@@ -3398,7 +3070,7 @@ public class xmlHelper {
         return new DatosAeConsumo(elementos);
     }
 
-    private DatosAeLecturaDesde aeLecturaDesde_A() {
+    protected DatosAeLecturaDesde aeLecturaDesde_A() {
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Double>(6);
         elementos.add(0.0);
@@ -3575,7 +3247,7 @@ public class xmlHelper {
         return new DatosAeLecturaDesde(elementos);
     }
 
-    private DatosAeLecturaHasta aeLecturaHasta_A() {
+    protected DatosAeLecturaHasta aeLecturaHasta_A() {
 
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Double>(6);
@@ -3759,7 +3431,7 @@ public class xmlHelper {
         return new DatosAeLecturaHasta(elementos);
     }
 
-    private DatosAeProcedenciaDesde aeProcedenciaDesde_A() {
+    protected DatosAeProcedenciaDesde aeProcedenciaDesde_A() {
 
         elementos = new ArrayList<Integer>(1);
         elementos.add(0);
@@ -3883,7 +3555,7 @@ public class xmlHelper {
         return new DatosAeProcedenciaDesde(elementos);
     }
 
-    private DatosAeProcedenciaHasta aeProcedenciaHasta_A() {
+    protected DatosAeProcedenciaHasta aeProcedenciaHasta_A() {
 
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Integer>(1);
@@ -4021,7 +3693,7 @@ public class xmlHelper {
     }
 
     //Reactiva - A (Negactivos)
-    private DatosRConsumo rConsumo_A() {
+    protected DatosRConsumo rConsumo_A() {
 
         //Obtiene 12 posibles valores, los organiza en 6 elementos correspondientes y los suma
         //Estos valores han sido declarados debido a que se pueden encontrar en distintos ordenes
@@ -4197,7 +3869,7 @@ public class xmlHelper {
         return new DatosRConsumo(elementos);
     }
 
-    private DatosRLecturaDesde rLecturaDesde_A() {
+    protected DatosRLecturaDesde rLecturaDesde_A() {
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Double>(6);
         elementos.add(0.0);
@@ -4374,7 +4046,7 @@ public class xmlHelper {
         return new DatosRLecturaDesde(elementos);
     }
 
-    private DatosRLecturaHasta rLecturaHasta_A() {
+    protected DatosRLecturaHasta rLecturaHasta_A() {
 
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Double>(6);
@@ -4557,7 +4229,7 @@ public class xmlHelper {
         return new DatosRLecturaHasta(elementos);
     }
 
-    private ReactivaImporteTotal rImporteTotal_A() {
+    protected ReactivaImporteTotal rImporteTotal_A() {
 
         elementos = new ArrayList<String>(1);
 
@@ -4578,7 +4250,7 @@ public class xmlHelper {
     }
 
     //PM - A (Negactivos)
-    private DatosPmConsumo pmConsumo_A() {
+    protected DatosPmConsumo pmConsumo_A() {
 
         //Obtiene 12 posibles valores, los organiza en 6 elementos correspondientes y los suma
         //Estos valores han sido declarados debido a que se pueden encontrar en distintos ordenes
@@ -4754,7 +4426,7 @@ public class xmlHelper {
         return new DatosPmConsumo(elementos);
     }
 
-    private DatosPmLecturaHasta pmLecturaHasta_A() {
+    protected DatosPmLecturaHasta pmLecturaHasta_A() {
 
         //Obtiene 12 lecturas  y las suma en 6 correspondientes
         elementos = new ArrayList<Double>(6);
@@ -4938,7 +4610,7 @@ public class xmlHelper {
     }
 
     //RegistroFin
-    private DatosFinDeRegistro registroFin() {
+    protected DatosFinDeRegistro registroFin() {
 
         elementos = new ArrayList<String>();
         elementos.add("0.0");
@@ -4990,7 +4662,7 @@ public class xmlHelper {
     }
 
     //Concepto Repercutible
-    private ConceptoRepercutible conceptoRepercutible() {
+    protected ConceptoRepercutible conceptoRepercutible() {
 
         elementos = new ArrayList<String>(2);
         elementos.add("0.0");
@@ -5039,13 +4711,14 @@ public class xmlHelper {
     }
 
     /*-----------------------------Globales-------------------------*/
-    private void iniciarVariables() {
+    protected void iniciarVariables() throws MasDeUnClienteEncontrado {
         this.errores = new StringBuilder("");
         this.comentarios = new StringBuilder("");
         this.cups = this.doc.getElementsByTagName("CUPS").item(0).getTextContent();
         this.codFactura = this.doc.getElementsByTagName("CodigoFiscalFactura").item(0).getTextContent();
         this.empEmi = Integer.parseInt(this.doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent());
         this.tipoFactura = this.doc.getElementsByTagName("TipoFactura").item(0).getTextContent();
+        this.cliente = this.clienteService.encontrarCups(this.cups);
     }
 
     private void iniciarVariablesPagoRemesa() {
@@ -5146,167 +4819,7 @@ public class xmlHelper {
         return StringHelper.toInteger(nodeList.item(index).getTextContent()) / 1000;
     }
 
-    private Peaje prepareAbonoPeaje(Peaje peaje) {
-        logger.log(Level.INFO, ">>> Pasando valores especificos a negativo del abono de peaje {0}", peaje.getCodFisFac());
-        peaje.setTipFac("A");
-        String fecDes1 = peaje.getEaFecDes1();
-        String fecHas1 = peaje.getEaFecHas1();
-        String fecDes2 = peaje.getEaFecDes2();
-        String fecHas2 = peaje.getEaFecHas2();
-        peaje.setEaFecDes1(fecHas1);
-        peaje.setEaFecHas1(fecDes1);
-        peaje.setEaFecDes2(fecHas2);
-        peaje.setEaFecHas2(fecDes2);
-        return peaje;
-    }
 
-    private Factura prepareAbonoFactura(Factura factura){
-        logger.log(Level.INFO, ">>> Pasando valores especificos a negativo del abono de factura {0}", factura.getCodFisFac());
-        factura.setTipFac("A");
-        String fecDes1 = factura.getEaFecDes1();
-        String fecHas1 = factura.getEaFecHas1();
-        String fecDes2 = factura.getEaFecDes2();
-        String fecHas2 = factura.getEaFecHas2();
-        factura.setEaFecDes1(fecHas1);
-        factura.setEaFecHas1(fecDes1);
-        factura.setEaFecDes2(fecHas2);
-        factura.setEaFecHas2(fecDes2);
-
-        factura.setNumDias(Utilidades.valorAbsolutoNegativo(factura.getNumDias()));
-
-        //ExcesoPotencia
-        factura.setExcPot1(Utilidades.valorAbsolutoNegativo(factura.getExcPot1()));
-        factura.setExcPot2(Utilidades.valorAbsolutoNegativo(factura.getExcPot2()));
-        factura.setExcPot3(Utilidades.valorAbsolutoNegativo(factura.getExcPot3()));
-        factura.setExcPot4(Utilidades.valorAbsolutoNegativo(factura.getExcPot4()));
-        factura.setExcPot5(Utilidades.valorAbsolutoNegativo(factura.getExcPot5()));
-        factura.setExcPot6(Utilidades.valorAbsolutoNegativo(factura.getExcPot6()));
-        factura.setExcImpTot(Utilidades.valorAbsolutoNegativo(factura.getExcImpTot()));
-
-        //PotenciaContratada
-        factura.setPotCon1(Utilidades.valorAbsolutoNegativo(factura.getPotCon1()));
-        factura.setPotCon2(Utilidades.valorAbsolutoNegativo(factura.getPotCon2()));
-        factura.setPotCon3(Utilidades.valorAbsolutoNegativo(factura.getPotCon3()));
-        factura.setPotCon4(Utilidades.valorAbsolutoNegativo(factura.getPotCon4()));
-        factura.setPotCon5(Utilidades.valorAbsolutoNegativo(factura.getPotCon5()));
-        factura.setPotCon6(Utilidades.valorAbsolutoNegativo(factura.getPotCon6()));
-
-        //PotenciaMaxDemandada
-        factura.setPotMax1(Utilidades.valorAbsolutoNegativo(factura.getPotMax1()));
-        factura.setPotMax2(Utilidades.valorAbsolutoNegativo(factura.getPotMax2()));
-        factura.setPotMax3(Utilidades.valorAbsolutoNegativo(factura.getPotMax3()));
-        factura.setPotMax4(Utilidades.valorAbsolutoNegativo(factura.getPotMax4()));
-        factura.setPotMax5(Utilidades.valorAbsolutoNegativo(factura.getPotMax5()));
-        factura.setPotMax6(Utilidades.valorAbsolutoNegativo(factura.getPotMax6()));
-
-        //PotenciaAFacturar
-        factura.setPotFac1(Utilidades.valorAbsolutoNegativo(factura.getPotFac1()));
-        factura.setPotFac2(Utilidades.valorAbsolutoNegativo(factura.getPotFac2()));
-        factura.setPotFac3(Utilidades.valorAbsolutoNegativo(factura.getPotFac3()));
-
-        //PotenciaPrecio
-        factura.setPotPre1(Utilidades.valorAbsolutoNegativo(factura.getPotPre1()));
-        factura.setPotPre2(Utilidades.valorAbsolutoNegativo(factura.getPotPre2()));
-        factura.setPotPre3(Utilidades.valorAbsolutoNegativo(factura.getPotPre3()));
-        factura.setPotPre4(Utilidades.valorAbsolutoNegativo(factura.getPotPre4()));
-        factura.setPotPre5(Utilidades.valorAbsolutoNegativo(factura.getPotPre5()));
-        factura.setPotPre6(Utilidades.valorAbsolutoNegativo(factura.getPotPre6()));
-        factura.setPotImpTot(Utilidades.valorAbsolutoNegativo(factura.getPotImpTot()));
-
-        //EnergíaActiva
-        factura.setEaVal1(Utilidades.valorAbsolutoNegativo(factura.getEaVal1()));
-        factura.setEaVal2(Utilidades.valorAbsolutoNegativo(factura.getEaVal2()));
-        factura.setEaVal3(Utilidades.valorAbsolutoNegativo(factura.getEaVal3()));
-        factura.setEaVal4(Utilidades.valorAbsolutoNegativo(factura.getEaVal4()));
-        factura.setEaVal5(Utilidades.valorAbsolutoNegativo(factura.getEaVal5()));
-        factura.setEaVal6(Utilidades.valorAbsolutoNegativo(factura.getEaVal6()));
-        factura.setEaValSum(Utilidades.valorAbsolutoNegativo(factura.getEaValSum()));
-
-        //Precios
-        factura.setEaPre1(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
-        factura.setEaPre2(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
-        factura.setEaPre3(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
-        factura.setEaPre4(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
-        factura.setEaPre5(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
-        factura.setEaPre6(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
-        factura.setEaImpTot(Utilidades.valorAbsolutoNegativo(factura.getEaImpTot()));
-
-        factura.setIeImp(Utilidades.valorAbsolutoNegativo(factura.getIeImp()));
-        factura.setaImpFac(Utilidades.valorAbsolutoNegativo(factura.getaImpFac()));
-        factura.setiBasImp(Utilidades.valorAbsolutoNegativo(factura.getiBasImp()));
-
-        //AEConsumo
-        factura.setAeCon1(Utilidades.valorAbsolutoNegativo(factura.getAeCon1()));
-        factura.setAeCon2(Utilidades.valorAbsolutoNegativo(factura.getAeCon2()));
-        factura.setAeCon3(Utilidades.valorAbsolutoNegativo(factura.getAeCon3()));
-        factura.setAeCon4(Utilidades.valorAbsolutoNegativo(factura.getAeCon4()));
-        factura.setAeCon5(Utilidades.valorAbsolutoNegativo(factura.getAeCon5()));
-        factura.setAeCon6(Utilidades.valorAbsolutoNegativo(factura.getAeCon6()));
-        factura.setAeConSum(Utilidades.valorAbsolutoNegativo(factura.getAeConSum()));
-
-        //AELecturasDesde
-        factura.setAeLecDes1(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes1()));
-        factura.setAeLecDes2(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes2()));
-        factura.setAeLecDes3(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes3()));
-        factura.setAeLecDes4(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes4()));
-        factura.setAeLecDes5(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes5()));
-        factura.setAeLecDes6(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes6()));
-
-        //AELecturasHasta
-        factura.setAeLecHas1(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas1()));
-        factura.setAeLecHas2(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas2()));
-        factura.setAeLecHas3(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas3()));
-        factura.setAeLecHas4(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas4()));
-        factura.setAeLecHas5(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas5()));
-        factura.setAeLecHas6(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas6()));
-
-        factura.setAeProDes(Utilidades.valorAbsolutoNegativo(factura.getAeProDes()));
-        factura.setAeProHas(Utilidades.valorAbsolutoNegativo(factura.getAeProHas()));
-
-        //Reactiva
-        factura.setrCon1(Utilidades.valorAbsolutoNegativo(factura.getrCon1()));
-        factura.setrCon2(Utilidades.valorAbsolutoNegativo(factura.getrCon2()));
-        factura.setrCon3(Utilidades.valorAbsolutoNegativo(factura.getrCon3()));
-        factura.setrCon4(Utilidades.valorAbsolutoNegativo(factura.getrCon4()));
-        factura.setrCon5(Utilidades.valorAbsolutoNegativo(factura.getrCon5()));
-        factura.setrCon6(Utilidades.valorAbsolutoNegativo(factura.getrCon6()));
-        factura.setrConSum(Utilidades.valorAbsolutoNegativo(factura.getrConSum()));
-
-        factura.setrLecDes1(Utilidades.valorAbsolutoNegativo(factura.getrLecDes1()));
-        factura.setrLecDes2(Utilidades.valorAbsolutoNegativo(factura.getrLecDes2()));
-        factura.setrLecDes3(Utilidades.valorAbsolutoNegativo(factura.getrLecDes3()));
-        factura.setrLecDes4(Utilidades.valorAbsolutoNegativo(factura.getrLecDes4()));
-        factura.setrLecDes5(Utilidades.valorAbsolutoNegativo(factura.getrLecDes5()));
-        factura.setrLecDes6(Utilidades.valorAbsolutoNegativo(factura.getrLecDes6()));
-
-        factura.setrLecHas1(Utilidades.valorAbsolutoNegativo(factura.getrLecHas1()));
-        factura.setrLecHas2(Utilidades.valorAbsolutoNegativo(factura.getrLecHas2()));
-        factura.setrLecHas3(Utilidades.valorAbsolutoNegativo(factura.getrLecHas3()));
-        factura.setrLecHas4(Utilidades.valorAbsolutoNegativo(factura.getrLecHas4()));
-        factura.setrLecHas5(Utilidades.valorAbsolutoNegativo(factura.getrLecHas5()));
-        factura.setrLecHas6(Utilidades.valorAbsolutoNegativo(factura.getrLecHas6()));
-        factura.setrImpTot(Utilidades.valorAbsolutoNegativo(factura.getrImpTot()));
-
-        factura.setPmCon1(Utilidades.valorAbsolutoNegativo(factura.getPmCon1()));
-        factura.setPmCon2(Utilidades.valorAbsolutoNegativo(factura.getPmCon2()));
-        factura.setPmCon3(Utilidades.valorAbsolutoNegativo(factura.getPmCon3()));
-        factura.setPmCon4(Utilidades.valorAbsolutoNegativo(factura.getPmCon4()));
-        factura.setPmCon5(Utilidades.valorAbsolutoNegativo(factura.getPmCon5()));
-        factura.setPmCon6(Utilidades.valorAbsolutoNegativo(factura.getPmCon6()));
-        factura.setPmConSum(Utilidades.valorAbsolutoNegativo(factura.getPmConSum()));
-
-        factura.setPmLecHas1(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas1()));
-        factura.setPmLecHas2(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas2()));
-        factura.setPmLecHas3(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas3()));
-        factura.setPmLecHas4(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas4()));
-        factura.setPmLecHas5(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas5()));
-        factura.setPmLecHas6(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas6()));
-
-        factura.setRfImpTot(Utilidades.valorAbsolutoNegativo(factura.getRfImpTot()));
-        factura.setRfSalTotFac(Utilidades.valorAbsolutoNegativo(factura.getRfSalTotFac()));
-
-        return factura;
-    }
     
     enum TIPO_FACTURA{
     	A_ABONO, 
