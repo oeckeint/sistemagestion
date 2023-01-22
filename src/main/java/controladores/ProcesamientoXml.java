@@ -1,17 +1,6 @@
 package controladores;
 
-import controladores.helper.ArchivarFactura;
-import controladores.helper.CambiodeComercializador;
-import controladores.helper.Etiquetas;
-import controladores.helper.NombresNodos;
-import controladores.helper.ConsultaFacturacion;
-import controladores.helper.ProcesarFactura;
-import controladores.helper.ProcesarOtrasFacturas;
-import controladores.helper.ProcesarPeaje;
-import controladores.helper.ProcesarRemesaPagoFactura;
-import controladores.helper.ProcesarRemesaPagoOtrasFacturas;
-import controladores.helper.ProcesarRemesaPagoPeaje;
-import controladores.helper.Utilidades;
+import controladores.helper.*;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
 import datos.interfaces.DocumentoXmlService;
@@ -31,6 +20,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -83,6 +73,8 @@ public class ProcesamientoXml {
     private boolean isPeaje;
     private HashMap<String, String> elementosCF;
 	private ResultSet rs;
+    @Value("${jdbc.password}")
+    String anyString;
 
     /**
      * Muestra el fomulario que procesa los archivos

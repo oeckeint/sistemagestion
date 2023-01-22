@@ -8,10 +8,8 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -26,8 +24,9 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement
-@ComponentScan(basePackages = {"app", "controladores", "datos"})
-@PropertySource("classpath:persistence-mysql.properties")
+@ComponentScan(basePackages = {"app", "controladores", "controladores.helper", "datos"})
+@PropertySources({@PropertySource("classpath:persistence-mysql.properties"),
+        @PropertySource("classpath:/cfg/application.properties")})
 public class AppConfig implements WebMvcConfigurer{
 
     @Autowired
@@ -102,6 +101,11 @@ public class AppConfig implements WebMvcConfigurer{
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
     
 }

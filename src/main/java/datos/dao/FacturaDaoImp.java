@@ -59,6 +59,7 @@ public class FacturaDaoImp implements datos.interfaces.DocumentoXmlDao<Factura> 
 
     @Override
     public void guardar(Factura factura) {
+        logger.log(Level.INFO, ">>> Guardando la factura {0}", factura.getCodFisFac());
         this.sessionFactory.getCurrentSession().saveOrUpdate(factura);
     }
 

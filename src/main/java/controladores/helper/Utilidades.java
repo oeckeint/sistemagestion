@@ -195,4 +195,8 @@ public class Utilidades {
         return valor > 0 ? -valor : valor;
     }
 
+    public static int valorAbsolutoNegativo(int valor){
+        return valor > 0 ? -valor : valor;
+    }
+
 }

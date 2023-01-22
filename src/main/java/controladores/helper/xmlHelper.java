@@ -12,6 +12,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.w3c.dom.*;
 import utileria.texto.Cadenas;
 import datos.interfaces.DocumentoXmlService;
@@ -26,6 +29,7 @@ import javax.persistence.NonUniqueResultException;
 import utileria.StringHelper;
 import utileria.xml;
 
+@Component
 public class xmlHelper {
 
     public DocumentoXmlService contenidoXmlService;
@@ -45,6 +49,12 @@ public class xmlHelper {
     private String codigoRemesa;
     private boolean existeEnergiaExcedentaria;
     private Logger logger = Logger.getLogger(getClass().getName());
+    @Value("${abono.factura.validaterectificadaanulada}")
+    private boolean isValidPeajeAbonoActive;
+    @Value("${jdbc.password}")
+    String anyString;
+
+    public xmlHelper(){}
 
     public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService) {
         this.doc = doc;
@@ -366,13 +376,19 @@ public class xmlHelper {
      * @throws CodRectNoExisteException
      */
     private void registrarPeajeA() throws MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException {
-        String codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
+        System.out.println(isValidPeajeAbonoActive);
+        System.out.println(anyString);
+        String codRectificada = null;
         try {
+            codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
             Peaje peaje = (Peaje) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
             comentarios.append(", este abono hace referencia al CodigoFacturaRectificadaAnulada <Strong> ").append(peaje.getCodFisFac()).append("</Strong>");
             this.registrarPeajeNA();
         }catch (RegistroVacioException e) {
             logger.log(Level.INFO, ">>> No se encontró un Peaje para rectificar con {0}", codRectificada);
+            throw new PeajeCodRectNoExisteException(codFactura);
+        } catch (NullPointerException e) {
+            logger.log(Level.INFO, ">>> El Abono de peaje {0} no especifica un codigo de factura para rectificar", xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, this.doc));
             throw new PeajeCodRectNoExisteException(codFactura);
         }
     }
@@ -449,7 +465,6 @@ public class xmlHelper {
             );
             this.prepareAbonoFactura(f);
             //this.contenidoXmlService.guardar(f);
-            System.out.println("Registrando factura");
         } catch (Exception e) {
 
         }
@@ -485,7 +500,7 @@ public class xmlHelper {
         );
         this.prepareAbonoPeaje(peaje);
         System.out.println("preparandoAbono");
-        this.contenidoXmlService.guardar(peaje);
+        //this.contenidoXmlService.guardar(peaje);
         System.out.print("\n\nComentarios : " + comentarios.toString());
         System.out.print("Codigo Errores : " + errores.toString());
     }
@@ -5132,6 +5147,7 @@ public class xmlHelper {
     }
 
     private Peaje prepareAbonoPeaje(Peaje peaje) {
+        logger.log(Level.INFO, ">>> Pasando valores especificos a negativo del abono de peaje {0}", peaje.getCodFisFac());
         peaje.setTipFac("A");
         String fecDes1 = peaje.getEaFecDes1();
         String fecHas1 = peaje.getEaFecHas1();
@@ -5141,11 +5157,11 @@ public class xmlHelper {
         peaje.setEaFecHas1(fecDes1);
         peaje.setEaFecDes2(fecHas2);
         peaje.setEaFecHas2(fecDes2);
-        System.out.println(Utilidades.valorAbsoluto(-1.2));
         return peaje;
     }
 
     private Factura prepareAbonoFactura(Factura factura){
+        logger.log(Level.INFO, ">>> Pasando valores especificos a negativo del abono de factura {0}", factura.getCodFisFac());
         factura.setTipFac("A");
         String fecDes1 = factura.getEaFecDes1();
         String fecHas1 = factura.getEaFecHas1();
@@ -5156,138 +5172,138 @@ public class xmlHelper {
         factura.setEaFecDes2(fecHas2);
         factura.setEaFecHas2(fecDes2);
 
-        factura.setNumDias(0);
+        factura.setNumDias(Utilidades.valorAbsolutoNegativo(factura.getNumDias()));
 
         //ExcesoPotencia
-        factura.setExcPot1(0);
-        factura.setExcPot2(0);
-        factura.setExcPot3(0);
-        factura.setExcPot4(0);
-        factura.setExcPot5(0);
-        factura.setExcPot6(0);
-        factura.setExcImpTot(0);
+        factura.setExcPot1(Utilidades.valorAbsolutoNegativo(factura.getExcPot1()));
+        factura.setExcPot2(Utilidades.valorAbsolutoNegativo(factura.getExcPot2()));
+        factura.setExcPot3(Utilidades.valorAbsolutoNegativo(factura.getExcPot3()));
+        factura.setExcPot4(Utilidades.valorAbsolutoNegativo(factura.getExcPot4()));
+        factura.setExcPot5(Utilidades.valorAbsolutoNegativo(factura.getExcPot5()));
+        factura.setExcPot6(Utilidades.valorAbsolutoNegativo(factura.getExcPot6()));
+        factura.setExcImpTot(Utilidades.valorAbsolutoNegativo(factura.getExcImpTot()));
 
         //PotenciaContratada
-        factura.setPotCon1(0);
-        factura.setPotCon2(0);
-        factura.setPotCon3(0);
-        factura.setPotCon4(0);
-        factura.setPotCon5(0);
-        factura.setPotCon6(0);
+        factura.setPotCon1(Utilidades.valorAbsolutoNegativo(factura.getPotCon1()));
+        factura.setPotCon2(Utilidades.valorAbsolutoNegativo(factura.getPotCon2()));
+        factura.setPotCon3(Utilidades.valorAbsolutoNegativo(factura.getPotCon3()));
+        factura.setPotCon4(Utilidades.valorAbsolutoNegativo(factura.getPotCon4()));
+        factura.setPotCon5(Utilidades.valorAbsolutoNegativo(factura.getPotCon5()));
+        factura.setPotCon6(Utilidades.valorAbsolutoNegativo(factura.getPotCon6()));
 
         //PotenciaMaxDemandada
-        factura.setPotMax1(0);
-        factura.setPotMax2(0);
-        factura.setPotMax3(0);
-        factura.setPotMax4(0);
-        factura.setPotMax5(0);
-        factura.setPotMax6(0);
+        factura.setPotMax1(Utilidades.valorAbsolutoNegativo(factura.getPotMax1()));
+        factura.setPotMax2(Utilidades.valorAbsolutoNegativo(factura.getPotMax2()));
+        factura.setPotMax3(Utilidades.valorAbsolutoNegativo(factura.getPotMax3()));
+        factura.setPotMax4(Utilidades.valorAbsolutoNegativo(factura.getPotMax4()));
+        factura.setPotMax5(Utilidades.valorAbsolutoNegativo(factura.getPotMax5()));
+        factura.setPotMax6(Utilidades.valorAbsolutoNegativo(factura.getPotMax6()));
 
-        //PotenciaAFacturar|°
-        factura.setPotFac1(0);
-        factura.setPotFac2(0);
-        factura.setPotFac3(0);
+        //PotenciaAFacturar
+        factura.setPotFac1(Utilidades.valorAbsolutoNegativo(factura.getPotFac1()));
+        factura.setPotFac2(Utilidades.valorAbsolutoNegativo(factura.getPotFac2()));
+        factura.setPotFac3(Utilidades.valorAbsolutoNegativo(factura.getPotFac3()));
 
         //PotenciaPrecio
-        factura.setPotPre1(0);
-        factura.setPotPre2(0);
-        factura.setPotPre3(0);
-        factura.setPotPre4(0);
-        factura.setPotPre5(0);
-        factura.setPotPre6(0);
-        factura.setPotImpTot(0);
+        factura.setPotPre1(Utilidades.valorAbsolutoNegativo(factura.getPotPre1()));
+        factura.setPotPre2(Utilidades.valorAbsolutoNegativo(factura.getPotPre2()));
+        factura.setPotPre3(Utilidades.valorAbsolutoNegativo(factura.getPotPre3()));
+        factura.setPotPre4(Utilidades.valorAbsolutoNegativo(factura.getPotPre4()));
+        factura.setPotPre5(Utilidades.valorAbsolutoNegativo(factura.getPotPre5()));
+        factura.setPotPre6(Utilidades.valorAbsolutoNegativo(factura.getPotPre6()));
+        factura.setPotImpTot(Utilidades.valorAbsolutoNegativo(factura.getPotImpTot()));
 
         //EnergíaActiva
-        factura.setEaVal1(0);
-        factura.setEaVal2(0);
-        factura.setEaVal3(0);
-        factura.setEaVal4(0);
-        factura.setEaVal5(0);
-        factura.setEaVal6(0);
-        factura.setEaValSum(0);
+        factura.setEaVal1(Utilidades.valorAbsolutoNegativo(factura.getEaVal1()));
+        factura.setEaVal2(Utilidades.valorAbsolutoNegativo(factura.getEaVal2()));
+        factura.setEaVal3(Utilidades.valorAbsolutoNegativo(factura.getEaVal3()));
+        factura.setEaVal4(Utilidades.valorAbsolutoNegativo(factura.getEaVal4()));
+        factura.setEaVal5(Utilidades.valorAbsolutoNegativo(factura.getEaVal5()));
+        factura.setEaVal6(Utilidades.valorAbsolutoNegativo(factura.getEaVal6()));
+        factura.setEaValSum(Utilidades.valorAbsolutoNegativo(factura.getEaValSum()));
 
         //Precios
-        factura.setEaPre1(0);
-        factura.setEaPre2(0);
-        factura.setEaPre3(0);
-        factura.setEaPre4(0);
-        factura.setEaPre5(0);
-        factura.setEaPre6(0);
-        factura.setEaImpTot(0);
+        factura.setEaPre1(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
+        factura.setEaPre2(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
+        factura.setEaPre3(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
+        factura.setEaPre4(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
+        factura.setEaPre5(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
+        factura.setEaPre6(Utilidades.valorAbsolutoNegativo(factura.getEaPre1()));
+        factura.setEaImpTot(Utilidades.valorAbsolutoNegativo(factura.getEaImpTot()));
 
-        factura.setIeImp(0);
-        factura.setaImpFac(0);
-        factura.setiBasImp(0);
+        factura.setIeImp(Utilidades.valorAbsolutoNegativo(factura.getIeImp()));
+        factura.setaImpFac(Utilidades.valorAbsolutoNegativo(factura.getaImpFac()));
+        factura.setiBasImp(Utilidades.valorAbsolutoNegativo(factura.getiBasImp()));
 
         //AEConsumo
-        factura.setAeCon1(0);
-        factura.setAeCon2(0);
-        factura.setAeCon3(0);
-        factura.setAeCon4(0);
-        factura.setAeCon5(0);
-        factura.setAeCon6(0);
-        factura.setAeConSum(0);
+        factura.setAeCon1(Utilidades.valorAbsolutoNegativo(factura.getAeCon1()));
+        factura.setAeCon2(Utilidades.valorAbsolutoNegativo(factura.getAeCon2()));
+        factura.setAeCon3(Utilidades.valorAbsolutoNegativo(factura.getAeCon3()));
+        factura.setAeCon4(Utilidades.valorAbsolutoNegativo(factura.getAeCon4()));
+        factura.setAeCon5(Utilidades.valorAbsolutoNegativo(factura.getAeCon5()));
+        factura.setAeCon6(Utilidades.valorAbsolutoNegativo(factura.getAeCon6()));
+        factura.setAeConSum(Utilidades.valorAbsolutoNegativo(factura.getAeConSum()));
 
         //AELecturasDesde
-        factura.setAeLecDes1(0);
-        factura.setAeLecDes2(0);
-        factura.setAeLecDes3(0);
-        factura.setAeLecDes4(0);
-        factura.setAeLecDes5(0);
-        factura.setAeLecDes6(0);
+        factura.setAeLecDes1(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes1()));
+        factura.setAeLecDes2(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes2()));
+        factura.setAeLecDes3(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes3()));
+        factura.setAeLecDes4(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes4()));
+        factura.setAeLecDes5(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes5()));
+        factura.setAeLecDes6(Utilidades.valorAbsolutoNegativo(factura.getAeLecDes6()));
 
         //AELecturasHasta
-        factura.setAeLecHas1(0);
-        factura.setAeLecHas2(0);
-        factura.setAeLecHas3(0);
-        factura.setAeLecHas4(0);
-        factura.setAeLecHas5(0);
-        factura.setAeLecHas6(0);
+        factura.setAeLecHas1(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas1()));
+        factura.setAeLecHas2(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas2()));
+        factura.setAeLecHas3(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas3()));
+        factura.setAeLecHas4(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas4()));
+        factura.setAeLecHas5(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas5()));
+        factura.setAeLecHas6(Utilidades.valorAbsolutoNegativo(factura.getAeLecHas6()));
 
-        factura.setAeProDes(0);
-        factura.setAeProHas(0);
+        factura.setAeProDes(Utilidades.valorAbsolutoNegativo(factura.getAeProDes()));
+        factura.setAeProHas(Utilidades.valorAbsolutoNegativo(factura.getAeProHas()));
 
         //Reactiva
-        factura.setrCon1(0);
-        factura.setrCon2(0);
-        factura.setrCon3(0);
-        factura.setrCon4(0);
-        factura.setrCon5(0);
-        factura.setrCon6(0);
-        factura.setrConSum(0);
+        factura.setrCon1(Utilidades.valorAbsolutoNegativo(factura.getrCon1()));
+        factura.setrCon2(Utilidades.valorAbsolutoNegativo(factura.getrCon2()));
+        factura.setrCon3(Utilidades.valorAbsolutoNegativo(factura.getrCon3()));
+        factura.setrCon4(Utilidades.valorAbsolutoNegativo(factura.getrCon4()));
+        factura.setrCon5(Utilidades.valorAbsolutoNegativo(factura.getrCon5()));
+        factura.setrCon6(Utilidades.valorAbsolutoNegativo(factura.getrCon6()));
+        factura.setrConSum(Utilidades.valorAbsolutoNegativo(factura.getrConSum()));
 
-        factura.setrLecDes1(0);
-        factura.setrLecDes2(0);
-        factura.setrLecDes3(0);
-        factura.setrLecDes4(0);
-        factura.setrLecDes5(0);
-        factura.setrLecDes6(0);
+        factura.setrLecDes1(Utilidades.valorAbsolutoNegativo(factura.getrLecDes1()));
+        factura.setrLecDes2(Utilidades.valorAbsolutoNegativo(factura.getrLecDes2()));
+        factura.setrLecDes3(Utilidades.valorAbsolutoNegativo(factura.getrLecDes3()));
+        factura.setrLecDes4(Utilidades.valorAbsolutoNegativo(factura.getrLecDes4()));
+        factura.setrLecDes5(Utilidades.valorAbsolutoNegativo(factura.getrLecDes5()));
+        factura.setrLecDes6(Utilidades.valorAbsolutoNegativo(factura.getrLecDes6()));
 
-        factura.setrLecHas1(0);
-        factura.setrLecHas2(0);
-        factura.setrLecHas3(0);
-        factura.setrLecHas4(0);
-        factura.setrLecHas5(0);
-        factura.setrLecHas6(0);
-        factura.setrImpTot(0);
+        factura.setrLecHas1(Utilidades.valorAbsolutoNegativo(factura.getrLecHas1()));
+        factura.setrLecHas2(Utilidades.valorAbsolutoNegativo(factura.getrLecHas2()));
+        factura.setrLecHas3(Utilidades.valorAbsolutoNegativo(factura.getrLecHas3()));
+        factura.setrLecHas4(Utilidades.valorAbsolutoNegativo(factura.getrLecHas4()));
+        factura.setrLecHas5(Utilidades.valorAbsolutoNegativo(factura.getrLecHas5()));
+        factura.setrLecHas6(Utilidades.valorAbsolutoNegativo(factura.getrLecHas6()));
+        factura.setrImpTot(Utilidades.valorAbsolutoNegativo(factura.getrImpTot()));
 
-        factura.setPmCon1(0);
-        factura.setPmCon2(0);
-        factura.setPmCon3(0);
-        factura.setPmCon4(0);
-        factura.setPmCon5(0);
-        factura.setPmCon6(0);
-        factura.setPmConSum(0);
+        factura.setPmCon1(Utilidades.valorAbsolutoNegativo(factura.getPmCon1()));
+        factura.setPmCon2(Utilidades.valorAbsolutoNegativo(factura.getPmCon2()));
+        factura.setPmCon3(Utilidades.valorAbsolutoNegativo(factura.getPmCon3()));
+        factura.setPmCon4(Utilidades.valorAbsolutoNegativo(factura.getPmCon4()));
+        factura.setPmCon5(Utilidades.valorAbsolutoNegativo(factura.getPmCon5()));
+        factura.setPmCon6(Utilidades.valorAbsolutoNegativo(factura.getPmCon6()));
+        factura.setPmConSum(Utilidades.valorAbsolutoNegativo(factura.getPmConSum()));
 
-        factura.setPmLecHas1(0);
-        factura.setPmLecHas2(0);
-        factura.setPmLecHas3(0);
-        factura.setPmLecHas4(0);
-        factura.setPmLecHas5(0);
-        factura.setPmLecHas6(0);
+        factura.setPmLecHas1(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas1()));
+        factura.setPmLecHas2(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas2()));
+        factura.setPmLecHas3(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas3()));
+        factura.setPmLecHas4(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas4()));
+        factura.setPmLecHas5(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas5()));
+        factura.setPmLecHas6(Utilidades.valorAbsolutoNegativo(factura.getPmLecHas6()));
 
-        factura.setRfImpTot(0);
-        factura.setRfSalTotFac(0);
+        factura.setRfImpTot(Utilidades.valorAbsolutoNegativo(factura.getRfImpTot()));
+        factura.setRfSalTotFac(Utilidades.valorAbsolutoNegativo(factura.getRfSalTotFac()));
 
         return factura;
     }
