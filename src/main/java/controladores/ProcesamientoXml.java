@@ -82,8 +82,6 @@ public class ProcesamientoXml {
     private boolean isPeaje;
     private HashMap<String, String> elementosCF;
 	private ResultSet rs;
-    @Value("${jdbc.password}")
-    String anyString;
 
     /**
      * Muestra el fomulario que procesa los archivos
@@ -177,7 +175,8 @@ public class ProcesamientoXml {
 
         } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado
                 | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException | TablaBusquedaNoExisteException | TablaBusquedaNoEspecificadaException
-                | NoExisteElNodoException | ArchivoNoCumpleParaSerClasificado | MasDatosdeLosEsperadosException | TarifaNoExisteException | PeajeMasDeUnRegistroException e) {
+                | NoExisteElNodoException | ArchivoNoCumpleParaSerClasificado | MasDatosdeLosEsperadosException | TarifaNoExisteException | PeajeMasDeUnRegistroException
+                | FacturaNoEspecificaCodRecticadaException | FacturaNoExisteException | FacturaCodRectNoExisteException e) {
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
             utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         } catch (Exception e) {
@@ -187,22 +186,6 @@ public class ProcesamientoXml {
         }
 
         System.out.println("(Fin)************************-----------------------------" + nombreArchivo);
-    }
-    
-    public void initializarConsultaFacturacion(Document doc) throws ArchivoNoCumpleParaSerClasificado, SQLException {
-    	rs = null;
-    			
-    	try {
-    		if(rs.next()) {
-    			elementosCF = new HashMap<String, String>();
-    			do {
-    				elementosCF.put(NombresNodos.COD_FIS_FAC, xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, doc));
-    				elementosCF.put(NombresNodos.FIL, xml.obtenerContenidoNodo(NombresNodos.FIL , doc));
-    			} while(rs.next());
-    		}
-		} catch (NullPointerException e){
-			elementosCF.clear();
-		}
     }
     
     

@@ -338,7 +338,7 @@ public class xmlHelper {
 
         int indice = 0;
         boolean continuar = true;
-        NodeList flowList = doc.getElementsByTagName("TerminoPotencia");
+        NodeList flowList = doc.getElementsByTagName("Periodo");
         for (int i = 0; i < flowList.getLength(); i++) {
             NodeList childList = flowList.item(i).getChildNodes();
             for (int j = 0; j < childList.getLength(); j++) {
@@ -351,11 +351,11 @@ public class xmlHelper {
 					}
                 	
                     switch (childNode.getNodeName()) {
-                        case "FechaDesde":
+                        case "FechaDesdeFactura":
                             elementos.set(0, childList.item(j).getTextContent().trim());
                             indice++;
                             break;
-                        case "FechaHasta":
+                        case "FechaHastaFactura":
                             elementos.set(1, childList.item(j).getTextContent().trim());
                             indice++;
                             break;

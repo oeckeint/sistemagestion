@@ -82,6 +82,12 @@ public class Factura {
     @Column(name = "porcentaje_perdidas")
     private String porPer;
 
+    @Column(name = "tp_fecha_desde")
+    String tpFechaDesde;
+
+    @Column(name = "tp_fecha_hasta")
+    String tpFechaHasta;
+
     @Column(name = "numero_dias")
     private int numDias;
 
@@ -448,7 +454,7 @@ public class Factura {
     }
 
     public Factura(
-            Cliente cliente, DatosCabecera datosCabecera, DatosGeneralesFactura datosGeneralesFactura, DatosFacturaAtr datosFacturaAtr,
+            Cliente cliente, DatosCabecera datosCabecera, DatosGeneralesFactura datosGeneralesFactura, DatosFacturaAtr datosFacturaAtr, DatosTerminoPotencia datosTerminoPotencia,
             DatosExcesoPotencia datosExcesoPotencia, DatosPotenciaContratada datosPotenciaContratada, DatosPotenciaMaxDemandada datosPotenciaMaxDemandada, DatosPotenciaAFacturar datosPotenciaAFacturar, DatosPotenciaPrecio datosPotenciaPrecio, DatosPotenciaImporteTotal datosPotenciaImporteTotal,
             DatosEnergiaActiva datosEnergiaActiva, DatosEnergiaActivaValores datosEnergiaActivaValores, DatosEnergiaActivaPrecio datosEnergiaActivaPrecio, DatosEnergiaActivaImporteTotal datosEnergiaActivaImporteTotal,
             DatosImpuestoElectrico datosImpuestoElectrico, DatosAlquileres datosAlquileres, DatosIva datosIva,
@@ -482,6 +488,10 @@ public class Factura {
         this.vasTra = datosFacturaAtr.getVAsTrafo();
         this.porPer = datosFacturaAtr.getPorcentajePerdidas();
         this.numDias = datosFacturaAtr.getNumeroDias();
+
+        //DatosTerminoPotencia
+        this.tpFechaDesde = datosTerminoPotencia.getFechaDesde();
+        this.tpFechaHasta = datosTerminoPotencia.getFechaHasta();
 
         //ExcesoPotencia
         this.excPot1 = datosExcesoPotencia.getP1();
@@ -790,6 +800,22 @@ public class Factura {
 
     public void setPorPer(String porPer) {
         this.porPer = porPer;
+    }
+
+    public String getTpFechaDesde() {
+        return tpFechaDesde;
+    }
+
+    public void setTpFechaDesde(String tpFechaDesde) {
+        this.tpFechaDesde = tpFechaDesde;
+    }
+
+    public String getTpFechaHasta() {
+        return tpFechaHasta;
+    }
+
+    public void setTpFechaHasta(String tpFechaHasta) {
+        this.tpFechaHasta = tpFechaHasta;
     }
 
     public int getNumDias() {

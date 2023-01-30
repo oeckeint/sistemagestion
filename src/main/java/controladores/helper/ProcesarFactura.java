@@ -1,5 +1,6 @@
 package controladores.helper;
 
+import controladores.ProcesamientoXml;
 import datos.entity.Factura;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.*;
@@ -20,7 +21,7 @@ import java.util.logging.Logger;
 @Component
 public class ProcesarFactura extends xmlHelper {
 
-    private final DocumentoXmlService service;
+    private final DocumentoXmlService<Factura> service;
     @Value("${abono.factura.validaterectificadaanulada}")
     private boolean isValidAbonoFacturaActive;
 
@@ -42,7 +43,7 @@ public class ProcesarFactura extends xmlHelper {
      * @throws PeajeMasDeUnRegistroException
      */
     public void procesarFactura(Document doc, String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException {
+            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException, PeajeCodRectNoExisteException, FacturaNoExisteException, FacturaNoEspecificaCodRecticadaException, FacturaCodRectNoExisteException {
         this.doc = doc;
         this.nombreArchivo = nombreArchivo;
         this.iniciarVariables();
@@ -84,27 +85,26 @@ public class ProcesarFactura extends xmlHelper {
      * No se necesita un registro existente para ejecutar esta factura
      *
      */
-    private void registrarFacturaA() {
+    private void registrarFacturaA() throws MasDeUnClienteEncontrado, TarifaNoExisteException, FacturaNoExisteException, PeajeMasDeUnRegistroException, FacturaNoEspecificaCodRecticadaException, FacturaCodRectNoExisteException {
         logger.log(Level.INFO, ">>> Registrando factura del tipo Abono con el codFisFac {0}", xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, this.doc));
+        String codRectificada = null;
         try {
-            Factura f = this.crearFactura();
-            f = this.prepareAbonoFactura(f);
-            this.service.guardar(f);
-            System.out.println("isValidAbonoFacturaActive = " + isValidAbonoFacturaActive);
-        } catch (Exception e) {
-
-        }
-        /*
-        String codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
-        try {
-            Factura f = (Factura) this.contenidoXmlService.buscarByCodFiscal(codRectificada);
-            System.out.println("Se intenta realizar registro");
-            //this.registrarFacturaA();
+            codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
+            Factura factura = this.service.buscarByCodFiscal(codRectificada);
+            comentarios.append(", este abono hace referencia al CodigoFacturaRectificadaAnulada <Strong> ").append(factura.getCodFisFac()).append("</Strong>");
+            this.guardarAbono();
         }catch (RegistroVacioException e) {
-            logger.log(Level.INFO, ">>> No se encontró una factura para abonar con {0}", codRectificada);
-            throw new CodRectNoExisteException(codRectificada);
+            logger.log(Level.INFO, ">>> No se encontró una Factura para rectificar con {0}", codRectificada);
+            throw new FacturaCodRectNoExisteException(this.codFactura);
+        } catch (NullPointerException e) {
+            logger.log(Level.INFO, ">>> El Abono de peaje {0} no especifica un codigo de factura para rectificar", xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, this.doc));
+            throw new FacturaNoEspecificaCodRecticadaException(this.codFactura);
         }
-         */
+    }
+
+    private void guardarAbono() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
+        Factura f = this.prepareAbonoFactura(this.crearFactura());
+        this.service.guardar(f);
     }
 
     /**
@@ -140,7 +140,6 @@ public class ProcesarFactura extends xmlHelper {
 
     protected Factura prepareAbonoFactura(Factura factura){
         logger.log(Level.INFO, ">>> Pasando valores especificos a negativo del abono de factura {0}", factura.getCodFisFac());
-        factura.setTipFac("A");
         String fecDes1 = factura.getEaFecDes1();
         String fecHas1 = factura.getEaFecHas1();
         String fecDes2 = factura.getEaFecDes2();
@@ -149,6 +148,12 @@ public class ProcesarFactura extends xmlHelper {
         factura.setEaFecHas1(fecDes1);
         factura.setEaFecDes2(fecHas2);
         factura.setEaFecHas2(fecDes2);
+
+        //FechaDesdeFactura || FechaHastaFactura
+        fecDes1 = factura.getTpFechaDesde();
+        fecHas1 = factura.getTpFechaHasta();
+        factura.setTpFechaDesde(fecHas1);
+        factura.setTpFechaHasta(fecDes1);
 
         factura.setNumDias(Utilidades.valorAbsolutoNegativo(factura.getNumDias()));
 
@@ -288,7 +293,7 @@ public class ProcesarFactura extends xmlHelper {
 
     private Factura crearFactura() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
         return new Factura(
-                this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(),
+                this.cliente, this.cabecera(), this.datosGenerales(), this.datosFacturaAtr(), this.datosTerminoPotencia(),
                 this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
                 this.energiaActivaDatos(), this.energiaActivaValores(), this.energiaActivaPrecio(), this.energiaActivaImporteTotal(),
                 this.impuestoElectrico(), this.alquileres(), this.iva(),

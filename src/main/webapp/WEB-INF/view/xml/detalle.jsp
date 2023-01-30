@@ -38,7 +38,13 @@
                 <hr>
                 <div class="row justify-content-between p-0">
                     <div class="col-6">
-                        <h2 class="m-0"><a id="backList" href="${pageContext.request.contextPath}/facturas"><i class="fas fa-arrow-circle-left text-success"></i></a> Factura</h2>
+                        <h2 class="m-0">
+                            <a id="backList" href="${pageContext.request.contextPath}/facturas"><i class="fas fa-arrow-circle-left text-success"></i></a>
+                            <c:choose>
+                                <c:when test="${isFactura}">Factura</c:when>
+                                <c:when test="${isPeaje}">Peaje</c:when>
+                            </c:choose>
+                        </h2>
                     </div>
                     <div class="col-6 row justify-content-end">
                         <security:authorize access="hasRole('ADMIN')">
@@ -388,25 +394,23 @@
                         </div>
                     </div>
                 	<div class="row justify-content-around">
-                        <c:if test="${isPeaje}">
-                            <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                                <h3 class="list-group-item list-group-item-action active text-center h4">Termino Potencia</h3>
-                                <div class="row">
-                                    <div class="col-5">
-                                        <ul class="list-group list-group-flush text-right">
-                                            <dt class="list-group-item px-1">Fecha Desde</dt>
-                                            <dt class="list-group-item px-1">Fecha Hasta</dt>
-                                        </ul>
-                                    </div>
-                                    <div class="col-7">
-                                        <ul class="list-group list-group-flush">
-                                            <li class="list-group-item px-1">${documento.tpFechaDesde}</li>
-                                            <li class="list-group-item px-1">${documento.tpFechaHasta}</li>
-                                        </ul>
-                                    </div>
+                        <div class="list-group col-12 col-md-5 col-lg-4 p-2">
+                            <h3 class="list-group-item list-group-item-action active text-center h4">Termino Potencia</h3>
+                            <div class="row">
+                                <div class="col-5">
+                                    <ul class="list-group list-group-flush text-right">
+                                        <dt class="list-group-item px-1">Fecha Desde</dt>
+                                        <dt class="list-group-item px-1">Fecha Hasta</dt>
+                                    </ul>
+                                </div>
+                                <div class="col-7">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item px-1">${documento.tpFechaDesde}</li>
+                                        <li class="list-group-item px-1">${documento.tpFechaHasta}</li>
+                                    </ul>
                                 </div>
                             </div>
-                        </c:if>
+                        </div>
 					</div>
                 </div>
                 <!--Cuarto Renglón-->
