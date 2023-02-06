@@ -1,6 +1,6 @@
 package excepciones;
 
-import controladores.ProcesamientoXml.TablaBusqueda;
+import controladores.Procesamiento.TablaBusqueda;
 import utileria.ArchivoTexto;
 
 public class FacturaNoExisteException extends Exception{

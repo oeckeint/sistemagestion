@@ -7,7 +7,6 @@ import datos.interfaces.ClienteService;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.MasDeUnClienteEncontrado;
 import excepciones.NoEsUnNumeroException;
-import excepciones.PeajeMasDeUnRegistroException;
 import excepciones.RegistroVacioException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ public class Facturas {
 
 	@Autowired
 	@Qualifier(value = "facturasServiceImp")
-	private DocumentoXmlService documentoXmlService;
+	private DocumentoXmlService<Factura> documentoXmlService;
 
 	@Autowired
 	private ClienteService clienteService;
@@ -67,7 +66,6 @@ public class Facturas {
 		model.addAttribute("controller", Etiquetas.FACTURAS_CONTROLLER);
 		model.addAttribute("rows", rows);
 		this.reiniciarVariables();
-		System.out.println("Se eliminaron varias comillas");
 		return "xml/lista2";
 	}
 

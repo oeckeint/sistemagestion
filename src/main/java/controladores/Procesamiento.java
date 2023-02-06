@@ -6,21 +6,18 @@ import datos.interfaces.CrudDao;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,14 +29,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.mchange.v2.cfg.DelayedLogItem.Level;
-
 import utileria.StringHelper;
-import utileria.xml;
 
 @Controller
 @RequestMapping("/procesar")
-public class ProcesamientoXml {
+public class Procesamiento {
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     @Autowired
     @Qualifier(value = "peajesServiceImp")
@@ -68,6 +64,9 @@ public class ProcesamientoXml {
 
     @Autowired
     private ProcesarOtrasFacturas procesarOtrasFacturas;
+
+    @Autowired
+    private ProcesarMedida procesarMedida;
 
     int archivosCorrectos;
     int archivosTotales;
@@ -119,7 +118,7 @@ public class ProcesamientoXml {
             //Escritura en archivos temporales por cada archivo recibido
             try (InputStream fileContent = file.getInputStream()) {
                 //Creación del los archivos temporales para su procesamiento
-                f = File.createTempFile("xmlTemp", null);
+                f = File.createTempFile("processTemp", null);
                 //File f = new File("C:\\a\\" + fileName);
                 ous = new FileOutputStream(f);
                 int dato = fileContent.read();
@@ -130,7 +129,18 @@ public class ProcesamientoXml {
             }
             //Fin del flujo de escritura
             ous.close();
-            this.procesar(f, file.getOriginalFilename());
+
+            String nombreArchivo = file.getOriginalFilename();
+            switch (Utilidades.definirExtensionArchivo(nombreArchivo)){
+                case XML:
+                    this.procesarXML(f, nombreArchivo);
+                    break;
+                case MEDIDAS:
+                    this.procesarMedidas(f, nombreArchivo);
+                    break;
+                default:
+                    System.out.println("ERROR");
+            }
             //Eliminación del archivo temporal
             f.deleteOnExit();
         }
@@ -145,7 +155,7 @@ public class ProcesamientoXml {
      * @param archivo Archivo xml recibido
      * @param nombreArchivo Nombre del archivo xml recibido
      */
-    private void procesar(File archivo, String nombreArchivo) {
+    private void procesarXML(File archivo, String nombreArchivo) {
         System.out.println("(Ini)************************-----------------------------" + nombreArchivo);
         try {
             Document documento = this.prepareXml(archivo, nombreArchivo);
@@ -187,7 +197,19 @@ public class ProcesamientoXml {
 
         System.out.println("(Fin)************************-----------------------------" + nombreArchivo);
     }
-    
+
+    private void procesarMedidas(File archivo, String nombreArchivo){
+        System.out.println("(Ini)************************-----------------------------" + nombreArchivo);
+        try {
+            this.procesarMedida.procesar(archivo, nombreArchivo);
+            archivosCorrectos++;
+        } catch (MedidaTipoNoReconocido e){
+            this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
+            utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
+        }
+        System.out.println("(Fin)************************-----------------------------" + nombreArchivo);
+    }
+
     
     /**
      * Lectura y formateo del archivo xml recibido

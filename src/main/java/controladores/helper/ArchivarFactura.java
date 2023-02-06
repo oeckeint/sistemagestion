@@ -10,7 +10,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import app.config.ApplicationContextUtils;
-import controladores.ProcesamientoXml.TablaBusqueda;
+import controladores.Procesamiento.TablaBusqueda;
 import datos.entity.Factura;
 import datos.entity.OtraFactura;
 import datos.entity.Peaje;

@@ -15,7 +15,7 @@
                 </button>
             </div>
             <div class="custom-file" id="archivosAEnviar">
-                <input type="file" name="archivosxml" accept=".xml" multiple="true" class="form-control" aria-describedby="inputGroupFileAddon03" id="xmlFiles" required>
+                <input type="file" name="archivosxml" accept=".xml, .0" multiple="true" class="form-control" aria-describedby="inputGroupFileAddon03" id="xmlFiles" required>
             </div>
         </div>
         <div id="nombreArchivos"></div>
@@ -48,7 +48,7 @@
             if(i + 1 === max) {
                 document.getElementById("nombreArchivos").innerHTML += (i + 1) + ".- " + xmlFiles.files[i].name;
             } else if(i >= 30) {
-                document.getElementById("nombreArchivos").innerHTML += "<Strong>" + (max - 30 + " archivos más ...</Strong>");
+                document.getElementById("nombreArchivos").innerHTML += "<Strong>" + (max - 30 + " archivos mï¿½s ...</Strong>");
                 break;
             } else {
                 document.getElementById("nombreArchivos").innerHTML += (i + 1) + ".- " + xmlFiles.files[i].name + "<br/>";

@@ -7,7 +7,7 @@ import excepciones.RegistroVacioException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import controladores.ProcesamientoXml.TablaBusqueda;
+import controladores.Procesamiento.TablaBusqueda;
 import datos.entity.Factura;
 import datos.entity.OtraFactura;
 import datos.interfaces.DocumentoXmlService;

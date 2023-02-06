@@ -13,13 +13,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import datos.entity.Cliente;
+import datos.entity.Medida;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.w3c.dom.Document;
+import utileria.ArchivoTexto;
 
 public class Utilidades {
 	
@@ -197,6 +201,69 @@ public class Utilidades {
 
     public static int valorAbsolutoNegativo(int valor){
         return valor > 0 ? -valor : valor;
+    }
+
+    /**
+     * Extrae cada linea de un archivo txt y las retorna en un arreglo del tipo String
+     * Es necesario especificar el Archivo del que se extraeran las lineas y el separador que se ocupara en caso de que exista entre lineas
+     * @param file
+     * @param separador
+     * @return
+     */
+    public static String[][] extraerLineasTxt(File file, String separador, int datosEsperadosPorLinea, String nombreArchivo){
+        String elementosTotales [][] = new String[0][datosEsperadosPorLinea];
+        FileReader fr = null;
+        BufferedReader br = null;
+
+        try {
+            fr = new FileReader (file);
+            br = new BufferedReader(fr);
+
+            String linea;
+            String elementosLinea [];
+            String elementosAux[][];
+            int lineaActual = 1;
+
+            while((linea = br.readLine()) != null){
+                elementosLinea = linea.split(separador);
+
+                if (elementosLinea.length == datosEsperadosPorLinea) {
+                    elementosAux = elementosTotales;
+                    elementosTotales = new String[elementosTotales.length + 1][datosEsperadosPorLinea];
+                    for(int i = 0 ; i < elementosAux.length; i++){
+                        elementosTotales[i] = elementosAux[i];
+                    }
+                    elementosTotales[elementosTotales.length-1] = elementosLinea;
+                } else {
+                    logger.log(Level.INFO, ">>> No tiene suficientes datos especificados {0} en archivo {1} en la linea {2}", new Object[]{ Arrays.toString(elementosLinea), nombreArchivo, lineaActual});
+                    ArchivoTexto.escribirAdvertencia(nombreArchivo, "No tiene suficientes datos especificados " +  Arrays.toString(elementosLinea) + " en la linea " + lineaActual);
+                }
+                lineaActual++;
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            try {
+                if (br != null) br.close();
+                if (fr != null) fr.close();
+            } catch (Exception e2) {e2.printStackTrace();}
+        }
+        return elementosTotales;
+    }
+
+    public static EXTENSION_ARCHIVO definirExtensionArchivo(String nombreArchivo){
+            switch (nombreArchivo.substring(nombreArchivo.lastIndexOf(".") + 1)){
+                case "xml":
+                    return EXTENSION_ARCHIVO.XML;
+                case "0":
+                    return EXTENSION_ARCHIVO.MEDIDAS;
+                default:
+                    return EXTENSION_ARCHIVO.DESCONOCIDO;
+            }
+    }
+
+    public enum EXTENSION_ARCHIVO{
+        XML, MEDIDAS, DESCONOCIDO;
     }
 
 }
