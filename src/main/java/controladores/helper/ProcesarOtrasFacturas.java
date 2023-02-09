@@ -41,7 +41,7 @@ public class ProcesarOtrasFacturas extends xmlHelper {
      * @throws PeajeMasDeUnRegistroException
      */
     public void procesar(Document doc, String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, MasDeUnClienteEncontrado, PeajeMasDeUnRegistroException {
+            throws OtraFacturaYaExisteException, ClienteNoExisteException, MasDeUnClienteEncontrado, PeajeMasDeUnRegistroException {
         this.doc = doc;
         this.nombreArchivo = nombreArchivo;
         this.iniciarVariables();
@@ -51,7 +51,7 @@ public class ProcesarOtrasFacturas extends xmlHelper {
             try {
                 this.service.buscarByCodFiscal(codFactura);
                 logger.log(Level.INFO, ">>> Ya existe un registro con el codigo Fiscal {0} en OtrasFacturas", this.codFactura);
-                throw new FacturaYaExisteException(codFactura, "otraFactura");
+                throw new OtraFacturaYaExisteException(codFactura);
             }catch (RegistroVacioException e){
                 logger.log(Level.INFO, ">>> Nuevo registro en OtrasFacturas {0}", this.codFactura);
             }

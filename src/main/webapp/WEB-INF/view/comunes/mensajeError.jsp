@@ -20,8 +20,8 @@
 	</div>
 </c:forEach>
 
-	<div class="alert alert-warning alert-dismissible fade show container" role="alert">
+	<!--<div class="alert alert-warning alert-dismissible fade show container" role="alert">
 		<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-		Notificación de ejemplo para advertencias de reclamación
+		Notificaciï¿½n de ejemplo para advertencias de reclamaciï¿½n
 		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"/>
-	</div>
+	</div>-->

@@ -51,7 +51,7 @@ public class ProcesarFactura extends xmlHelper {
             try {
                 this.service.buscarByCodFiscal(this.codFactura);
                 logger.log(Level.INFO, ">>> Ya existe una factura con el codigo Fiscal {0}", this.codFactura);
-                throw new FacturaYaExisteException(this.codFactura, "factura");
+                throw new FacturaYaExisteException(this.codFactura);
             } catch (RegistroVacioException e) {
                 logger.log(Level.INFO, ">>> Nuevo registro en Facturas {0}", this.codFactura);
             }
@@ -64,7 +64,10 @@ public class ProcesarFactura extends xmlHelper {
                     break;
                 case "N":
                 case "G":
-                    this.registrarFacturaN();
+                    this.registrarFacturaN(TIPO_FACTURA.N_NORMAL);
+                    break;
+                case "C":
+                    this.registrarFacturaN(TIPO_FACTURA.C_);
                     break;
                 case "R":
                     this.registrarFacturaR(nombreArchivo);
@@ -108,10 +111,17 @@ public class ProcesarFactura extends xmlHelper {
     /**
      * Registra el Factura de tipo N
      */
-    private void registrarFacturaN() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
-        this.service.guardar(this.crearFactura());
-        System.out.print("\n\nComentarios : " + comentarios.toString());
-        System.out.print("Codigo Errores : " + errores.toString());
+    private void registrarFacturaN(TIPO_FACTURA tp) throws MasDeUnClienteEncontrado, TarifaNoExisteException {
+        Factura f = null;
+        switch (tp){
+            case N_NORMAL:
+                f = this.crearFactura();
+                break;
+            case C_:
+                f = this.crearFactura();
+                break;
+        }
+        this.service.guardar(f);
     }
 
     /**
@@ -129,7 +139,7 @@ public class ProcesarFactura extends xmlHelper {
             Factura factura = (Factura) this.service.buscarByCodFiscal(codRectificada);
             String nuevaRemesa = String.valueOf(Long.parseLong(xml.obtenerContenidoNodo(NombresNodos.ID_REM, this.doc)));
             this.service.rectificar(factura, nuevaRemesa, nombreArchivo);
-            this.registrarFacturaN();
+            this.registrarFacturaN(TIPO_FACTURA.N_NORMAL);
         } catch (RegistroVacioException e) {
             logger.log(Level.INFO, ">>> No se encontró una factura para rectificar con {0}", codRectificada);
             throw new CodRectNoExisteException(codRectificada);

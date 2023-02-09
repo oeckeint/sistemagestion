@@ -183,7 +183,7 @@ public class Procesamiento {
             }
             archivosCorrectos++;
 
-        } catch (FacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado
+        } catch (FacturaYaExisteException | PeajeYaExisteException | OtraFacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado
                 | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException | TablaBusquedaNoExisteException | TablaBusquedaNoEspecificadaException
                 | NoExisteElNodoException | ArchivoNoCumpleParaSerClasificado | MasDatosdeLosEsperadosException | TarifaNoExisteException | PeajeMasDeUnRegistroException
                 | FacturaNoEspecificaCodRecticadaException | FacturaNoExisteException | FacturaCodRectNoExisteException e) {

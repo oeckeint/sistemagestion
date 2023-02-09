@@ -46,7 +46,7 @@ public class ProcesarPeaje extends xmlHelper {
      * @throws PeajeMasDeUnRegistroException
      */
     public void procesar(Document doc, String nombreArchivo)
-            throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException {
+            throws ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException, PeajeYaExisteException {
         this.doc = doc;
         this.nombreArchivo = nombreArchivo;
         this.iniciarVariables();
@@ -54,9 +54,9 @@ public class ProcesarPeaje extends xmlHelper {
         if (this.cliente != null) {
             //Se revisa que la factura no exista
             try {
-                this.service.buscarByCodFiscal(codFactura);
+                this.service.buscarByCodFiscal(this.codFactura);
                 logger.log(Level.INFO, ">>> Ya existe un peaje con el codigo Fiscal {0}", this.codFactura);
-                throw new FacturaYaExisteException(codFactura, "peajes");
+                throw new PeajeYaExisteException(this.codFactura);
             }catch (RegistroVacioException e){
                 logger.log(Level.INFO, ">>> Nuevo registro en Peajes {0}", this.codFactura);
             }
@@ -70,7 +70,8 @@ public class ProcesarPeaje extends xmlHelper {
                     break;
                 case "N":
                 case "G":
-                    this.registrarPeajeN();
+                case "C":
+                    this.registrarPeajeN(this.tipoFactura.charAt(0));
                     break;
                 case "R":
                     this.registrarPeajeR(nombreArchivo);
@@ -119,8 +120,18 @@ public class ProcesarPeaje extends xmlHelper {
     /**
      * Registra el peaje de tipo Normnal
      */
-    private void registrarPeajeN() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
-        this.service.guardar(this.crearPeaje(TIPO_FACTURA.N_NORMAL));
+    private void registrarPeajeN(char tipoFactura) throws MasDeUnClienteEncontrado, TarifaNoExisteException {
+        Peaje p = null;
+        switch (tipoFactura) {
+            case 'N':
+            case 'G':
+                p = this.crearPeaje(TIPO_FACTURA.N_NORMAL);
+                break;
+            case 'C':
+                p = this.crearPeaje(TIPO_FACTURA.C_);
+                break;
+        }
+        this.service.guardar(p);
     }
 
     /**
@@ -138,7 +149,7 @@ public class ProcesarPeaje extends xmlHelper {
             Peaje peaje = (Peaje) this.service.buscarByCodFiscal(codRectificada);
             String nuevaRemesa = String.valueOf(Long.parseLong(xml.obtenerContenidoNodo(NombresNodos.ID_REM, this.doc)));
             this.service.rectificar(peaje, nuevaRemesa, nombreArchivo);
-            this.registrarPeajeN();
+            this.registrarPeajeN('N');
         } catch (RegistroVacioException e) {
             logger.log(Level.INFO, ">>> No se encontró una factura para rectificar con {0}", codRectificada);
             throw new CodRectNoExisteException(codRectificada);
@@ -327,11 +338,21 @@ public class ProcesarPeaje extends xmlHelper {
                 this.pmConsumo(), this.pmLecturaHasta(),
                 this.registroFin(), this.comentarios.toString(), this.errores.toString()
         );
+        if (tp == TIPO_FACTURA.C_) return peaje;
         EnergiaExcedentaria energiaExcedentaria = this.energiaExcedentaria();
         if (this.existeEnergiaExcedentaria) {
             this.existeEnergiaExcedentaria = false;
             peaje.setEnergiaExcedentaria(energiaExcedentaria);
         }
+        return peaje;
+    }
+
+    /**
+     * Crea un peaje del tipo C, este peaje es similar a los del tipo N, pero tiene menos datos embebidos en el documento xml
+     * @return
+     */
+    private Peaje crearPeajeC(){
+        Peaje peaje = new Peaje();
         return peaje;
     }
 

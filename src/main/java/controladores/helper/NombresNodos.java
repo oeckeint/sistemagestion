@@ -16,8 +16,10 @@ public class NombresNodos {
     public static String EMP_EMI = "CodigoREEEmpresaEmisora";
     public static String EMP_DES = "CodigoREEEmpresaDestino";
     public static String FEC = "Fecha";
+    public static final String IMPORTE_TOTAL_TERMINO_POTENCIA = "ImporteTotalTerminoPotencia";
     public static String MOD_LEC = "ModoLectura";   
-    public static String MOT_FAC = "MotivoFacturacion";   
+    public static String MOT_FAC = "MotivoFacturacion";
+    public static final String NUMERO_DIAS = "NumeroDias";
     public static String NUM_SER = "NumeroSerie";
     public static String PER = "Periodo";
     public static String POB = "";//Pendiente por averiguarse

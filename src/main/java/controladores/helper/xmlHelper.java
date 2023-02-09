@@ -630,6 +630,7 @@ public class xmlHelper {
 
         //Obtiene 1 elemento denomidado ImporteTotalTerminoPotencia en el nodo Potencia
         elementos = new ArrayList<Double>(1);
+        elementos.add(0.0);
 
         NodeList flowListPeriodo = this.doc.getElementsByTagName("Potencia");
 
@@ -645,7 +646,7 @@ public class xmlHelper {
                         continuar = false;
                         break;
                     } else {
-                        elementos.add(indicePeriodo++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
+                        elementos.set(indicePeriodo++, Double.parseDouble(childListLecturaHasta.item(j).getTextContent().trim()));
                     }
                 }
             }
@@ -984,6 +985,10 @@ public class xmlHelper {
      */
     protected Cargos Cargos(String tipoCargoValue, TIPO_FACTURA tp) {
         elementos =  (ArrayList) IntStream.range(0, 12).mapToDouble(i -> 0.0).boxed().collect(Collectors.toList());
+        if (tp == TIPO_FACTURA.C_){
+            this.logger.log(Level.INFO, "Las facturas de tipo C, no tienen Cargos");
+            return new Cargos(elementos);
+        }
         boolean continuar = true;
         int indice = 0;
         //List of blocks of parent nodes
@@ -1034,7 +1039,10 @@ public class xmlHelper {
      */
     protected CargoImporteTotal ImporteTotalCargos(String tipoCargoValue, TIPO_FACTURA tp) {
     	elementos =  (ArrayList) IntStream.range(0, 1).mapToDouble(i -> 0.0).boxed().collect(Collectors.toList());
-
+        if (tp == TIPO_FACTURA.C_){
+            this.logger.log(Level.INFO, "Las facturas de tipo C, no tienen Cargos");
+            return new CargoImporteTotal(elementos);
+        }
         int indice = 0;
         boolean continuar = true;
         //List of blocks of parent nodes
@@ -4693,20 +4701,14 @@ public class xmlHelper {
 
     /*-----------------------------Otros Metodos-------------------------*/
     private void verificarPotenciaAFacturar(double suma) {
-        double importeTotalTerminoPotencia = Double.parseDouble(this.doc.getElementsByTagName("ImporteTotalTerminoPotencia").item(0).getTextContent());
-        int numDias = Integer.parseInt(this.doc.getElementsByTagName("NumeroDias").item(0).getTextContent());
-
-        double importeCalculado = new BigDecimal(numDias * suma).setScale(2, RoundingMode.HALF_UP).doubleValue();
-
-        System.out.println(suma);
-        System.out.println(numDias);
-        System.out.println(importeTotalTerminoPotencia);
-
-        if (importeCalculado != importeTotalTerminoPotencia) {
-            System.out.println("Se esperaba encontrar el valor de " + importeTotalTerminoPotencia + ", en donde se calculó " + importeCalculado);
-            utileria.ArchivoTexto.escribirAdvertencia(nombreArchivo, "22");
-        } else {
-            System.out.println("Importe total termino potencia OK " + importeTotalTerminoPotencia);
+        String impTotTerPot = xml.obtenerContenidoNodo(NombresNodos.IMPORTE_TOTAL_TERMINO_POTENCIA, this.doc);
+        if (impTotTerPot != null){
+            double importeTotalTerminoPotencia = Double.parseDouble(impTotTerPot);
+            int numDias = Integer.parseInt(xml.obtenerContenidoNodo(NombresNodos.NUMERO_DIAS, this.doc));
+            double importeCalculado = new BigDecimal(numDias * suma).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            if (importeCalculado != importeTotalTerminoPotencia) {
+                utileria.ArchivoTexto.escribirAdvertencia(this.nombreArchivo, "22");
+            }
         }
     }
 
@@ -4824,7 +4826,8 @@ public class xmlHelper {
     enum TIPO_FACTURA{
     	A_ABONO, 
     	N_NORMAL, 
-    	R_RECTIFICADA;
+    	R_RECTIFICADA,
+        C_;
     }
 
 }
