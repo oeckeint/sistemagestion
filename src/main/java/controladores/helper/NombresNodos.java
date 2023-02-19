@@ -16,6 +16,7 @@ public class NombresNodos {
     public static String EMP_EMI = "CodigoREEEmpresaEmisora";
     public static String EMP_DES = "CodigoREEEmpresaDestino";
     public static String FEC = "Fecha";
+    public static final String FECHA_LIMITE_PAGO = "FechaLimitePago";
     public static final String IMPORTE_TOTAL_TERMINO_POTENCIA = "ImporteTotalTerminoPotencia";
     public static String MOD_LEC = "ModoLectura";   
     public static String MOT_FAC = "MotivoFacturacion";

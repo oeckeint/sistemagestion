@@ -82,7 +82,7 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
 
     @Override
     @Transactional
-    public void rectificar(Peaje documento, String nuevaRemesa, String nuevoNombreArchivo) {
+    public void rectificar(Peaje documento, String nuevaRemesa, String nuevoNombreArchivo, String nuevaFechaLimitePago) {
         Peaje peaje = documento;
         peaje.setIdPeaje(0L);
         peaje.setCodFisFac(documento.getCodFisFac() + "-A");
@@ -227,6 +227,7 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
                 + "Se cambio la remensa <Strong>" + peaje.getRfIdRem() + "</Strong> por <Strong>" + nuevaRemesa + "</Strong>.");
                 
         peaje.setRfIdRem(nuevaRemesa);
+        peaje.setRfFecLimPag(nuevaFechaLimitePago);
         
         if (peaje.getEnergiaExcedentaria() != null) {
         	EnergiaExcedentaria eE = new EnergiaExcedentaria();

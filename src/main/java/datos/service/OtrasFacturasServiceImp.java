@@ -79,7 +79,7 @@ public class OtrasFacturasServiceImp implements datos.interfaces.DocumentoXmlSer
 
     @Override
     @Transactional
-    public void rectificar(OtraFactura documento, String nuevaRemesa, String nuevoNombreArchivo) {
+    public void rectificar(OtraFactura documento, String nuevaRemesa, String nuevoNombreArchivo, String nuevaFechaLimitePago) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

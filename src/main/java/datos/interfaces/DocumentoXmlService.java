@@ -24,7 +24,7 @@ public interface DocumentoXmlService<T> {
     
     public List<T> buscarByRemesa(String remesa);
     
-    public void rectificar(T documento, String nuevaRemesa, String nuevoNombreArchivo);
+    public void rectificar(T documento, String nuevaRemesa, String nuevoNombreArchivo, String nuevaFechaLimitePago);
     
     public void actualizar(T documento);
     

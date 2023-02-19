@@ -138,7 +138,8 @@ public class ProcesarFactura extends xmlHelper {
         try {
             Factura factura = (Factura) this.service.buscarByCodFiscal(codRectificada);
             String nuevaRemesa = String.valueOf(Long.parseLong(xml.obtenerContenidoNodo(NombresNodos.ID_REM, this.doc)));
-            this.service.rectificar(factura, nuevaRemesa, nombreArchivo);
+            String nuevaFechaLimitePago = xml.obtenerContenidoNodo(NombresNodos.FECHA_LIMITE_PAGO, this.doc);
+            this.service.rectificar(factura, nuevaRemesa, nombreArchivo, nuevaFechaLimitePago);
             this.registrarFacturaN(TIPO_FACTURA.N_NORMAL);
         } catch (RegistroVacioException e) {
             logger.log(Level.INFO, ">>> No se encontró una factura para rectificar con {0}", codRectificada);

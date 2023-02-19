@@ -148,7 +148,8 @@ public class ProcesarPeaje extends xmlHelper {
         try {
             Peaje peaje = (Peaje) this.service.buscarByCodFiscal(codRectificada);
             String nuevaRemesa = String.valueOf(Long.parseLong(xml.obtenerContenidoNodo(NombresNodos.ID_REM, this.doc)));
-            this.service.rectificar(peaje, nuevaRemesa, nombreArchivo);
+            String nuevaFechaLimitePago = xml.obtenerContenidoNodo(NombresNodos.FECHA_LIMITE_PAGO, this.doc);
+            this.service.rectificar(peaje, nuevaRemesa, nombreArchivo, nuevaFechaLimitePago);
             this.registrarPeajeN('N');
         } catch (RegistroVacioException e) {
             logger.log(Level.INFO, ">>> No se encontró una factura para rectificar con {0}", codRectificada);
