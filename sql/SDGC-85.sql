@@ -13,7 +13,7 @@ CREATE TABLE `tipo_reclamacion` (
   `updated_on` date DEFAULT NULL,
   `updated_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   PRIMARY KEY (`id_tipo_reclamacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 #Nueva tabla de subtipo_reclamacion
 
@@ -28,7 +28,7 @@ CREATE TABLE `subtipo_reclamacion` (
   `updated_on` date DEFAULT NULL,
   `updated_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   PRIMARY KEY (`id_subtipo_reclamacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 #Nueva tabla de Reclamaciones
 
