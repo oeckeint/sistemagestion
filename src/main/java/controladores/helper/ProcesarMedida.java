@@ -63,20 +63,25 @@ public class ProcesarMedida {
                 if (elementos.length == 12) {
                     Cliente cliente = clienteService.encontrarCups(elementos[0]);
                     if (cliente != null) {
-                        medida = new Medida();
-                        medida.setCliente(cliente);
-                        medida.setFecha(new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(elementos[1]));
-                        medida.setBanderaInvVer(Integer.parseInt(elementos[2]));
-                        medida.setAe1(Integer.parseInt(elementos[3]));
-                        medida.setAs1(Integer.parseInt(elementos[4]));
-                        medida.setRq1(Integer.parseInt(elementos[5]));
-                        medida.setRq2(Integer.parseInt(elementos[6]));
-                        medida.setRq3(Integer.parseInt(elementos[7]));
-                        medida.setRq4(Integer.parseInt(elementos[8]));
-                        medida.setMetodObj(Integer.parseInt(elementos[9]));
-                        medida.setIndicFirmez(Integer.parseInt(elementos[10]));
-                        medida.setCodigoFactura(elementos[11]);
-                        medidas.add(medida);
+                        if (!cliente.getTarifa().equals("20TD")){
+                            medida = new Medida();
+                            medida.setCliente(cliente);
+                            medida.setFecha(new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(elementos[1]));
+                            medida.setBanderaInvVer(Integer.parseInt(elementos[2]));
+                            medida.setAe1(Integer.parseInt(elementos[3]));
+                            medida.setAs1(Integer.parseInt(elementos[4]));
+                            medida.setRq1(Integer.parseInt(elementos[5]));
+                            medida.setRq2(Integer.parseInt(elementos[6]));
+                            medida.setRq3(Integer.parseInt(elementos[7]));
+                            medida.setRq4(Integer.parseInt(elementos[8]));
+                            medida.setMetodObj(Integer.parseInt(elementos[9]));
+                            medida.setIndicFirmez(Integer.parseInt(elementos[10]));
+                            medida.setCodigoFactura(elementos[11]);
+                            medidas.add(medida);
+                        } else {
+                            logger.log(Level.INFO, ">>> El cliente con el cups {0}, tiene tarifa 20TD. No se guarda en la DB", elementos[0]);
+                            ArchivoTexto.escribirError("El cliente con el cups " + elementos[0] + ", tiene tarifa 20TD. No se guarda en la DB del archivo " + nombreArchivo);
+                        }
                     } else {
                         logger.log(Level.INFO, ">>> No existe el cliente con el cups {0}", elementos[0]);
                         ArchivoTexto.escribirError("No se encontró un cliente con el cups " + elementos[0] + " en el archivo " + nombreArchivo);
