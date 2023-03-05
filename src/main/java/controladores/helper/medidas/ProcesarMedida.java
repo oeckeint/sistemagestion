@@ -1,4 +1,4 @@
-package controladores.helper;
+package controladores.helper.medidas;
 
 import datos.entity.Cliente;
 import datos.entity.Medida;
@@ -32,17 +32,22 @@ public class ProcesarMedida {
         this.clienteService = clienteService;
     }
 
-    public void procesar(File file, String nombreArchivo) throws MedidaTipoNoReconocido {
-        switch (this.definirTipoMedida(nombreArchivo)){
-            case F5:
-                this.obtenerMedidasArchivo(file, nombreArchivo).forEach(medidasService::guardar);
-                break;
-            case DESCONOCIDO:
-                throw new MedidaTipoNoReconocido(nombreArchivo);
-        }
+    /**
+     * Lee todas las lineas que contiene el archivo y las guarda en la base de datos en la tabla de medidas
+     * @param file
+     * @param nombreArchivo
+     * @throws MedidaTipoNoReconocido
+     */
+    public void guardar(File file, String nombreArchivo) {
+        this.obtenerMedidasArchivo(file, nombreArchivo).forEach(medidasService::guardar);
     }
 
-
+    /**
+     * Extraer cada una de las lineas y crea un objeto del tipo Medida asignandolo a una lista de Medidas
+     * @param f
+     * @param nombreArchivo
+     * @return
+     */
     private List<Medida> obtenerMedidasArchivo(File f, String nombreArchivo){
         List<Medida> medidas = new ArrayList<>();
         Medida medida;
@@ -106,19 +111,6 @@ public class ProcesarMedida {
             } catch (Exception e2) {e2.printStackTrace();}
         }
         return medidas;
-    }
-
-
-    private TIPO_MEDIDA definirTipoMedida(String nombreArchivo){
-        TIPO_MEDIDA t = TIPO_MEDIDA.DESCONOCIDO;
-        if (nombreArchivo.startsWith("F5")) {
-            t = TIPO_MEDIDA.F5;
-        }
-        return t;
-    }
-
-    private enum TIPO_MEDIDA{
-        F5, DESCONOCIDO
     }
 
 }

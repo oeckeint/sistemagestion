@@ -6,16 +6,15 @@ import java.util.List;
 import javax.persistence.*;
 
 import datos.entity.cliente.tickets.ClienteTicket;
+import lombok.Data;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
+@Data
 @Entity
 @Table(name = "cliente")
 public class Cliente implements Serializable {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -53,6 +52,9 @@ public class Cliente implements Serializable {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Medida> medidas;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<MedidaCCH> medidasCCH;
     
     public Cliente() {
     }
@@ -72,93 +74,5 @@ public class Cliente implements Serializable {
     public Cliente(String cups) {
         this.cups = cups;
     }
-
-    public long getIdCliente() {
-        return idCliente;
-    }
-
-    public void setIdCliente(long idCliente) {
-        this.idCliente = idCliente;
-    }
-
-    public String getCups() {
-        return cups;
-    }
-
-    public void setCups(String cups) {
-        this.cups = cups;
-    }
-
-    public String getNombreCliente() {
-        return nombreCliente;
-    }
-
-    public void setNombreCliente(String nombreCliente) {
-        this.nombreCliente = nombreCliente;
-    }
-
-    public String getTarifa() {
-        return tarifa;
-    }
-
-    public void setTarifa(String tarifa) {
-        this.tarifa = tarifa;
-    }
-
-    public short getIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(short isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
-    public ClientePuntoSuministro getClientePuntoSuministro() {
-        return clientePuntoSuministro;
-    }
-
-    public void setClientePuntoSuministro(ClientePuntoSuministro clientePuntoSuministro) {
-        this.clientePuntoSuministro = clientePuntoSuministro;
-    }
-
-    public ClienteDatosGenerales getClienteDatosGenerales() {
-        return clienteDatosGenerales;
-    }
-
-    public void setClienteDatosGenerales(ClienteDatosGenerales clienteDatosGenerales) {
-        this.clienteDatosGenerales = clienteDatosGenerales;
-    }
-
-    public ClienteContrato getClienteContrato() {
-        return clienteContrato;
-    }
-
-    public void setClienteContrato(ClienteContrato clienteContrato) {
-        this.clienteContrato = clienteContrato;
-    }
-    
-    public List<ClienteTicket> getClienteTickets() {
-		return clienteTickets;
-	}
-
-	public void setClienteTickets(List<ClienteTicket> clienteTickets) {
-		this.clienteTickets = clienteTickets;
-	}
-
-    public List<Medida> getMedidas() {
-        return medidas;
-    }
-
-    public void setMedidas(List<Medida> medidas) {
-        this.medidas = medidas;
-    }
-
-    @Override
-	public String toString() {
-		return "Cliente [idCliente=" + idCliente + ", cups=" + cups + ", nombreCliente=" + nombreCliente + ", tarifa="
-				+ tarifa + ", isDeleted=" + isDeleted + ", clientePuntoSuministro=" + clientePuntoSuministro
-				+ ", clienteDatosGenerales=" + clienteDatosGenerales + ", clienteContrato=" + clienteContrato
-				+ ", clienteTickets=" + clienteTickets + "]";
-	}
 
 }

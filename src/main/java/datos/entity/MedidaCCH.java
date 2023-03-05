@@ -4,14 +4,16 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.*;
-
 
 @Data
 @Entity
 @Table(name = "medida_cch")
 
-public class MedidaCCH {
+public class MedidaCCH implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_medida_cch")
@@ -21,7 +23,7 @@ public class MedidaCCH {
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "fecha")
     private Date fecha;
 
@@ -52,16 +54,13 @@ public class MedidaCCH {
 
     public MedidaCCH() {
     }
-    public MedidaCCH(Cliente cliente, Date fecha, int banderaInvVer, int actent, int metod, Calendar createdOn, String createdBy, Calendar updatedOn, String updatedBy){
+
+    public MedidaCCH(Cliente cliente, Date fecha, int banderaInvVer, int actent, int metod){
         this.cliente = cliente;
         this.fecha = fecha;
         this.banderaInvVer = banderaInvVer;
         this.actent = actent;
         this.metod = metod;
-        this.createdOn = createdOn;
-        this.createdBy = createdBy;
-        this.updatedOn = updatedOn;
-        this.updatedBy = updatedBy;
     }
 
     public MedidaCCH(long idCliente){

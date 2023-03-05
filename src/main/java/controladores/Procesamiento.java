@@ -1,6 +1,9 @@
 package controladores;
 
 import controladores.helper.*;
+import controladores.helper.medidas.MedidasHelper;
+import controladores.helper.medidas.ProcesarMedida;
+import controladores.helper.medidas.ProcesarMedidaCCH;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
 import datos.interfaces.DocumentoXmlService;
@@ -11,7 +14,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -67,6 +69,12 @@ public class Procesamiento {
 
     @Autowired
     private ProcesarMedida procesarMedida;
+
+    @Autowired
+    private ProcesarMedidaCCH procesarMedidaCCH;
+
+    @Autowired
+    private MedidasHelper medidasHelper;
 
     int archivosCorrectos;
     int archivosTotales;
@@ -201,7 +209,14 @@ public class Procesamiento {
     private void procesarMedidas(File archivo, String nombreArchivo){
         System.out.println("(Ini)************************-----------------------------" + nombreArchivo);
         try {
-            this.procesarMedida.procesar(archivo, nombreArchivo);
+            switch (medidasHelper.definirTipoMedida(nombreArchivo)){
+                case F5:
+                    this.procesarMedida.guardar(archivo, nombreArchivo);
+                    break;
+                case P5:
+                    this.procesarMedidaCCH.guardar(archivo, nombreArchivo);
+                    break;
+            }
             archivosCorrectos++;
         } catch (MedidaTipoNoReconocido e){
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());

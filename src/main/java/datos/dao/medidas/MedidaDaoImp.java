@@ -1,4 +1,4 @@
-package datos.dao;
+package datos.dao.medidas;
 
 import datos.entity.Medida;
 import datos.interfaces.CrudDao;
