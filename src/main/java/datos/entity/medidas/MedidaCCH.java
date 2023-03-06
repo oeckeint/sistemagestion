@@ -37,16 +37,14 @@ public class MedidaCCH implements Serializable {
     @Column(name = "metod")
     private int metod;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_on")
     private Calendar createdOn;
 
     @Column(name = "created_by")
     private String createdBy;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_on")
     private Calendar updatedOn;
 
