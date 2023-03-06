@@ -2,37 +2,33 @@
 
 #Nueva tabla tipo_reclamacion
 
--- sge.tipo_reclamacion definition
+#sge.tipo_reclamacion definition
 
 CREATE TABLE `tipo_reclamacion` (
   `id_tipo_reclamacion` int NOT NULL AUTO_INCREMENT,
   `codigo_reclamacion` int NOT NULL,
   `descripcion` varchar(50) NOT NULL,
-  `created_on` date DEFAULT NULL,
+  `created_on` datetime DEFAULT NULL,
   `created_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `updated_on` date DEFAULT NULL,
+  `updated_on` datetime DEFAULT NULL,
   `updated_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   PRIMARY KEY (`id_tipo_reclamacion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 #Nueva tabla de subtipo_reclamacion
 
--- sge.subtipo_reclamacion definition
-
 CREATE TABLE `subtipo_reclamacion` (
   `id_subtipo_reclamacion` int NOT NULL AUTO_INCREMENT,
   `codigo_reclamacion` int NOT NULL,
   `descripcion` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `created_on` date DEFAULT NULL,
+  `created_on` datetime DEFAULT NULL,
   `created_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `updated_on` date DEFAULT NULL,
+  `updated_on` datetime DEFAULT NULL,
   `updated_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   PRIMARY KEY (`id_subtipo_reclamacion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 #Nueva tabla de Reclamaciones
-
--- sge.reclamaciones definition
 
 CREATE TABLE `reclamaciones` (
   `id_reclamacion` int NOT NULL AUTO_INCREMENT,
@@ -48,9 +44,9 @@ CREATE TABLE `reclamaciones` (
   `id_tipo_reclamacion` int NOT NULL,
   `id_subtipo_reclamacion` int NOT NULL,
   `is_deleted` int DEFAULT NULL,
-  `created_on` date NOT NULL,
+  `created_on` datetime NOT NULL,
   `created_by` varchar(100) NOT NULL,
-  `updated_on` date NOT NULL,
+  `updated_on` datetime NOT NULL,
   `updated_by` varchar(100) NOT NULL,
   PRIMARY KEY (`id_reclamacion`),
   KEY `reclamaciones_FK` (`id_cliente`),
@@ -71,7 +67,6 @@ INSERT INTO sge.tipo_reclamacion (codigo_reclamacion, descripcion, created_on, c
 INSERT INTO sge.tipo_reclamacion (codigo_reclamacion, descripcion, created_on, created_by, updated_on, updated_by) VALUES( 7, 'Atención Reglamentaria', NULL, NULL, NULL, NULL);
 
 #Datos de la tabla de subtipo_reclamacion
-
 INSERT INTO sge.subtipo_reclamacion (codigo_reclamacion, descripcion, created_on, created_by, updated_on, updated_by) VALUES( 1, 'Atencion Incorrecta', NULL, NULL, NULL, NULL);
 INSERT INTO sge.subtipo_reclamacion (codigo_reclamacion, descripcion, created_on, created_by, updated_on, updated_by) VALUES( 2, 'Privacidad de los Datos', NULL, NULL, NULL, NULL);
 INSERT INTO sge.subtipo_reclamacion (codigo_reclamacion, descripcion, created_on, created_by, updated_on, updated_by) VALUES( 3, 'Incidencia en Equipos de Medida', NULL, NULL, NULL, NULL);
