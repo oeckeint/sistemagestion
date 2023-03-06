@@ -8,6 +8,7 @@ import javax.persistence.*;
 import datos.entity.cliente.tickets.ClienteTicket;
 import datos.entity.medidas.Medida;
 import datos.entity.medidas.MedidaCCH;
+import datos.entity.reclamaciones.Reclamacion;
 import lombok.Data;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -57,7 +58,10 @@ public class Cliente implements Serializable {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<MedidaCCH> medidasCCH;
-    
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Reclamacion> reclamaciones;
+
     public Cliente() {
     }
 
