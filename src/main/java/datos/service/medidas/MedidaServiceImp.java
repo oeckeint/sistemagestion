@@ -1,11 +1,13 @@
 package datos.service.medidas;
 
+import controladores.helper.Utilidades;
 import datos.entity.medidas.Medida;
 import datos.interfaces.CrudDao;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -44,6 +46,13 @@ public class MedidaServiceImp implements CrudDao<Medida> {
     @Override
     @Transactional
     public void guardar(Medida medida) {
+        if (medida.getCreatedBy() == null || medida.getCreatedBy().length() == 0){
+            medida.setCreatedOn(Calendar.getInstance());
+            medida.setCreatedBy(Utilidades.currentUser());
+        } else {
+            medida.setUpdatedOn(Calendar.getInstance());
+            medida.setUpdatedBy(Utilidades.currentUser());
+        }
         this.medidaCrudDao.guardar(medida);
     }
 
