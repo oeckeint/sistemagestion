@@ -1,8 +1,11 @@
-package datos.entity;
+package datos.entity.medidas;
 
+import datos.entity.Cliente;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 
 @Data
@@ -57,6 +60,20 @@ public class Medida {
 
     @Column(name = "medida_col")
     private String medidaCol;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_on")
+    private Calendar createdOn;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_on")
+    private Calendar updatedOn;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
 
     public Medida() {
     }

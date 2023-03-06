@@ -1,5 +1,6 @@
-package datos.entity;
+package datos.entity.medidas;
 
+import datos.entity.Cliente;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 

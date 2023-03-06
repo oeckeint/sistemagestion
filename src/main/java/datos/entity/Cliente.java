@@ -6,6 +6,8 @@ import java.util.List;
 import javax.persistence.*;
 
 import datos.entity.cliente.tickets.ClienteTicket;
+import datos.entity.medidas.Medida;
+import datos.entity.medidas.MedidaCCH;
 import lombok.Data;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;

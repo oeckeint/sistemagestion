@@ -1,7 +1,7 @@
 package datos.service.medidas;
 
 import controladores.helper.Utilidades;
-import datos.entity.MedidaCCH;
+import datos.entity.medidas.MedidaCCH;
 import datos.interfaces.CrudDao;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

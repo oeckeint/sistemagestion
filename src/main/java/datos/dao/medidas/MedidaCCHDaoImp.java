@@ -1,7 +1,6 @@
 package datos.dao.medidas;
 
-import datos.entity.Medida;
-import datos.entity.MedidaCCH;
+import datos.entity.medidas.MedidaCCH;
 import datos.interfaces.CrudDao;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;

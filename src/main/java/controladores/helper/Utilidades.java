@@ -18,8 +18,6 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import datos.entity.Cliente;
-import datos.entity.Medida;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.w3c.dom.Document;

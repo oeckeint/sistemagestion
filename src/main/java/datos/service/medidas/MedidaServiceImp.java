@@ -1,6 +1,6 @@
 package datos.service.medidas;
 
-import datos.entity.Medida;
+import datos.entity.medidas.Medida;
 import datos.interfaces.CrudDao;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

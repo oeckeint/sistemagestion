@@ -1,7 +1,7 @@
 package controladores.helper.medidas;
 
 import datos.entity.Cliente;
-import datos.entity.MedidaCCH;
+import datos.entity.medidas.MedidaCCH;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
 import excepciones.MasDeUnClienteEncontrado;
