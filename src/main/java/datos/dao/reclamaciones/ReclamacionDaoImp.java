@@ -3,8 +3,10 @@ package datos.dao.reclamaciones;
 import datos.entity.reclamaciones.Reclamacion;
 import datos.interfaces.CrudDao;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 
 import java.util.List;
 
@@ -57,11 +59,18 @@ public class ReclamacionDaoImp implements CrudDao<Reclamacion> {
 
     @Override
     public int contarRegistros() {
-        return 0;
+        Query query = this.sessionFactory.getCurrentSession()
+                .createNativeQuery("select  count(*) from reclamaciones r where is_deleted = 0");
+        Long a = Long.parseLong(query.uniqueResult().toString());
+        return a.intValue();
     }
 
     @Override
     public int contarPaginacion(int rows) {
-        return 0;
+        Query query = this.sessionFactory.getCurrentSession()
+                .createNativeQuery("select count(*) from reclamaciones r where is_deleted = 0");
+        Long a = Long.parseLong(query.uniqueResult().toString());
+        Double b = Math.ceil((double) a / rows);
+        return b.intValue();
     }
 }

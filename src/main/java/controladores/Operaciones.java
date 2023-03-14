@@ -6,16 +6,16 @@ import org.springframework.web.servlet.ModelAndView;
 
 public abstract class Operaciones {
 	
-	ModelAndView mv;
+	public ModelAndView mv;
 	
-	abstract ModelAndView listar();
+	public abstract ModelAndView listar();
 	
-	abstract ModelAndView listar(Integer paginaActual, Integer rows);
+	public abstract ModelAndView listar(Integer paginaActual, Integer rows);
+
+	public abstract ModelAndView listarFiltro();
 	
-	abstract ModelAndView listarFiltro();
+	public abstract ModelAndView detalle(String valor, String filtro);
 	
-	abstract ModelAndView detalle(String valor, String filtro);
-	
-	abstract ModelAndView agregar();
+	public abstract ModelAndView agregar();
 	
 }

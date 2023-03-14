@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.Date;
 
 @Data @Entity @Table(name = "reclamaciones")
 public class Reclamacion implements Serializable {
@@ -15,7 +16,7 @@ public class Reclamacion implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_reclamacion")
-    private long id;
+    private long idReclamacion;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_cliente")
@@ -33,15 +34,13 @@ public class Reclamacion implements Serializable {
     @Column(name = "codigo_de_solicitud")
     private int codigoDeSolicitud;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha_solicitud")
-    private Calendar fechaSolicitud;
+    private Date fechaSolicitud;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha_incidente")
-    private Calendar fechaIncidente;
+    private Date fechaIncidente;
 
     @Column(name = "numero_factura_atr")
     private String numeroFacturaATR;
