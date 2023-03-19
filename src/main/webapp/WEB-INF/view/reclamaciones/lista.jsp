@@ -32,16 +32,7 @@
                     <h2 class="m-0"><a href="${pageContext.request.contextPath}/">
                             <i class="fas fa-arrow-circle-left text-success"></i></a>
                           <fmt:message key="customers.reclamaciones.tittle"/>
-                        <span class="badge bg-success">
-                            <c:choose>
-                                <c:when test="${paginaActual < ultimaPagina}">
-                                    ${registrosMostrados} / ${totalRegistros}
-                                </c:when>
-                                <c:otherwise>
-                                    ${totalRegistros} / ${totalRegistros}
-                                </c:otherwise>
-                            </c:choose>
-                        </span>
+
                     </h2>
                 </div>
                 <div class="col-6 row justify-content-end">
@@ -74,8 +65,9 @@
                             </thead>
                             <tbody>
                                 <c:forEach var="reclamacion" items="${reclamaciones}" varStatus="id">
-                                    <c:url var="detalles" value="/clientes/detalles">
-                                        <c:param name="idRegistro" value="${reclamacion.numeroFacturaATR}"/>
+                                    <c:url var="detalles" value="/clientes/reclamaciones/detalles">
+                                        <c:param name="valor" value="${reclamacion.idReclamacion}"/>
+                                        <c:param name="filtro" value="reclamacion"/>
                                     </c:url>
                                     <c:url var="detallesCliente" value="/clientes/detalles">
                                         <c:param name="valor" value="${reclamacion.cliente.idCliente}"/>

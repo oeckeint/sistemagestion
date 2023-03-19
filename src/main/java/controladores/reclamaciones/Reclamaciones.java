@@ -59,10 +59,33 @@ public class Reclamaciones extends Operaciones{
     }
     @GetMapping("/detalles")
     @Override
-    public ModelAndView detalle(String valor, String filtro) {
-        System.out.println("Dentro del método detalle");
-        return null;
+    public ModelAndView detalle(@RequestParam("valor") String valor,@RequestParam("filtro") String filtro) {
+        Reclamacion reclamacion = null;
+        List<Reclamacion> reclamaciones = null;
+        super.mv = new ModelAndView("reclamaciones/reclamacion_detalle");
+        switch (filtro){
+            case "reclamacion":
+                reclamacion = this.reclamacionService.buscarId(Integer.parseInt(valor));
+                super.mv.addObject("reclamacion", reclamacion);
+                if(reclamacion == null){
+                    this.listar(1, 50);
+                    super.mv.addObject("error", "sinregistro");
+                }
+                break;
+            case "CUPS":
+                System.out.println("Dentro del case CUPS");
+                break;
+            case "Cliente":
+                System.out.println("Dentro del case Cliente");
+                break;
+            case "ATR":
+                System.out.println("Dentro del case ATR");
+                break;
+        }
+        super.mv.addObject("titulo", "Reclamaciones");
+        return super.mv;
     }
+
     @GetMapping("/agregar")
     @Override
     public ModelAndView agregar() {

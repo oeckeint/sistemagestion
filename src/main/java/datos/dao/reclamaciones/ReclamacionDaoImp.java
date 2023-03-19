@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 
+import javax.persistence.NoResultException;
 import java.util.List;
 
 @Repository
@@ -34,7 +35,12 @@ public class ReclamacionDaoImp implements CrudDao<Reclamacion> {
 
     @Override
     public Reclamacion buscarId(long id) {
-        return null;
+        try{
+            return sessionFactory.getCurrentSession().createQuery("from Reclamacion r where r.idReclamacion = :id", Reclamacion.class)
+                    .setParameter("id", id).getSingleResult();
+        } catch (NoResultException e){
+            return null;
+        }
     }
 
     @Override
