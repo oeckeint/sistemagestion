@@ -2,94 +2,184 @@ package controladores.reclamaciones;
 
 import controladores.Operaciones;
 import controladores.helper.Utilidades;
+import datos.entity.reclamaciones.BusquedaReclamacion;
 import datos.entity.reclamaciones.Reclamacion;
 import datos.interfaces.CrudDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.logging.Logger;
 
 @Controller
 @RequestMapping("/clientes/reclamaciones")
-public class Reclamaciones extends Operaciones{
+public class Reclamaciones extends Operaciones<BusquedaReclamacion>{
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    @Autowired
-    @Qualifier(value = "reclamacionServiceImp")
-    private CrudDao<Reclamacion> reclamacionService;
+    private final CrudDao<Reclamacion> reclamacionService;
+    private final BusquedaReclamacion busquedaReclamacion;
+
+    private boolean confirmacionArchivado;
+    private boolean confirmacionDesarchivado;
+    private boolean confirmacionNuevoComentario;
+
+    public Reclamaciones(@Qualifier(value = "reclamacionServiceImp") CrudDao<Reclamacion> reclamacionService, BusquedaReclamacion busquedaReclamacion) {
+        this.reclamacionService = reclamacionService;
+        this.busquedaReclamacion = busquedaReclamacion;
+    }
 
     @GetMapping("")
     @Override
-    public ModelAndView listar() {
-        return null;
-    }
-    @GetMapping("/listar")
-    @Override
     public ModelAndView listar(@RequestParam(required = false, defaultValue = "1", name = "page") Integer paginaActual,
                                @RequestParam(required = false,defaultValue = "50", name = "rows") Integer rows) {
-        //List<Reclamacion> = reclamacionService.listar();
         super.mv = new ModelAndView("reclamaciones/lista");
-        super.mv.addObject("titulo", "Reclamaciones");
 
-        //Paginacion
-        paginaActual = Utilidades.revisarPaginaActual(paginaActual);
-        int ultimaPagina = this.reclamacionService.contarPaginacion(rows);
         rows = Utilidades.revisarRangoRows(rows, 25);
-        List<Reclamacion> reclamaciones = this.reclamacionService.listar();
-        int registrosMostrados = rows * paginaActual;
-        super.mv.addObject("reclamaciones", reclamaciones);
+        paginaActual = Utilidades.revisarPaginaActual(paginaActual);
+        List<Reclamacion> reclamaciones = this.reclamacionService.listar(rows, paginaActual - 1);
+
+        super.mv.addObject("titulo", "Reclamaciones");
+        super.mv.addObject("registrosMostrados", (rows * paginaActual));
         super.mv.addObject("totalRegistros", this.reclamacionService.contarRegistros());
-        super.mv.addObject("paginaActual", paginaActual);
-        super.mv.addObject("ultimaPagina", ultimaPagina);
         super.mv.addObject("rows", rows);
-        super.mv.addObject("registrosMostrados", registrosMostrados);
+        super.mv.addObject("paginaActual", paginaActual);
+        super.mv.addObject("ultimaPagina", this.reclamacionService.contarPaginacion(rows));
+        super.mv.addObject("busqueda", this.busquedaReclamacion);
+        super.mv.addObject("controller", "clientes/reclamaciones");
+        super.mv.addObject("reclamaciones", reclamaciones);
+
         return super.mv;
     }
-    @GetMapping("/listarFiltro")
-    @Override
-    public ModelAndView listarFiltro() {
-        System.out.println("Dentro del método listarFiltro");
-        return null;
-    }
+
     @GetMapping("/detalles")
     @Override
     public ModelAndView detalle(@RequestParam("valor") String valor,@RequestParam("filtro") String filtro) {
+        super.mv = new ModelAndView("reclamaciones/reclamacion_detalle");
         Reclamacion reclamacion = null;
         List<Reclamacion> reclamaciones = null;
-        super.mv = new ModelAndView("reclamaciones/reclamacion_detalle");
+        String mensaje = "sinregistro";
+
         switch (filtro){
             case "reclamacion":
                 reclamacion = this.reclamacionService.buscarId(Integer.parseInt(valor));
-                super.mv.addObject("reclamacion", reclamacion);
-                if(reclamacion == null){
+                if (reclamacion != null){
+                    super.mv.addObject("reclamacion", reclamacion);
+                    mensaje = "registroEncontrado";
+                } else {
                     this.listar(1, 50);
-                    super.mv.addObject("error", "sinregistro");
                 }
                 break;
-            case "CUPS":
-                System.out.println("Dentro del case CUPS");
-                break;
-            case "Cliente":
-                System.out.println("Dentro del case Cliente");
-                break;
-            case "ATR":
-                System.out.println("Dentro del case ATR");
+            case "cliente":
+                reclamaciones = this.reclamacionService.buscarFiltro(valor, filtro);
+
+                if (reclamaciones != null){
+                    if (reclamaciones.size() == 1){
+                        super.mv.addObject("reclamacion", reclamaciones.get(0));
+                        mensaje = "registroEncontrado";
+                    } else {
+                        this.createViewForReclamacionesFilter(reclamaciones);
+                        mensaje = "registrosEncontrados";
+                    }
+                } else {
+                    super.mv = this.listar(1, 50);
+                }
                 break;
         }
+
+        mensaje = confirmacionArchivado ? "registroarchivado" : mensaje;
+        mensaje = confirmacionDesarchivado ? "registrodesarchivado" : mensaje;
+        mensaje = confirmacionNuevoComentario ? "nuevoComentario" : mensaje;
+        this.reiniciarVariablesBooleanas();
+
+        busquedaReclamacion.setValorActual(valor);
+        busquedaReclamacion.setFiltroActual(filtro);
+        super.mv.addObject("mensaje", mensaje);
+        super.mv.addObject("busqueda", this.busquedaReclamacion);
         super.mv.addObject("titulo", "Reclamaciones");
         return super.mv;
+    }
+
+    @Override
+    public ModelAndView listarFiltro() {
+        return null;
     }
 
     @GetMapping("/agregar")
     @Override
     public ModelAndView agregar() {
-        System.out.println();
         return null;
     }
+
+    @PostMapping("/busqueda")
+    @Override
+    public ModelAndView busqueda(@ModelAttribute("busqueda") @Valid final BusquedaReclamacion busqueda, final BindingResult bindingResult) {
+        if (!bindingResult.hasErrors()){
+            return this.detalle(busqueda.getValorActual(), busqueda.getFiltroActual());
+        }
+        super.mv.addObject("busqueda", busqueda);
+        return super.mv;
+    }
+
+    @GetMapping("/archivar")
+    private ModelAndView archivar(@RequestParam(required = true, name = "id") final String id){
+        Reclamacion r = reclamacionService.buscarId(Long.parseLong(id));
+        if (r != null){
+            if (r.getIsDeleted() == 0){
+                r.setIsDeleted(1);
+                this.confirmacionArchivado = true;
+            } else if (r.getIsDeleted() == 1){
+                r.setIsDeleted(0);
+                this.confirmacionDesarchivado = true;
+            }
+            this.reclamacionService.actualizar(r);
+            super.mv = new ModelAndView("redirect:/clientes/reclamaciones/detalles?valor=" + r.getIdReclamacion() + "&filtro=reclamacion");
+        } else {
+            super.mv = this.listar(1, 50);
+        }
+        return super.mv;
+    }
+
+    @PostMapping("/comentar")
+    private ModelAndView comentar(@RequestParam("comentario") String comentario, @RequestParam("id") String id){
+        try {
+            Reclamacion r = this.reclamacionService.buscarId(Long.parseLong(id));
+            if (r != null){
+                r.setComentarios(comentario);
+                this.reclamacionService.actualizar(r);
+                this.confirmacionNuevoComentario = true;
+            }
+            super.mv = new ModelAndView("redirect:/clientes/reclamaciones/detalles?valor=" + r.getIdReclamacion() + "&filtro=reclamacion");
+        } catch (Exception e){
+            e.printStackTrace(System.out);
+        }
+        return super.mv;
+    }
+
+
+
+    @Override
+    public ModelAndView listar() {
+        return null;
+    }
+
+    private ModelAndView createViewForReclamacionesFilter(List<Reclamacion> reclamaciones) {
+        super.mv = new ModelAndView("reclamaciones/lista");
+        super.mv.addObject("reclamaciones", reclamaciones);
+        super.mv.addObject("titulo", "Reclamaciones");
+        super.mv.addObject("totalRegistros", reclamaciones.size());
+        super.mv.addObject("desactivarPaginacion", true);
+        return super.mv;
+    }
+
+    private void reiniciarVariablesBooleanas(){
+        this.confirmacionDesarchivado = false;
+        this.confirmacionArchivado = false;
+        this.confirmacionNuevoComentario = false;
+    }
+
+
 }

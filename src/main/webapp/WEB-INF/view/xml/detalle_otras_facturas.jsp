@@ -1,6 +1,5 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -34,7 +33,7 @@
                     </ul>
                 </div>
                          
-                <!--Primer RenglÃ³n-->
+                <!--Primer Renglón-->
                 <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
@@ -106,7 +105,7 @@
                     </div>
                 </div>
                             
-                <!-- RenglÃ³n-->
+                <!-- Renglón-->
                 <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">

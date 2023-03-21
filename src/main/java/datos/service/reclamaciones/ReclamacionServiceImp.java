@@ -59,7 +59,7 @@ public class ReclamacionServiceImp implements CrudDao<Reclamacion> {
     @Override
     @Transactional
     public void actualizar(Reclamacion reclamacion) {
-        this.reclamacionDao.actualizar(reclamacion);
+        this.guardar(reclamacion);
     }
 
     @Override

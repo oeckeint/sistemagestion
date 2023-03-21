@@ -1,7 +1,6 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -60,7 +59,7 @@
                 if(i + 1 === max) {
                     document.getElementById("nombreArchivos").innerHTML += (i + 1) + ".- " + xmlFiles.files[i].name;
                 } else if(i >= 30) {
-                    document.getElementById("nombreArchivos").innerHTML += "<Strong>" + (max - 30 + " archivos m√°s ...</Strong>");
+                    document.getElementById("nombreArchivos").innerHTML += "<Strong>" + (max - 30 + " archivos m·s ...</Strong>");
                     break;
                 } else {
                     document.getElementById("nombreArchivos").innerHTML += (i + 1) + ".- " + xmlFiles.files[i].name + "<br/>";

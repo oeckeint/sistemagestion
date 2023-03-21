@@ -1,7 +1,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -13,9 +13,24 @@
                 <div class="container">
 					<c:choose>
 						<c:when test="${mensaje eq 'registroEncontrado'}">
-							<fmt:message key="customers.tickets.registrosencontrados">
-								<fmt:param value="${busquedaTicket.valor}"/>
-                        		<fmt:param value="${busquedaTicket.filtro}"/>
+							<fmt:message key="customers.reclamaciones.detallemensaje">
+								<fmt:param value="${busqueda.valorActual}"/>
+                        		<fmt:param value="${busqueda.filtroActual}"/>
+							</fmt:message>
+						</c:when>
+						<c:when test="${mensaje eq 'registroarchivado'}">
+							<fmt:message key="customers.reclamaciones.detalleregistroarchivado1">
+								<fmt:param value="${reclamacion.idReclamacion}"/>
+							</fmt:message>
+						</c:when>
+						<c:when test="${mensaje eq 'registrodesarchivado'}">
+							<fmt:message key="customers.reclamaciones.detalleregistroarchivado0">
+								<fmt:param value="${reclamacion.idReclamacion}"/>
+							</fmt:message>
+						</c:when>
+						<c:when test="${mensaje eq 'nuevoComentario'}">
+							<fmt:message key="customers.reclamaciones.detallenuevocomentario">
+								<fmt:param value="${reclamacion.idReclamacion}"/>
 							</fmt:message>
 						</c:when>
 					</c:choose>
@@ -26,76 +41,162 @@
                 <hr>
                 <div class="row justify-content-between p-0">
                     <div class="col-6">
-                        <h2 class="m-0"><a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-circle-left text-success"></i></a> <fmt:message key="customers.reclamaciones.tittle"/> </h2>
+                        <h2 class="m-0"><a href="${pageContext.request.contextPath}/clientes/reclamaciones"><i class="fas fa-arrow-circle-left text-success"></i></a> <fmt:message key="customers.reclamaciones.tittle"/> </h2>
                     </div>
                     <div class="row col-12 col-lg-6 justify-content-sm-evenly mt-3 mt-md-0">
                     	<div class="col-2">
-                    		<c:url var="archivar" value="/clientes/tickets/archivar">                        <span class="badge bg-success">
-                            <c:choose>
-								<c:when test="${paginaActual < ultimaPagina}">
-									${registrosMostrados} / ${totalRegistros}
-								</c:when>
-								<c:otherwise>
-									${totalRegistros} / ${totalRegistros}
-								</c:otherwise>
-							</c:choose>
-                        </span>
-                    			<c:param name="id" value="${reclamacion.idReclamacion}"/>
-                    		</c:url>
                     		<security:authorize access="hasRole('ADMIN')">
+								<c:url var="archivar" value="/clientes/reclamaciones/archivar">
+									<c:param name="id" value="${reclamacion.idReclamacion}"/>
+								</c:url>
 		                    	<c:choose>
 		                    		<c:when test="${reclamacion.isDeleted == 0}">
-		                    			<a href="${archivar}" class="btn btn-danger m-0" id="linkClasify"><i class="fa-solid fa-eye-slash"></i></a>
+										<c:set var="buttonType" value="danger"/>
+										<c:set var="eyeIcon" value="fa-eye-slash"/>
 		                    		</c:when>
-		                    		<c:when test="${ticket.isDeleted == 1}">
-		                    			<a href="${archivar}" class="btn btn-success m-0" id="linkClasify"><i class="fa-solid fa-eye"></i></a>
+		                    		<c:when test="${reclamacion.isDeleted == 1}">
+										<c:set var="buttonType" value="success"/>
+										<c:set var="eyeIcon" value="fa-eye"/>
 		                    		</c:when>
 		                    	</c:choose>
+								<a href="${archivar}" class="btn btn-${buttonType} m-0" id="linkClasify"><i class="fa-solid ${eyeIcon}"></i></a>
 	                    	</security:authorize>
                     	</div>
-                        <jsp:include page="./busqueda_ticket.jsp" />
+                        <jsp:include page="./formularioBusqueda.jsp" />
                     </div>
                 </div>
                 <hr>
 
-                <!--Primer RenglÃ³n-->
-                <div class="row justify-content-around">
+				<c:set var="comentarios" value="${reclamacion.comentarios}"/>
+				<ul class="list-group list-group-flush row">
+					<li class="list-group-item col-12">
+						<form:form action="${pageContext.request.contextPath}/clientes/reclamaciones/comentar" method="post" id="form-coment">
+							<h3 class="col-12 mb-4">Comentarios</h3>
+							<textarea id="comentarios" class="col-12" name="comentario" rows="6" style="resize:none; height:auto; min-height: 40px">${comentarios}</textarea>
+							<h3 class="m-2 col-12 d-flex justify-content-end">
+								<button id="boton" style="display: none;" type="submit" class="btn btn-success"><i class="fas fa-check-circle"></i> Actualizar comentario</button>
+							</h3>
+							<input type="hidden" value="${reclamacion.idReclamacion}" name="id">
+
+						</form:form>
+					</li>
+				</ul>
+				<hr class="my-2"/>
+
+				<script>
+					const texto = document.getElementById('comentarios');
+					const boton = document.getElementById('boton');
+
+					let valorOriginal = texto.value;
+
+					texto.addEventListener('input', function() {
+						if (texto.value !== valorOriginal) {
+							boton.style.display = 'block';
+						} else {
+							boton.style.display = 'none';
+						}
+					});
+
+					var textarea = document.getElementById('comentarios');
+
+					textarea.addEventListener('input', function() {
+						this.style.height = 'auto'; // Establece la altura en 'auto' para evitar que el contenido se corte
+						this.style.height = Math.max(this.scrollHeight, this.offsetHeight, this.clientHeight) + 'px'; // Establece la altura en función del contenido, tomando en cuenta la altura actual y la altura del contenido mínimo
+					});
+
+
+				</script>
+
+                <!--Primer Renglón-->
+                <div class="row justify-content-between container">
                     <div class="list-group col-12 col-md-5 col-lg-5 p-2">
-                    	<c:url var="editar" value="/clientes/tickets/editar">
-                            <c:param name="id" value="${ticket.idTicket}"/>
-                        </c:url>
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Reclamacion #${reclamacion.idReclamacion}  <a href="${editar}" class="btn btn-danger"><i class="fas fa-edit"></i></a></h3>
+						<h3 class="list-group-item list-group-item-action active text-center h4 py-3">
+							<fmt:message key="customers.reclamaciones.titulotabladetalles">
+								<fmt:param value="${reclamacion.idReclamacion}"/>
+							</fmt:message>
+						</h3>
                         <div class="row px-3">
+							<c:set var="fullColumn" value="col-12"/>
+							<c:set var="leftColumn" value="col-md-5"/>
+							<c:set var="rightColumn" value="col-md-6"/>
                             <div class="col-12">
                                 <ul class="list-group list-group-flush text-right">
-                                    <div class="row align-items-center justify-content-evenly mt-2">
-                                    	<div class="col-12 col-md-3 text-md-end"><Strong><fmt:message key="customers.reclamaciones.fechaSolicitud"/></Strong></div>
-                                    	<div class="col-12 col-md-8 ">${reclamacion.fechaSolicitud}</div>
-                                   	</div>
-                                   	<hr class="my-2"/>
-                                    <div class="row align-items-center justify-content-evenly">
-                                    	<div class="col-12 col-md-3 text-md-end"><Strong><fmt:message key="customers.reclamaciones.fechaIncidente"/> </Strong></div>
-                                    	<div class="col-12 col-md-8 ">${reclamacion.fechaIncidente}</div>
-                                   	</div>
-                                   	<hr class="my-2"/>
                                    	<div class="row align-items-center justify-content-evenly">
-                                    	<div class="col-12 col-md-3 text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoEmpresaEmisora"/></Strong></div>
-                                    	<div class="col-12 col-md-8 ">${reclamacion.codigoEmpresaEmisora}</div>
+                                    	<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoEmpresaEmisora"/></Strong></div>
+                                    	<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoEmpresaEmisora}</div>
                                    	</div>
                                    	<hr class="my-2"/>
                                     <div class="row align-items-center justify-content-evenly">
-                                    	<div class="col-12 col-md-3 text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoEmpresaDestino"/></Strong></div>
-                                    	<div class="col-12 col-md-8 ">${reclamacion.codigoEmpresaDestino}</div>
+                                    	<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoEmpresaDestino"/></Strong></div>
+                                    	<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoEmpresaDestino}</div>
                                    	</div>
 									<hr class="my-2"/>
 									<div class="row align-items-center justify-content-evenly">
-										<div class="col-12 col-md-3 text-md-end"><Strong><fmt:message key="customers.reclamaciones.numeroFacturaATR"/></Strong></div>
-										<div class="col-12 col-md-8 ">${reclamacion.numeroFacturaATR}</div>
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo de paso</Strong></div>
+										<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDePaso}</div>
+									</div>
+									<hr class="my-2"/>
+									<div class="row align-items-center justify-content-evenly">
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo de solicitud</Strong></div>
+										<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDeSolicitud}</div>
+									</div>
+									<hr class="my-2"/>
+									<div class="row align-items-center justify-content-evenly mt-2">
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.fechaSolicitud"/></Strong></div>
+										<div class="${fullColumn} ${rightColumn}">${reclamacion.fechaSolicitud}</div>
+									</div>
+									<hr class="my-2"/>
+									<div class="row align-items-center justify-content-evenly">
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.fechaIncidente"/> </Strong></div>
+										<div class="${fullColumn} ${rightColumn}">${reclamacion.fechaIncidente}</div>
+									</div>
+									<hr class="my-2"/>
+									<div class="row align-items-center justify-content-evenly">
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.numeroFacturaATR"/></Strong></div>
+										<div class="${fullColumn} ${rightColumn}">${reclamacion.numeroFacturaATR}</div>
 									</div>
                                    	<hr class="my-2"/>
+									<div class="row align-items-center justify-content-evenly">
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Tipo Reclamacion</Strong></div>
+										<div class="${fullColumn} ${rightColumn}">${reclamacion.tipoReclamacion.id}</div>
+									</div>
+									<hr class="my-2"/>
+									<div class="row align-items-center justify-content-evenly">
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Subtipo Reclamacion</Strong></div>
+										<div class="${fullColumn} ${rightColumn}">${reclamacion.subtipoReclamacion.id}</div>
+									</div>
+									<hr class="my-2"/>
+									<div class="row align-items-center justify-content-evenly">
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Creado</Strong></div>
+										<div class="${fullColumn} ${rightColumn}">
+											<fmt:formatDate value="${reclamacion.createdOn.time}" pattern="yyyy/MM/dd" var="createdOn"/>
+											<fmt:formatDate value="${reclamacion.createdOn.time}" pattern="HH:mm:ss" var="createdAt"/>
+											<fmt:message key="customers.reclamaciones.fechapor">
+												<fmt:param value="${createdOn}"/>
+												<fmt:param value="${createdAt}"/>
+												<fmt:param value="${reclamacion.createdBy}"/>
+											</fmt:message>
+										</div>
+									</div>
+									<hr class="my-2"/>
+									<c:if test="${reclamacion.updatedOn != null}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Actualizado</Strong></div>
+											<div class="${fullColumn} ${rightColumn}">
+												<fmt:formatDate value="${reclamacion.updatedOn.time}" pattern="yyyy/MM/dd" var="updatedOn"/>
+												<fmt:formatDate value="${reclamacion.updatedOn.time}" pattern="HH:mm:ss" var="updatedAt"/>
+												<fmt:message key="customers.reclamaciones.fechapor">
+													<fmt:param value="${updatedOn}"/>
+													<fmt:param value="${updatedAt}"/>
+													<fmt:param value="${reclamacion.updatedBy}"/>
+												</fmt:message>
+											</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
                                    	<div class="row align-items-center justify-content-evenly">
-                                    	<div class="col-12 col-md-3 text-md-end"><Strong>Archivado</Strong></div>
-                                    	<div class="col-12 col-md-8 ">
+                                    	<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Archivado</Strong></div>
+                                    	<div class="${fullColumn} ${rightColumn}">
 											<c:choose>
 												<c:when test="${reclamacion.isDeleted == 0}">
 													<fmt:message key="customers.tickets.desarchivado">
@@ -110,13 +211,12 @@
 											</c:choose>
 										</div>
                                    	</div>
-                                   	<hr class="my-2"/>
                                     <c:if test="${ticket.updatedOn != null}">
+										<hr class="my-2"/>
                                     	<div class="row align-items-center justify-content-evenly">
-	                                    	<div class="col-12 col-md-3 text-md-end"><Strong>Actualizado</Strong></div>
-	                                    	<div class="col-12 col-md-8 "><fmt:formatDate value="${ticket.updatedOn.time}" type="date" dateStyle="long" /> <Strong>(${ticket.updatedBy})</Strong></div>
+	                                    	<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Actualizado</Strong></div>
+	                                    	<div class="${fullColumn} ${rightColumn}"><fmt:formatDate value="${ticket.updatedOn.time}" type="date" dateStyle="long" /> <Strong>(${ticket.updatedBy})</Strong></div>
 	                                   	</div>
-	                                   	<hr class="my-2"/>
                                     </c:if>
                                 </ul>
                             </div>

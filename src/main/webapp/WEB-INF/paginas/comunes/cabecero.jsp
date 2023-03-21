@@ -19,8 +19,9 @@
                                     <security:authorize access="hasRole('ADMIN')">
                                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/clientes/formulario"><fmt:message key="customers.add"/></a></li>
                                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/clientes/tickets"><fmt:message key="customers.tickets"/></a></li>
+                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/clientes/reclamaciones"><fmt:message key="customers.reclamaciones.tittle"/></a></li>
                                     </security:authorize>
-                                    <!--<li><a class="dropdown-item" href="#">Búsqueda Avanzada</a></li>-->
+                                    <!--<li><a class="dropdown-item" href="#">Bï¿½squeda Avanzada</a></li>-->
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">

@@ -1,4 +1,3 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -25,7 +24,7 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <!------ Include the above in your HEAD tag ---------->
 
-        <title>Sistema de gestiÃ³n</title>
+        <title>Sistema de gestión</title>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-light navbar-laravel">
@@ -95,7 +94,7 @@
                                     </div>
                                 </div>
                                     <a href="${pageContext.request.contextPath}/login?language=en">English</a>
-                                    <a href="${pageContext.request.contextPath}/login?language=es">EspaÃ±ol</a>
+                                    <a href="${pageContext.request.contextPath}/login?language=es">Español</a>
                             </form:form>
                         </div>
                     </div>

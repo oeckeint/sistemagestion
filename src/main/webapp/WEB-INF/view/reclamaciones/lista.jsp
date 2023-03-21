@@ -1,4 +1,3 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
@@ -16,27 +15,48 @@
         <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp"></jsp:include>
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 <div class="container">
-                <c:choose>
-                    <c:when test="${param.error != null}"><fmt:message key="login.badcredentials"/></c:when>
-                    <c:when test="${param.logout != null}"><fmt:message key="login.logout.message"/></c:when>
-                    <c:otherwise>${mensaje}</c:otherwise>
-                </c:choose>
+                    <c:choose>
+                        <c:when test="${mensaje eq 'registrosEncontrados'}">
+                            <fmt:message key="customers.reclamaciones.iniciodatosfiltradosmensaje">
+                                <fmt:param value="${busqueda.valorActual}"/>
+                                <fmt:param value="${busqueda.filtroActual}"/>
+                            </fmt:message>
+                        </c:when>
+                        <c:when test="${mensaje eq 'sinregistro'}">
+                            <fmt:message key="customers.reclamaciones.iniciosindatosfiltradosmensaje">
+                                <fmt:param value="${busqueda.valorActual}"/>
+                                <fmt:param value="${busqueda.filtroActual}"/>
+                            </fmt:message>
+                        </c:when>
+                        <c:otherwise>
+                            <fmt:message key="customers.reclamaciones.iniciomensaje"></fmt:message>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </div>
-        </div>
 
         <div class="container">
             <hr>
             <div class="row justify-content-between p-0">
 
                 <div class="col-6">
-                    <h2 class="m-0"><a href="${pageContext.request.contextPath}/">
-                            <i class="fas fa-arrow-circle-left text-success"></i></a>
-                          <fmt:message key="customers.reclamaciones.tittle"/>
-
+                    <h2 class="m-0">
+                        <a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-circle-left text-success"></i></a>
+                        <fmt:message key="customers.reclamaciones.tittle"/>
+                        <span class="badge bg-success">
+                            <c:choose>
+                                <c:when test="${paginaActual < ultimaPagina}">
+                                    ${registrosMostrados} / ${totalRegistros}
+                                </c:when>
+                                <c:otherwise>
+                                    ${totalRegistros} / ${totalRegistros}
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
                     </h2>
                 </div>
                 <div class="col-6 row justify-content-end">
-                    <jsp:include page="../comunes/BotonesXML.jsp" />
+                    <jsp:include page="formularioBusqueda.jsp" />
                 </div>
             </div>
             <hr>
@@ -49,16 +69,12 @@
                         <table class="table table-hover text-center">
                             <thead>
                                 <tr class="bg-dark text-white">
-                                    <th scope="col"><fmt:message key="customers.reclamaciones.#Reclamacion"/></th>
+                                    <th scope="col"><fmt:message key="customers.reclamaciones.titulotablalista"/></th>
                                     <th scope="col"><fmt:message key="customers.reclamaciones.cliente"/> </th>
-                                    <!-- <th scope="col"><fmt:message key="customers.reclamaciones.cups"/></th> -->
                                     <th scope="col"><fmt:message key="customers.reclamaciones.fechaSolicitud"/></th>
                                     <th scope="col"><fmt:message key="customers.reclamaciones.fechaIncidente"/></th>
                                     <th scope="col"><fmt:message key="customers.reclamaciones.numeroFacturaATR"/></th>
-                                    <!-- <th scope="col"><fmt:message key="customers.reclamaciones.codigoEmpresaEmisora"/></th> -->
-                                    <!-- <th scope="col"><fmt:message key="customers.reclamaciones.codigoEmpresaDestino"/></th> -->
                                     <th scope="col"><fmt:message key="customers.reclamaciones.codigoDePaso"/></th>
-                                    <!--<th scope="col"><fmt:message key="customers.reclamaciones.codigoSolicitud"/></th> -->
                                     <th scope="col"><fmt:message key="customers.reclamaciones.acciones"/></th>
                                 </tr>
                                 </tr>
@@ -75,14 +91,10 @@
                                     </c:url>
                                     <tr>
                                         <td>${reclamacion.idReclamacion}</td>
-                                        <td><a href="${detallesCliente}" class="btn btn-success">${reclamacion.cliente.idCliente}</i></a></td>
-                                        <!--<td>${reclamacion.cliente.cups}</td> -->
+                                        <td><a href="${detallesCliente}" class="btn btn-success">${reclamacion.cliente.idCliente}</a></td>
                                         <td>${reclamacion.fechaSolicitud}</td>
                                         <td>${reclamacion.fechaIncidente}</td>
                                         <td>${reclamacion.numeroFacturaATR}</td>
-                                        <!--<td>${reclamacion.codigoEmpresaEmisora}</td> -->
-                                        <!-- <td>${reclamacion.codigoEmpresaDestino}</td> -->
-                                        <!--<td>${reclamacion.codigoDePaso}</td> -->
                                         <td>${reclamacion.codigoDeSolicitud}</td>
                                         <td>
                                             <button class="btn btn-danger" type="button" id="detailButton${id.count}" onclick="loadData(${id.count}, '${detalles}');">

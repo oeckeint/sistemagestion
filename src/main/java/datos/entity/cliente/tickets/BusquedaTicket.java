@@ -1,5 +1,7 @@
 package datos.entity.cliente.tickets;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,5 +49,14 @@ public class BusquedaTicket {
 
     public void setFiltros(List<String> filtros) {
         this.filtros = filtros;
+    }
+
+    @Override
+    public String toString() {
+        return "BusquedaTicket{" +
+                "valor='" + valor + '\'' +
+                ", filtro='" + filtro + '\'' +
+                ", filtros=" + filtros +
+                '}';
     }
 }

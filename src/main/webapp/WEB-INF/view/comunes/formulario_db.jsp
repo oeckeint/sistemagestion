@@ -1,5 +1,4 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -16,7 +15,7 @@
             </div>
         </div>
 
-        <form:form method="POST" action="${pageContext.request.contextPath}/${controller}/procesar" enctype="multipart/form-data" onsubmit="return confirm('Esta acciÃ³n no puede ser deshecha Â¿Seguro que desea continuar?')">
+        <form:form method="POST" action="${pageContext.request.contextPath}/${controller}/procesar" enctype="multipart/form-data" onsubmit="return confirm('Esta acción no puede ser deshecha ¿Seguro que desea continuar?')">
             <div class="container my-5">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -40,9 +39,9 @@
 
         <script>
             $("#btnSubmit").click(function () {
-                $(this).prop("disabled", true); //deshabilitamos el botÃ³n
+                $(this).prop("disabled", true); //deshabilitamos el botón
                 $(this).html(
-                        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  ${etiquetaBoton}` //aÃ±adimos el spinner
+                        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  ${etiquetaBoton}` //añadimos el spinner
                         );
                 document.getElementById("myForm").submit();
             });

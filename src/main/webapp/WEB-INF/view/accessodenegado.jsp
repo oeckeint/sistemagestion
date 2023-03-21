@@ -1,10 +1,9 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <div class="wrapper">
     <div class="box">
         <h1>403</h1>
-        <p>Lo siento <security:authentication property="principal.username" />, no tienes los permisos para ir m√°s all√° de este punto.</p>
-        <p><a href="${pageContext.request.contextPath}/">Por favor, da click aqu√≠ para regresar</a></p>
+        <p>Lo siento <security:authentication property="principal.username" />, no tienes los permisos para ir m·s all· de este punto.</p>
+        <p><a href="${pageContext.request.contextPath}/">Por favor, da click aquÌ para regresar</a></p>
     </div>
 </div>
 

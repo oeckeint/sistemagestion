@@ -27,7 +27,7 @@ public class ReclamacionDaoImp implements CrudDao<Reclamacion> {
     @Override
     public List<Reclamacion> listar(int rows, int page) {
         return sessionFactory.getCurrentSession()
-                .createQuery("from Reclamacion r order by r.id desc", Reclamacion.class)
+                .createQuery("from Reclamacion r where r.isDeleted = 0 order by r.id desc", Reclamacion.class)
                 .setFirstResult(rows * page)
                 .setMaxResults(rows)
                 .getResultList();
@@ -45,7 +45,20 @@ public class ReclamacionDaoImp implements CrudDao<Reclamacion> {
 
     @Override
     public List<Reclamacion> buscarFiltro(String valor, String filtro) {
-        return null;
+        Query<Reclamacion> q = null;
+        try{
+            switch (filtro){
+                case "cliente":
+                    q =	this.sessionFactory.getCurrentSession()
+                            .createQuery("from Reclamacion r where r.cliente.idCliente = :valor order by r.id desc", Reclamacion.class)
+                            .setParameter("valor", Long.parseLong(valor));
+                    break;
+            }
+        } catch (NoResultException e){
+            e.printStackTrace(System.out);
+            return null;
+        }
+        return q.getResultList().size() == 0 ? null : q.getResultList();
     }
 
     @Override

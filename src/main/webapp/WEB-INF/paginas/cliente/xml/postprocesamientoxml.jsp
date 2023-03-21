@@ -1,6 +1,4 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -17,19 +15,19 @@
         <c:forEach var="ResConsulta" items="${resultadosArchivoXML}" varStatus="indice">
          **********Datos del archivo ${indice.index}*************
         <li>idCliente ${ResConsulta.idClente}</li>
-        <li>CompaÃ±ia ${ResConsulta.compania}</li>
+        <li>Compañia ${ResConsulta.compania}</li>
         <li>Tarifa ${ResConsulta.tarifa}</li>
         <li>Fecha Factura ${ResConsulta.fechaFactura}</li>
         <li>Fecha Inicio ${ResConsulta.fechaInicio}</li>
         <li>Fecha Fin ${ResConsulta.fechaFin}</li>
-        <li>NÃºmero de Dias ${ResConsulta.numeroDias}</li>
+        <li>Número de Dias ${ResConsulta.numeroDias}</li>
         <li>CUPS ${ResConsulta.cups}</li>
         <li>Cliente ${ResConsulta.cliente}</li>
         <li>Importe Total Termino Potencia ${ResConsulta.importeTotalTerminoPotencia}</li>
         <li>Importe Importe Total Energia Activa ${ResConsulta.importeTotalEnergiaActiva}</li>
         <li>Importe Importe Total Energia Reactiva ${ResConsulta.importeTotalEnergiaReactiva}</li>
         <li>Importe Importe Total Excesos ${ResConsulta.importeTotalExcesos}</li>
-        <li>Importe Importe FacturaciÃ³n Alquileres ${ResConsulta.importeFacturacionAlquileres}</li>
+        <li>Importe Importe Facturación Alquileres ${ResConsulta.importeFacturacionAlquileres}</li>
         ****************Datos de Periodo***************<br>
         Datos P# kW Fact|#]
         <li>Potencia a facturar (1) ${ResConsulta.potenciaAFacturar1}</li>

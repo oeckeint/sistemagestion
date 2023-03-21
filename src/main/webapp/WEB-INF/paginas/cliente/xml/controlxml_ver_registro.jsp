@@ -1,5 +1,4 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -26,7 +25,7 @@
                     </ul>
                 </div>
 
-                <!--Primer Rengl贸n-->
+                <!--Primer Rengl髇-->
                 <hr>
                 <h2 class="display-4">Factura</h2>
                 <hr>
@@ -160,7 +159,7 @@
                                     <dt class="list-group-item px-1">MarcaMedida</dt>
                                     <dt class="list-group-item px-1">VAsTrafo</dt>
                                     <dt class="list-group-item px-1">Perdidas</dt>
-                                    <dt class="list-group-item px-1">D铆as</dt>
+                                    <dt class="list-group-item px-1">D韆s</dt>
                                 </ul>
                             </div>
                             <div class="col-7">
@@ -176,7 +175,7 @@
                         </div>
                     </div>
                 </div>
-                <!--Segundo Rengl贸n-->
+                <!--Segundo Rengl髇-->
                 <hr>
                 <h2 class="display-4">Potencia</h2>
                 <hr>
@@ -259,7 +258,7 @@
                         </div>
                     </div>
                 </div>                
-                <!--Tercer Rengl贸n-->
+                <!--Tercer Rengl髇-->
                 <div class="row justify-content-between">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
                         <h3 class="list-group-item list-group-item-action active text-center h4">Potencia a Facturar</h3>
@@ -322,9 +321,9 @@
                         </div>
                     </div>
                 </div>
-                <!--Cuarto Rengl贸n-->
+                <!--Cuarto Rengl髇-->
                 <hr>
-                <h2 class="display-4">Energ铆a Activa</h2>
+                <h2 class="display-4">Energ韆 Activa</h2>
                 <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
@@ -421,7 +420,7 @@
                     </div>
                 </div>
 
-                <!-- Rengl贸n-->
+                <!-- Rengl髇-->
                 <hr>
                 <h2 class="display-4">Cargos</h2>
                 <hr>
@@ -482,13 +481,13 @@
                     </div>
                 </div>
 
-                <!-- Rengl贸n-->
+                <!-- Rengl髇-->
                 <hr>
                 <h2 class="display-4">Otros Datos</h2>
                 <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Impuesto El茅ctrico</h3>
+                        <h3 class="list-group-item list-group-item-action active text-center h4">Impuesto El閏trico</h3>
                         <div class="row">
                             <div class="col-5">
                                 <ul class="list-group list-group-flush text-right">
@@ -535,7 +534,7 @@
                 </div>
 
 
-                <!-- Rengl贸n-->
+                <!-- Rengl髇-->
                 <hr>
                 <h2 class="display-4">AE</h2>
                 <hr>
@@ -619,7 +618,7 @@
                     </div>
                 </div>
 
-                <!-- Rengl贸n-->
+                <!-- Rengl髇-->
                 <hr>
                 <h2 class="display-4">Reactiva</h2>
                 <hr>
@@ -722,7 +721,7 @@
                 </div>
 
 
-                <!-- Rengl贸n-->
+                <!-- Rengl髇-->
                 <hr>
                 <h2 class="display-4">PM</h2>
                 <hr>
@@ -782,7 +781,7 @@
                 </div>
 
 
-                <!-- Rengl贸n-->
+                <!-- Rengl髇-->
                 <hr>
                 <h2 class="display-4">Fin de Registro</h2>
                 <hr>

@@ -6,11 +6,14 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
+
+import datos.helper.StringToLinkedHashMap;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -36,7 +39,11 @@ public class AppConfig implements WebMvcConfigurer{
 
     @Bean
     public ViewResolver viewResolver() {
-        return new InternalResourceViewResolver("/WEB-INF/view/", ".jsp");
+        InternalResourceViewResolver internalResourceViewResolver = new InternalResourceViewResolver();
+        internalResourceViewResolver.setPrefix("/WEB-INF/view/");
+        internalResourceViewResolver.setSuffix(".jsp");
+        internalResourceViewResolver.setContentType("text/html; charset=ISO-8859-1");
+        return internalResourceViewResolver;
     }
 
     @Bean
@@ -101,6 +108,11 @@ public class AppConfig implements WebMvcConfigurer{
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry){
+        registry.addConverter(new StringToLinkedHashMap());
     }
 
     @Bean

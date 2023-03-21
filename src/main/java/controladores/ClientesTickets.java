@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import datos.entity.reclamaciones.BusquedaReclamacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -42,7 +43,7 @@ import datos.entity.Cliente;
 
 @Controller
 @RequestMapping("/clientes/tickets")
-public class ClientesTickets extends Operaciones {
+public class ClientesTickets extends Operaciones<BusquedaTicket> {
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -128,8 +129,9 @@ public class ClientesTickets extends Operaciones {
     }
 
     @PostMapping("/busqueda")
-    ModelAndView busqueda(@ModelAttribute("busquedaTicket") @Valid final BusquedaTicket busquedaTicket, final BindingResult binding,
-                          RedirectAttributes redirectAttributes) {
+    @Override
+    public ModelAndView busqueda(@ModelAttribute("busquedaTicket") @Valid final BusquedaTicket busquedaTicket, final BindingResult binding) {
+        System.out.println(busquedaTicket);
         if (!binding.hasErrors()) {
             //super.mv = new ModelAndView("cliente/ticket_detalle");
             //super.mv.addObject("busquedaTicket", busquedaTicket);
