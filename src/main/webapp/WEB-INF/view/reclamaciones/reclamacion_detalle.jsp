@@ -71,7 +71,7 @@
 				<ul class="list-group list-group-flush row">
 					<li class="list-group-item col-12">
 						<form:form action="${pageContext.request.contextPath}/clientes/reclamaciones/comentar" method="post" id="form-coment">
-							<h3 class="col-12 mb-4">Comentarios</h3>
+							<h3 class="col-12 mb-4"><fmt:message key="customers.reclamaciones.comentarios"/></h3>
 							<textarea id="comentarios" class="col-12" name="comentario" rows="6" style="resize:none; height:auto; min-height: 40px">${comentarios}</textarea>
 							<h3 class="m-2 col-12 d-flex justify-content-end">
 								<button id="boton" style="display: none;" type="submit" class="btn btn-success"><i class="fas fa-check-circle"></i> Actualizar comentario</button>
@@ -101,13 +101,13 @@
 
 					textarea.addEventListener('input', function() {
 						this.style.height = 'auto'; // Establece la altura en 'auto' para evitar que el contenido se corte
-						this.style.height = Math.max(this.scrollHeight, this.offsetHeight, this.clientHeight) + 'px'; // Establece la altura en función del contenido, tomando en cuenta la altura actual y la altura del contenido mínimo
+						this.style.height = Math.max(this.scrollHeight, this.offsetHeight, this.clientHeight) + 'px'; // Establece la altura en funciï¿½n del contenido, tomando en cuenta la altura actual y la altura del contenido mï¿½nimo
 					});
 
 
 				</script>
 
-                <!--Primer Renglón-->
+                <!--Primer Renglï¿½n-->
                 <div class="row justify-content-between container">
                     <div class="list-group col-12 col-md-5 col-lg-5 p-2">
 						<h3 class="list-group-item list-group-item-action active text-center h4 py-3">
@@ -132,12 +132,12 @@
                                    	</div>
 									<hr class="my-2"/>
 									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo de paso</Strong></div>
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoDePaso"/></Strong></div>
 										<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDePaso}</div>
 									</div>
 									<hr class="my-2"/>
 									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo de solicitud</Strong></div>
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoSolicitud"/></Strong></div>
 										<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDeSolicitud}</div>
 									</div>
 									<hr class="my-2"/>
@@ -157,17 +157,17 @@
 									</div>
                                    	<hr class="my-2"/>
 									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Tipo Reclamacion</Strong></div>
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.idTipoReclamacion"/></Strong></div>
 										<div class="${fullColumn} ${rightColumn}">${reclamacion.tipoReclamacion.id}</div>
 									</div>
 									<hr class="my-2"/>
 									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Subtipo Reclamacion</Strong></div>
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.idSubtipoReclamacion"/></Strong></div>
 										<div class="${fullColumn} ${rightColumn}">${reclamacion.subtipoReclamacion.id}</div>
 									</div>
 									<hr class="my-2"/>
 									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Creado</Strong></div>
+										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.creado"/></Strong></div>
 										<div class="${fullColumn} ${rightColumn}">
 											<fmt:formatDate value="${reclamacion.createdOn.time}" pattern="yyyy/MM/dd" var="createdOn"/>
 											<fmt:formatDate value="${reclamacion.createdOn.time}" pattern="HH:mm:ss" var="createdAt"/>
@@ -181,7 +181,7 @@
 									<hr class="my-2"/>
 									<c:if test="${reclamacion.updatedOn != null}">
 										<div class="row align-items-center justify-content-evenly">
-											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Actualizado</Strong></div>
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.actualizado"/></Strong></div>
 											<div class="${fullColumn} ${rightColumn}">
 												<fmt:formatDate value="${reclamacion.updatedOn.time}" pattern="yyyy/MM/dd" var="updatedOn"/>
 												<fmt:formatDate value="${reclamacion.updatedOn.time}" pattern="HH:mm:ss" var="updatedAt"/>
@@ -195,7 +195,7 @@
 										<hr class="my-2"/>
 									</c:if>
                                    	<div class="row align-items-center justify-content-evenly">
-                                    	<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Archivado</Strong></div>
+                                    	<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.archivado"/></Strong></div>
                                     	<div class="${fullColumn} ${rightColumn}">
 											<c:choose>
 												<c:when test="${reclamacion.isDeleted == 0}">
@@ -228,7 +228,7 @@
 	                        <c:param name="valor" value="${ticket.cliente.idCliente}"/>
 	                        <c:param name="filtro" value="id"/>
 	                    </c:url>
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Cliente <a href="${detalles}" class="btn btn-danger"><i class="fas fa-eye"></i></a></h3>
+                        <h3 class="list-group-item list-group-item-action active text-center h4"><fmt:message key="customers.reclamaciones.cliente"/> <a href="${detalles}" class="btn btn-danger"><i class="fas fa-eye"></i></a></h3>
                         <div class="row">
 	                        <c:url var="detalles" value="/clientes/tickets/detalles">
 	                            <c:param name="valor" value="${reclamacion.cliente.idCliente}"/>
@@ -236,11 +236,11 @@
 	                        </c:url>
                             <div class="col-3 col-md-4">
                                 <ul class="list-group list-group-flush text-right">
-                                	<dt class="list-group-item px-1">idCliente</dt>
+                                	<dt class="list-group-item px-1"><fmt:message key="customers.reclamaciones.idCliente"/></dt>
                                     <dt class="list-group-item px-1">CUPS</dt>
-                                    <dt class="list-group-item px-1">Nombre</dt>
-                                    <dt class="list-group-item px-1">Tarifa</dt>
-                                    <dt class="list-group-item px-1">Estado</dt>
+                                    <dt class="list-group-item px-1"><fmt:message key="customers.reclamaciones.nombre"/></dt>
+                                    <dt class="list-group-item px-1"><fmt:message key="customers.reclamaciones.tarifa"/></dt>
+                                    <dt class="list-group-item px-1"><fmt:message key="customers.reclamaciones.estado"/></dt>
                                     <dt class="list-group-item px-1"><a href="${detalles}">No. Tickets</a></dt>
                                 </ul>
                             </div>

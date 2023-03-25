@@ -42,7 +42,7 @@ public class Reclamaciones extends Operaciones<BusquedaReclamacion>{
         paginaActual = Utilidades.revisarPaginaActual(paginaActual);
         List<Reclamacion> reclamaciones = this.reclamacionService.listar(rows, paginaActual - 1);
 
-        super.mv.addObject("titulo", "Reclamaciones");
+        super.mv.addObject("titulo", "<i class=\"fa fa-exclamation-circle\" aria-hidden=\"true\"></i> Reclamaciones");
         super.mv.addObject("registrosMostrados", (rows * paginaActual));
         super.mv.addObject("totalRegistros", this.reclamacionService.contarRegistros());
         super.mv.addObject("rows", rows);
@@ -99,7 +99,7 @@ public class Reclamaciones extends Operaciones<BusquedaReclamacion>{
         busquedaReclamacion.setFiltroActual(filtro);
         super.mv.addObject("mensaje", mensaje);
         super.mv.addObject("busqueda", this.busquedaReclamacion);
-        super.mv.addObject("titulo", "Reclamaciones");
+        super.mv.addObject("titulo", "<i class=\"fa fa-exclamation-circle\" aria-hidden=\"true\"></i> Reclamaciones");
         return super.mv;
     }
 
