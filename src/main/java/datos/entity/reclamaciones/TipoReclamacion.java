@@ -18,7 +18,7 @@ public class TipoReclamacion implements Serializable {
     private long id;
 
     @Column(name = "codigo_reclamacion")
-    private int codigoReclamacion;
+    private long codigoReclamacion;
 
     @Column(name = "descripcion")
     private String descripcion;

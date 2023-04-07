@@ -1,11 +1,13 @@
 package datos.dao.reclamaciones;
 
+import datos.entity.reclamaciones.Reclamacion;
 import datos.entity.reclamaciones.SubtipoReclamacion;
 import datos.interfaces.CrudDao;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.NoResultException;
 import java.util.List;
 
 @Repository
@@ -32,7 +34,12 @@ public class SubtipoReclamacionDaoImp implements CrudDao<SubtipoReclamacion> {
 
     @Override
     public SubtipoReclamacion buscarId(long id) {
-        return null;
+        try{
+        return sessionFactory.getCurrentSession().createQuery("from SubtipoReclamacion r where r.codigoReclamacion = :id", SubtipoReclamacion.class)
+                .setParameter("id", id).getSingleResult();
+        } catch(NoResultException e){
+            return null;
+        }
     }
 
     @Override

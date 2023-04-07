@@ -4,6 +4,7 @@ import controladores.helper.*;
 import controladores.helper.medidas.MedidasHelper;
 import controladores.helper.medidas.ProcesarMedida;
 import controladores.helper.medidas.ProcesarMedidaCCH;
+import controladores.helper.ProcesarReclamacion;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
 import datos.interfaces.DocumentoXmlService;
@@ -76,6 +77,9 @@ public class Procesamiento {
     @Autowired
     private MedidasHelper medidasHelper;
 
+    @Autowired
+    private ProcesarReclamacion procesarReclamacion;
+
     int archivosCorrectos;
     int archivosTotales;
     List<String> archivosErroneos;
@@ -87,6 +91,7 @@ public class Procesamiento {
     private boolean isMACCSinCambios;
     private boolean isConsultaFacturacion;
     private boolean isPeaje;
+    private boolean isReclamacion;
     private HashMap<String, String> elementosCF;
 	private ResultSet rs;
 
@@ -185,6 +190,8 @@ public class Procesamiento {
                 this.procesarPeaje.procesar(documento, nombreArchivo);
             } else if(isConsultaFacturacion) {
             	this.procesarConsultaFactura(documento, nombreArchivo);
+            } else if(isReclamacion){
+                this.procesarReclamacion.procesar(documento, nombreArchivo);
             }
             else {
                 throw new XmlNoSoportado();
@@ -268,14 +275,21 @@ public class Procesamiento {
             this.isMACCSinCambios = true;
             return;
         }
-        
-        if (Utilidades.existeNodo(doc, "CodigoREEEmpresaEmisora")) {
+
+        if(Utilidades.existeNodo(doc, "MensajeReclamacionPeticion") || Utilidades.existeNodo(doc, "MensajeAceptacionReclamacion") ||
+                Utilidades.existeNodo(doc, "MensajeCierreReclamacion") || Utilidades.existeNodo(doc, "MensajePeticionInformacionAdicionalReclamacion")){
+            this.isReclamacion = true;
+            return;
+        }
+
+        if (Utilidades.existeNodo(doc, "" +
+                "")) {
             this.isFactura = StringHelper.toInteger(doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent()) == 894;
             if (this.isFactura) {
 				return;
 			}
         }
-        
+
         if (Utilidades.existeNodo(doc, "RemesaPago")) {
             this.isRemesaPago = true;
             return;
@@ -303,6 +317,7 @@ public class Procesamiento {
         this.isArchivarFactura = false;
         this.isPeaje = false;
         this.isConsultaFacturacion = false;
+        this.isReclamacion = false;
     }
 
     /**

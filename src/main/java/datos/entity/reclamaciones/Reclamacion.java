@@ -1,16 +1,18 @@
 package datos.entity.reclamaciones;
 
 import datos.entity.Cliente;
+import dominio.componentesxml.DatosCabecera;
+import dominio.componentesxml.reclamaciones.*;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 @Data @Entity @Table(name = "reclamaciones")
-public class Reclamacion implements Serializable {
+public class Reclamacion {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -31,8 +33,14 @@ public class Reclamacion implements Serializable {
     @Column(name = "codigo_de_paso")
     private int codigoDePaso;
 
+    @Column(name = "codigo_del_proceso")
+    private String codigoDelProceso;
+
     @Column(name = "codigo_de_solicitud")
-    private int codigoDeSolicitud;
+    private long codigoDeSolicitud;
+
+    @Column(name = "secuencial_de_solicitud")
+    private int secuencialDeSolicitud;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha_solicitud")
@@ -72,8 +80,84 @@ public class Reclamacion implements Serializable {
 
     @Column(name = "updated_by")
     private String updatedBy;
+    @Column(name = "secuencial")
+    private int secuencial;
+
+    @Column(name = "codigo_motivo")
+    private int codigoMotivo;
+
+    @Column(name ="codigo_reclamacion_distribuidora")
+    private int codigoReclamacionDistribuidora;
 
     public Reclamacion(){}
 
+    public Reclamacion(Cliente cliente, DatosCabeceraReclamacion datosCabecera){
+        this.cliente = cliente;
 
+        //Cabecera
+        this.codigoEmpresaEmisora = Integer.parseInt(datosCabecera.getCodigoREEEmpresaEmisora());
+        this.codigoEmpresaDestino = Integer.parseInt(datosCabecera.getCodigoREEEmpresaDestino());
+        this.codigoDePaso = Integer.parseInt(datosCabecera.getCodigoDePaso());
+        this.codigoDelProceso = datosCabecera.getCodigoDelProceso();
+        this.codigoDeSolicitud = Long.parseLong(datosCabecera.getCodigoDeSolicitud());
+        this.secuencialDeSolicitud = Integer.parseInt(datosCabecera.getSecuencialDeSolicitud());
+        try {
+            this.fechaSolicitud = new SimpleDateFormat("yyyy-MM-dd").parse(datosCabecera.getFechaSolicitud());
+        } catch (ParseException e) {
+            System.out.println("Ocurrio un error al procesar una fecha");
+            this.fechaSolicitud = null;
+        }
+    }
+    public Reclamacion(Cliente cliente, DatosCabeceraReclamacion datosCabecera, RechazoReclamacion rechazoReclamacion){
+        this.cliente = cliente;
+
+        //Cabecera
+        this.codigoEmpresaEmisora = Integer.parseInt(datosCabecera.getCodigoREEEmpresaEmisora());
+        this.codigoEmpresaDestino = Integer.parseInt(datosCabecera.getCodigoREEEmpresaDestino());
+        this.codigoDePaso = Integer.parseInt(datosCabecera.getCodigoDePaso());
+        this.codigoDelProceso = datosCabecera.getCodigoDelProceso();
+        this.codigoDeSolicitud = Long.parseLong(datosCabecera.getCodigoDeSolicitud());
+        this.secuencialDeSolicitud = Integer.parseInt(datosCabecera.getSecuencialDeSolicitud());
+        try {
+            this.fechaSolicitud = new SimpleDateFormat("yyyy-MM-dd").parse(datosCabecera.getFechaSolicitud());
+        } catch (ParseException e) {
+            System.out.println("Ocurrio un error al procesar una fecha");
+            this.fechaSolicitud = null;
+        }
+
+        //Rechazo
+        if(rechazoReclamacion.equals("")){
+        this.secuencial = Integer.parseInt(rechazoReclamacion.getSecuencial());
+        this.codigoMotivo = Integer.parseInt(rechazoReclamacion.getCodigoMotivo());
+        this.comentarios = rechazoReclamacion.getComentariosReclamacion();
+        } else{
+            System.out.println("Cadenas vacias");
+        }
+    }
+
+    public Reclamacion(Cliente cliente, DatosCabeceraReclamacion datosCabecera, DatosInformacionReclamacion datosInformacionReclamacion, InformacionAdicionalReclamacion informacionAdicionalReclamacion, TipoReclamacion tipoReclamacion, SubtipoReclamacion subtipoReclamacion){
+        this.cliente = cliente;
+        this.tipoReclamacion = tipoReclamacion;
+        this.subtipoReclamacion = subtipoReclamacion;
+
+        //Cabecera
+        this.codigoEmpresaEmisora = Integer.parseInt(datosCabecera.getCodigoREEEmpresaEmisora());
+        this.codigoEmpresaDestino = Integer.parseInt(datosCabecera.getCodigoREEEmpresaDestino());
+        this.codigoDePaso = Integer.parseInt(datosCabecera.getCodigoDePaso());
+        this.codigoDelProceso = datosCabecera.getCodigoDelProceso();
+        this.codigoDeSolicitud = Long.parseLong(datosCabecera.getCodigoDeSolicitud());
+        this.secuencialDeSolicitud = Integer.parseInt(datosCabecera.getSecuencialDeSolicitud());
+        try {
+            this.fechaSolicitud = new SimpleDateFormat("yyyy-MM-dd").parse(datosCabecera.getFechaSolicitud());
+        } catch (ParseException e) {
+            System.out.println("Ocurrio un error al procesar una fecha");
+            this.fechaSolicitud = null;
+        }
+
+        //Datos Informacion
+        this.codigoReclamacionDistribuidora = Integer.parseInt(datosInformacionReclamacion.getCodigoReclamacioneDistribuidora());
+
+        //Informacion Adicional
+        this.comentarios = informacionAdicionalReclamacion.getComentarios();
+    };
 }

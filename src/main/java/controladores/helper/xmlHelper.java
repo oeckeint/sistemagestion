@@ -7,15 +7,14 @@ import datos.entity.OtraFactura;
 import datos.entity.Peaje;
 import datos.interfaces.ClienteService;
 import dominio.componentesxml.*;
+import dominio.componentesxml.reclamaciones.*;
 import excepciones.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 import org.w3c.dom.*;
 import utileria.texto.Cadenas;
 import datos.interfaces.DocumentoXmlService;
@@ -26,7 +25,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.persistence.NonUniqueResultException;
 import utileria.StringHelper;
 import utileria.xml;
 
@@ -284,6 +282,171 @@ public class xmlHelper {
 
         this.imprimirResultado("cabecera", elementos);
         return new DatosCabecera(elementos);
+    }
+
+    protected DatosCabeceraReclamacion cabeceraReclamacion() {
+        elementos = new ArrayList<String>(8);
+        elementos.add("");
+        elementos.add("");
+        elementos.add("");
+        elementos.add("");
+        elementos.add("");
+        elementos.add("");
+        elementos.add("");
+        elementos.add("");
+
+        NodeList flowList = doc.getElementsByTagName("CabeceraReclamacion");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "CodigoREEEmpresaEmisora":
+                            elementos.set(0, childList.item(j).getTextContent().trim());
+                            this.EmpresaEmisora = childList.item(j).getTextContent().trim();
+                            break;
+                        case "CodigoREEEmpresaDestino":
+                            elementos.set(1, childList.item(j).getTextContent().trim());
+                            break;
+                        case "CodigoDelProceso":
+                            elementos.set(2, childList.item(j).getTextContent().trim());
+                            break;
+                        case "CodigoDePaso":
+                            elementos.set(3, childList.item(j).getTextContent().trim());
+                            break;
+                        case "CodigoDeSolicitud":
+                            elementos.set(4, childList.item(j).getTextContent().trim());
+                            break;
+                        case "FechaSolicitud":
+                            elementos.set(5, childList.item(j).getTextContent().trim().substring(0, 10));
+                            break;
+                        case "CUPS":
+                            elementos.set(6, childList.item(j).getTextContent().trim());
+                            break;
+                        case "SecuencialDeSolicitud":
+                            elementos.set(7, childList.item(j).getTextContent().trim());
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        this.imprimirResultado("cabeceraReclamacion", elementos);
+        return new DatosCabeceraReclamacion(elementos);
+    }
+    protected RechazoReclamacion reclamacionRechazo() {
+        elementos = new ArrayList<String>(3);
+        elementos.add("");
+        elementos.add("");
+        elementos.add("");
+
+        NodeList flowList = doc.getElementsByTagName("Rechazo");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "Secuencial":
+                            elementos.set(0, childList.item(j).getTextContent().trim());
+                            break;
+                        case "CodigoMotivo":
+                            elementos.set(1, childList.item(j).getTextContent().trim());
+                            break;
+                        case "Comentarios":
+                            elementos.set(2, childList.item(j).getTextContent().trim());
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        this.imprimirResultado("reclamacionaRechazo", elementos);
+        return new RechazoReclamacion(elementos);
+    }
+
+    protected DatosSolicitud datosSolicitud() {
+        elementos = new ArrayList<String>(2);
+        elementos.add("");
+        elementos.add("");
+
+        NodeList flowList = doc.getElementsByTagName("DatosSolicitud");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "Tipo":
+                            elementos.set(0, childList.item(j).getTextContent().trim());
+                            break;
+                        case "Subtipo":
+                            elementos.set(1, childList.item(j).getTextContent().trim());
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        this.imprimirResultado("reclamacionaRechazo", elementos);
+        return new DatosSolicitud(elementos);
+    }
+
+    protected DatosInformacionReclamacion datosInformacionReclamacion() {
+        elementos = new ArrayList<String>(1);
+        elementos.add("");
+
+        NodeList flowList = doc.getElementsByTagName("DatosCierre");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "CodigoReclamacionDistribuidora":
+                            elementos.set(0, childList.item(j).getTextContent().trim());
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        this.imprimirResultado("reclamacionaRechazo", elementos);
+        return new DatosInformacionReclamacion(elementos);
+    }
+
+    protected InformacionAdicionalReclamacion informacionAdicionalReclamacion() {
+        elementos = new ArrayList<String>(1);
+        elementos.add("");
+
+        NodeList flowList = doc.getElementsByTagName("CierreReclamacion");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "Comentarios":
+                            elementos.set(0, childList.item(j).getTextContent().trim());
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        this.imprimirResultado("reclamacionaRechazo", elementos);
+        return new InformacionAdicionalReclamacion(elementos);
     }
 
     protected DatosGeneralesFactura datosGenerales() {
