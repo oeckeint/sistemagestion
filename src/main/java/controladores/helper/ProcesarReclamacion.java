@@ -72,6 +72,10 @@ public class ProcesarReclamacion extends xmlHelper {
                 this.iniciarVariablesLocales();
                 r = this.crearReclamacionPaso3();
                 break;
+            case 5:
+                this.iniciarVariablesLocales();
+                r = this.crearReclamacionPaso5();
+                break;
             default:
                 System.out.println("No soportado");
                 break;
@@ -90,6 +94,11 @@ public class ProcesarReclamacion extends xmlHelper {
     }
 
     private Reclamacion crearReclamacionPaso3(){
+        Reclamacion reclamacion = new Reclamacion(super.cliente, super.cabeceraReclamacion(), super.datosInformacionReclamacion(),super.informacionAdicionalReclamacion(), tipoReclamacion, subtipoReclamacion);
+        return reclamacion;
+    }
+
+    private Reclamacion crearReclamacionPaso5(){
         Reclamacion reclamacion = new Reclamacion(super.cliente, super.cabeceraReclamacion(), super.datosInformacionReclamacion(),super.informacionAdicionalReclamacion(), tipoReclamacion, subtipoReclamacion);
         return reclamacion;
     }
