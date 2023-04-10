@@ -10,6 +10,7 @@ import dominio.componentesxml.DatosCabecera;
 import dominio.componentesxml.reclamaciones.RechazoReclamacion;
 import excepciones.ClienteNoExisteException;
 import excepciones.MasDeUnClienteEncontrado;
+import excepciones.ReclamacionYaExisteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -18,11 +19,15 @@ import utileria.xml;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Component
 public class ProcesarReclamacion extends xmlHelper {
 
     private int codigoDePaso;
+
+    private String codigoDeSolicitud;
 
     private String reclamacionTipo;
 
@@ -37,6 +42,8 @@ public class ProcesarReclamacion extends xmlHelper {
 
     private CrudDao<SubtipoReclamacion> serviceSubtipoReclamacion;
 
+    private final Logger logger = Logger.getLogger(getClass().getName());
+
     public ProcesarReclamacion(@Qualifier(value = "reclamacionServiceImp") CrudDao<Reclamacion> service,
                                @Qualifier(value = "tipoReclamacionServiceImp") CrudDao<TipoReclamacion> serviceTipoReclamacion,
                                @Qualifier(value = "subtipoReclamacionServiceImp")CrudDao<SubtipoReclamacion> serviceSubtipoReclamacion) {
@@ -45,21 +52,26 @@ public class ProcesarReclamacion extends xmlHelper {
         this.serviceSubtipoReclamacion = serviceSubtipoReclamacion;
     }
 
-    public void procesar(Document doc, String nombreArchivo) throws MasDeUnClienteEncontrado {
+    public void procesar(Document doc, String nombreArchivo) throws MasDeUnClienteEncontrado, ClienteNoExisteException, ReclamacionYaExisteException {
         super.doc = doc;
         super.nombreArchivo = nombreArchivo;
         this.iniciarVariablesR();
 
-        if(super.cliente !=null){
-            registrarReclamacion();
-        } else{
-            System.out.println("No se registro nada :(");
+        if (this.service.buscarFiltro(this.codigoDeSolicitud, "codigoSolicitud") == null){
+            if(super.cliente !=null){
+                registrarReclamacion();
+            } else{
+                logger.log(Level.INFO, "No existe un cliente con el cups {0} por lo que no se registra el archivo con codigo de solicitud " + this.codigoDeSolicitud, super.cups);
+                throw new ClienteNoExisteException(super.cups);
+            }
+        } else {
+            logger.log(Level.INFO, "Ya existe un registro con el codigo de solicitud {0} por lo que no se registra.", this.codigoDeSolicitud);
+            throw new ReclamacionYaExisteException(this.codigoDeSolicitud);
         }
     }
 
     private void registrarReclamacion(){
         Reclamacion r = null;
-        System.out.println(this.codigoDePaso);
         switch (this.codigoDePaso) {
             case 1:
                 this.iniciarVariablesLocales();
@@ -69,7 +81,7 @@ public class ProcesarReclamacion extends xmlHelper {
                 r = this.crearReclamacionPaso2();
                 break;
             case 3:
-                this.iniciarVariablesLocales();
+                System.out.println("PAso 3");
                 r = this.crearReclamacionPaso3();
                 break;
             case 5:
@@ -84,7 +96,7 @@ public class ProcesarReclamacion extends xmlHelper {
     }
 
     private Reclamacion crearReclamacionPaso1(){
-        Reclamacion reclamacion = new Reclamacion(super.cliente, super.cabeceraReclamacion());
+        Reclamacion reclamacion = new Reclamacion(super.cliente, super.cabeceraReclamacion(), super.solicitudReclamacion());
         return reclamacion;
     }
 
@@ -94,18 +106,24 @@ public class ProcesarReclamacion extends xmlHelper {
     }
 
     private Reclamacion crearReclamacionPaso3(){
-        Reclamacion reclamacion = new Reclamacion(super.cliente, super.cabeceraReclamacion(), super.datosInformacionReclamacion(),super.informacionAdicionalReclamacion(), tipoReclamacion, subtipoReclamacion);
+        Reclamacion reclamacion = new Reclamacion(
+                super.cliente,
+                super.cabeceraReclamacion(),
+                super.datosInformacionReclamacion("DatosInformacion"),
+                super.informacionAdicionalReclamacion(),
+                super.datosRetipificacion(this.serviceTipoReclamacion, this.serviceSubtipoReclamacion)
+        );
         return reclamacion;
     }
 
     private Reclamacion crearReclamacionPaso5(){
-        Reclamacion reclamacion = new Reclamacion(super.cliente, super.cabeceraReclamacion(), super.datosInformacionReclamacion(),super.informacionAdicionalReclamacion(), tipoReclamacion, subtipoReclamacion);
+        Reclamacion reclamacion = new Reclamacion(super.cliente, super.cabeceraReclamacion(), super.datosInformacionReclamacion("DatosCierre"),super.informacionAdicionalReclamacion(), tipoReclamacion, subtipoReclamacion);
         return reclamacion;
     }
 
     private void iniciarVariablesR() throws MasDeUnClienteEncontrado {
-
         this.codigoDePaso = Integer.parseInt(super.doc.getElementsByTagName("CodigoDePaso").item(0).getTextContent());
+        this.codigoDeSolicitud = xml.obtenerContenidoNodo("CodigoDeSolicitud", this.doc);
         super.cups = super.doc.getElementsByTagName("CUPS").item(0).getTextContent();
         super.cliente = super.clienteService.encontrarCups(super.cups);
     }

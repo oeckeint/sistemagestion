@@ -71,10 +71,9 @@
                                 <tr class="bg-dark text-white">
                                     <th scope="col"><fmt:message key="customers.reclamaciones.titulotablalista"/></th>
                                     <th scope="col"><fmt:message key="customers.reclamaciones.cliente"/> </th>
+                                    <th scope="col"><fmt:message key="customers.reclamaciones.codigoDePaso"/> </th>
                                     <th scope="col"><fmt:message key="customers.reclamaciones.fechaSolicitud"/></th>
-                                    <th scope="col"><fmt:message key="customers.reclamaciones.fechaIncidente"/></th>
-                                    <th scope="col"><fmt:message key="customers.reclamaciones.numeroFacturaATR"/></th>
-                                    <th scope="col"><fmt:message key="customers.reclamaciones.codigoDePaso"/></th>
+                                    <th scope="col"><fmt:message key="customers.reclamaciones.codigoSolicitud"/></th>
                                     <th scope="col"><fmt:message key="customers.reclamaciones.acciones"/></th>
                                 </tr>
                                 </tr>
@@ -92,9 +91,8 @@
                                     <tr>
                                         <td>${reclamacion.idReclamacion}</td>
                                         <td><a href="${detallesCliente}" class="btn btn-success">${reclamacion.cliente.idCliente}</a></td>
+                                        <td>${reclamacion.codigoDePaso}</td>
                                         <td>${reclamacion.fechaSolicitud}</td>
-                                        <td>${reclamacion.fechaIncidente}</td>
-                                        <td>${reclamacion.numeroFacturaATR}</td>
                                         <td>${reclamacion.codigoDeSolicitud}</td>
                                         <td>
                                             <button class="btn btn-danger" type="button" id="detailButton${id.count}" onclick="loadData(${id.count}, '${detalles}');">

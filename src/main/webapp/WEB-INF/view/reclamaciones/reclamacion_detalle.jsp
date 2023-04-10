@@ -121,64 +121,119 @@
 							<c:set var="rightColumn" value="col-md-6"/>
                             <div class="col-12">
                                 <ul class="list-group list-group-flush text-right">
-                                   	<div class="row align-items-center justify-content-evenly">
-                                    	<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoEmpresaEmisora"/></Strong></div>
-                                    	<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoEmpresaEmisora}</div>
-                                   	</div>
-                                   	<hr class="my-2"/>
-                                    <div class="row align-items-center justify-content-evenly">
-                                    	<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoEmpresaDestino"/></Strong></div>
-                                    	<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoEmpresaDestino}</div>
-                                   	</div>
-									<hr class="my-2"/>
-									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoDePaso"/></Strong></div>
-										<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDePaso}</div>
-									</div>
-									<hr class="my-2"/>
-									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoSolicitud"/></Strong></div>
-										<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDeSolicitud}</div>
-									</div>
-									<hr class="my-2"/>
-									<div class="row align-items-center justify-content-evenly mt-2">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.fechaSolicitud"/></Strong></div>
-										<div class="${fullColumn} ${rightColumn}">${reclamacion.fechaSolicitud}</div>
-									</div>
-									<hr class="my-2"/>
-									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.fechaIncidente"/> </Strong></div>
-										<div class="${fullColumn} ${rightColumn}">${reclamacion.fechaIncidente}</div>
-									</div>
-									<hr class="my-2"/>
-									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.numeroFacturaATR"/></Strong></div>
-										<div class="${fullColumn} ${rightColumn}">${reclamacion.numeroFacturaATR}</div>
-									</div>
-                                   	<hr class="my-2"/>
-									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.idTipoReclamacion"/></Strong></div>
-										<div class="${fullColumn} ${rightColumn}">${reclamacion.tipoReclamacion.id}</div>
-									</div>
-									<hr class="my-2"/>
-									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.idSubtipoReclamacion"/></Strong></div>
-										<div class="${fullColumn} ${rightColumn}">${reclamacion.subtipoReclamacion.id}</div>
-									</div>
-									<hr class="my-2"/>
-									<div class="row align-items-center justify-content-evenly">
-										<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.creado"/></Strong></div>
-										<div class="${fullColumn} ${rightColumn}">
-											<fmt:formatDate value="${reclamacion.createdOn.time}" pattern="yyyy/MM/dd" var="createdOn"/>
-											<fmt:formatDate value="${reclamacion.createdOn.time}" pattern="HH:mm:ss" var="createdAt"/>
-											<fmt:message key="customers.reclamaciones.fechapor">
-												<fmt:param value="${createdOn}"/>
-												<fmt:param value="${createdAt}"/>
-												<fmt:param value="${reclamacion.createdBy}"/>
-											</fmt:message>
+									<c:if test="${reclamacion.codigoEmpresaEmisora ne ''}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoEmpresaEmisora"/></Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoEmpresaEmisora}</div>
 										</div>
-									</div>
-									<hr class="my-2"/>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.codigoEmpresaDestino}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoEmpresaDestino"/></Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoEmpresaDestino}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.codigoDelProceso}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo del proceso</Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDelProceso}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.codigoDePaso}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoDePaso"/></Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDePaso}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.secuencialDeSolicitud}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Secuencial de solicitud</Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.secuencialDeSolicitud}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.codigoDeSolicitud}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo de solicitud</Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDeSolicitud}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.fechaSolicitud}">
+										<div class="row align-items-center justify-content-evenly mt-2">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.fechaSolicitud"/></Strong></div>
+											<div class="${fullColumn} ${rightColumn}"><fmt:formatDate value="${reclamacion.fechaSolicitud}" pattern="yyyy/MM/dd"/>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.fechaIncidente}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.fechaIncidente"/> </Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.fechaIncidente}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.numeroFacturaATR}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.numeroFacturaATR"/></Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.numeroFacturaATR}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.secuencialRechazo}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Secuencial rechazo</Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.secuencialRechazo}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.codigoMotivo}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo Motivo</Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoMotivo}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.codigoReclamacionDistribuidora}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo reclamacion distribuidora</Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoReclamacionDistribuidora}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.tipoReclamacion.descripcion}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.idTipoReclamacion"/></Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.tipoReclamacion.codigoReclamacion} - ${reclamacion.tipoReclamacion.descripcion}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.subtipoReclamacion.descripcion}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.idSubtipoReclamacion"/></Strong></div>
+											<div class="${fullColumn} ${rightColumn}">${reclamacion.subtipoReclamacion.codigoReclamacion} - ${reclamacion.subtipoReclamacion.descripcion}</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
+									<c:if test="${not empty reclamacion.createdOn}">
+										<div class="row align-items-center justify-content-evenly">
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.creado"/></Strong></div>
+											<div class="${fullColumn} ${rightColumn}">
+												<fmt:formatDate value="${reclamacion.createdOn.time}" pattern="yyyy/MM/dd" var="createdOn"/>
+												<fmt:formatDate value="${reclamacion.createdOn.time}" pattern="HH:mm:ss" var="createdAt"/>
+												<fmt:message key="customers.reclamaciones.fechapor">
+													<fmt:param value="${createdOn}"/>
+													<fmt:param value="${createdAt}"/>
+													<fmt:param value="${reclamacion.createdBy}"/>
+												</fmt:message>
+											</div>
+										</div>
+										<hr class="my-2"/>
+									</c:if>
 									<c:if test="${reclamacion.updatedOn != null}">
 										<div class="row align-items-center justify-content-evenly">
 											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.actualizado"/></Strong></div>

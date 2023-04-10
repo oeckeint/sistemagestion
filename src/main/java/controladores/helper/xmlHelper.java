@@ -5,7 +5,10 @@ import datos.entity.EnergiaExcedentaria;
 import datos.entity.Factura;
 import datos.entity.OtraFactura;
 import datos.entity.Peaje;
+import datos.entity.reclamaciones.SubtipoReclamacion;
+import datos.entity.reclamaciones.TipoReclamacion;
 import datos.interfaces.ClienteService;
+import datos.interfaces.CrudDao;
 import dominio.componentesxml.*;
 import dominio.componentesxml.reclamaciones.*;
 import excepciones.*;
@@ -286,7 +289,7 @@ public class xmlHelper {
 
     protected DatosCabeceraReclamacion cabeceraReclamacion() {
         elementos = new ArrayList<String>(8);
-        elementos.add("");
+        elementos.add("0");
         elementos.add("");
         elementos.add("");
         elementos.add("");
@@ -337,6 +340,32 @@ public class xmlHelper {
         this.imprimirResultado("cabeceraReclamacion", elementos);
         return new DatosCabeceraReclamacion(elementos);
     }
+
+    protected SolicitudReclamacion solicitudReclamacion() {
+        elementos = new ArrayList<String>(1);
+        elementos.add("");
+
+        NodeList flowList = doc.getElementsByTagName("SolicitudReclamacion");
+        for (int i = 0; i < flowList.getLength(); i++) {
+            NodeList childList = flowList.item(i).getChildNodes();
+            for (int j = 0; j < childList.getLength(); j++) {
+                Node childNode = childList.item(j);
+                if (null != childNode.getNodeName()) {
+                    switch (childNode.getNodeName()) {
+                        case "Comentarios":
+                            elementos.set(0, childList.item(j).getTextContent().trim());
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        this.imprimirResultado("datosInformacionReclamacion", elementos);
+        return new SolicitudReclamacion(elementos);
+    }
+
     protected RechazoReclamacion reclamacionRechazo() {
         elementos = new ArrayList<String>(3);
         elementos.add("");
@@ -370,12 +399,14 @@ public class xmlHelper {
         return new RechazoReclamacion(elementos);
     }
 
-    protected DatosSolicitud datosSolicitud() {
+    protected DatosRetipificacion datosRetipificacion(CrudDao<TipoReclamacion> tipoReclamacionService, CrudDao<SubtipoReclamacion> subtipoReclamacionService) {
+        TipoReclamacion tipoReclamacion = null;
+        SubtipoReclamacion subtipoReclamacion = null;
         elementos = new ArrayList<String>(2);
-        elementos.add("");
-        elementos.add("");
+        elementos.add("0");
+        elementos.add("0");
 
-        NodeList flowList = doc.getElementsByTagName("DatosSolicitud");
+        NodeList flowList = doc.getElementsByTagName("Retipificacion");
         for (int i = 0; i < flowList.getLength(); i++) {
             NodeList childList = flowList.item(i).getChildNodes();
             for (int j = 0; j < childList.getLength(); j++) {
@@ -395,15 +426,19 @@ public class xmlHelper {
             }
         }
 
-        this.imprimirResultado("reclamacionaRechazo", elementos);
-        return new DatosSolicitud(elementos);
+        tipoReclamacion = tipoReclamacionService.buscarId(Long.parseLong((String) elementos.get(0)));
+        subtipoReclamacion = subtipoReclamacionService.buscarId(Long.parseLong((String) elementos.get(1)));
+
+
+        this.imprimirResultado("datosRetipificacion", elementos);
+        return new DatosRetipificacion(tipoReclamacion, subtipoReclamacion);
     }
 
-    protected DatosInformacionReclamacion datosInformacionReclamacion() {
+    protected DatosInformacionReclamacion datosInformacionReclamacion(String nodoPadre) {
         elementos = new ArrayList<String>(1);
         elementos.add("");
 
-        NodeList flowList = doc.getElementsByTagName("DatosCierre");
+        NodeList flowList = doc.getElementsByTagName(nodoPadre);
         for (int i = 0; i < flowList.getLength(); i++) {
             NodeList childList = flowList.item(i).getChildNodes();
             for (int j = 0; j < childList.getLength(); j++) {
@@ -420,7 +455,7 @@ public class xmlHelper {
             }
         }
 
-        this.imprimirResultado("reclamacionaRechazo", elementos);
+        this.imprimirResultado("datosInformacionReclamacion", elementos);
         return new DatosInformacionReclamacion(elementos);
     }
 
@@ -445,7 +480,7 @@ public class xmlHelper {
             }
         }
 
-        this.imprimirResultado("reclamacionaRechazo", elementos);
+        this.imprimirResultado("informacionAdicionalReclamacion", elementos);
         return new InformacionAdicionalReclamacion(elementos);
     }
 

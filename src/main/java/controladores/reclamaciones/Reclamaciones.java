@@ -74,6 +74,7 @@ public class Reclamaciones extends Operaciones<BusquedaReclamacion>{
                 }
                 break;
             case "cliente":
+            case "codigoSolicitud":
                 reclamaciones = this.reclamacionService.buscarFiltro(valor, filtro);
 
                 if (reclamaciones != null){

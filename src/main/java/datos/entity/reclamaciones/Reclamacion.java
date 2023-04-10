@@ -80,8 +80,8 @@ public class Reclamacion {
 
     @Column(name = "updated_by")
     private String updatedBy;
-    @Column(name = "secuencial")
-    private int secuencial;
+    @Column(name = "secuencial_rechazo")
+    private int secuencialRechazo;
 
     @Column(name = "codigo_motivo")
     private int codigoMotivo;
@@ -91,7 +91,12 @@ public class Reclamacion {
 
     public Reclamacion(){}
 
-    public Reclamacion(Cliente cliente, DatosCabeceraReclamacion datosCabecera){
+    /**
+     * Paso 1
+     * @param cliente
+     * @param datosCabecera
+     */
+    public Reclamacion(Cliente cliente, DatosCabeceraReclamacion datosCabecera, SolicitudReclamacion solicitudReclamacion){
         this.cliente = cliente;
 
         //Cabecera
@@ -107,7 +112,15 @@ public class Reclamacion {
             System.out.println("Ocurrio un error al procesar una fecha");
             this.fechaSolicitud = null;
         }
+        this.comentarios = solicitudReclamacion.getComentarios();
     }
+
+    /**
+     * Paso 2
+     * @param cliente
+     * @param datosCabecera
+     * @param rechazoReclamacion
+     */
     public Reclamacion(Cliente cliente, DatosCabeceraReclamacion datosCabecera, RechazoReclamacion rechazoReclamacion){
         this.cliente = cliente;
 
@@ -127,7 +140,7 @@ public class Reclamacion {
 
         //Rechazo
         if(rechazoReclamacion.equals("")){
-        this.secuencial = Integer.parseInt(rechazoReclamacion.getSecuencial());
+        this.secuencialRechazo = Integer.parseInt(rechazoReclamacion.getSecuencial());
         this.codigoMotivo = Integer.parseInt(rechazoReclamacion.getCodigoMotivo());
         this.comentarios = rechazoReclamacion.getComentariosReclamacion();
         } else{
@@ -135,6 +148,42 @@ public class Reclamacion {
         }
     }
 
+    public Reclamacion(Cliente cliente, DatosCabeceraReclamacion datosCabecera, DatosInformacionReclamacion datosInformacionReclamacion, InformacionAdicionalReclamacion informacionAdicionalReclamacion, DatosRetipificacion datosRetipificacion){
+        this.cliente = cliente;
+        this.tipoReclamacion = datosRetipificacion.getTipoReclamacion();
+        this.subtipoReclamacion = datosRetipificacion.getSubtipoReclamacion();
+
+        //Cabecera
+        this.codigoEmpresaEmisora = Integer.parseInt(datosCabecera.getCodigoREEEmpresaEmisora());
+        this.codigoEmpresaDestino = Integer.parseInt(datosCabecera.getCodigoREEEmpresaDestino());
+        this.codigoDePaso = Integer.parseInt(datosCabecera.getCodigoDePaso());
+        this.codigoDelProceso = datosCabecera.getCodigoDelProceso();
+        this.codigoDeSolicitud = Long.parseLong(datosCabecera.getCodigoDeSolicitud());
+        this.secuencialDeSolicitud = Integer.parseInt(datosCabecera.getSecuencialDeSolicitud());
+        try {
+            this.fechaSolicitud = new SimpleDateFormat("yyyy-MM-dd").parse(datosCabecera.getFechaSolicitud());
+        } catch (ParseException e) {
+            System.out.println("Ocurrio un error al procesar una fecha");
+            this.fechaSolicitud = null;
+        }
+
+        //Datos Informacion
+        this.codigoReclamacionDistribuidora = Integer.parseInt(datosInformacionReclamacion.getCodigoReclamacioneDistribuidora());
+
+        //Informacion Adicional
+        this.comentarios = informacionAdicionalReclamacion.getComentarios();
+    };
+
+
+    /**
+     * Paso 5
+     * @param cliente
+     * @param datosCabecera
+     * @param datosInformacionReclamacion
+     * @param informacionAdicionalReclamacion
+     * @param tipoReclamacion
+     * @param subtipoReclamacion
+     */
     public Reclamacion(Cliente cliente, DatosCabeceraReclamacion datosCabecera, DatosInformacionReclamacion datosInformacionReclamacion, InformacionAdicionalReclamacion informacionAdicionalReclamacion, TipoReclamacion tipoReclamacion, SubtipoReclamacion subtipoReclamacion){
         this.cliente = cliente;
         this.tipoReclamacion = tipoReclamacion;
