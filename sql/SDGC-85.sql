@@ -1,8 +1,5 @@
 #SDGC-85
 
-#Nueva tabla tipo_reclamacion
-
-#sge.tipo_reclamacion definition
 
 CREATE TABLE `tipo_reclamacion` (
   `id_tipo_reclamacion` int NOT NULL AUTO_INCREMENT,
@@ -15,7 +12,6 @@ CREATE TABLE `tipo_reclamacion` (
   PRIMARY KEY (`id_tipo_reclamacion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
-#Nueva tabla de subtipo_reclamacion
 
 CREATE TABLE `subtipo_reclamacion` (
   `id_subtipo_reclamacion` int NOT NULL AUTO_INCREMENT,
@@ -28,26 +24,29 @@ CREATE TABLE `subtipo_reclamacion` (
   PRIMARY KEY (`id_subtipo_reclamacion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
-#Nueva tabla de Reclamaciones
-
 CREATE TABLE `reclamaciones` (
   `id_reclamacion` int NOT NULL AUTO_INCREMENT,
   `id_cliente` int NOT NULL,
   `codigo_empresa_emisora` int NOT NULL,
   `codigo_empresa_destino` int NOT NULL,
+  `codigo_del_proceso` varchar(100) DEFAULT NULL,
   `codigo_de_paso` int NOT NULL,
-  `codigo_de_solicitud` int NOT NULL,
+  `secuencial_de_solicitud` int DEFAULT NULL,
+  `codigo_de_solicitud` bigint NOT NULL,
   `fecha_solicitud` date NOT NULL,
-  `fecha_incidente` date NOT NULL,
-  `numero_factura_atr` varchar(45) NOT NULL,
-  `comentarios` text NOT NULL,
-  `id_tipo_reclamacion` int NOT NULL,
-  `id_subtipo_reclamacion` int NOT NULL,
+  `fecha_incidente` date DEFAULT NULL,
+  `numero_factura_atr` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `secuencial_rechazo` int NOT NULL,
+  `codigo_motivo` int NOT NULL,
+  `codigo_reclamacion_distribuidora` int DEFAULT NULL,
+  `comentarios` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
+  `id_tipo_reclamacion` int DEFAULT NULL,
+  `id_subtipo_reclamacion` int DEFAULT NULL,
   `is_deleted` int DEFAULT NULL,
-  `created_on` datetime NOT NULL,
-  `created_by` varchar(100) NOT NULL,
-  `updated_on` datetime NOT NULL,
-  `updated_by` varchar(100) NOT NULL,
+  `created_on` datetime DEFAULT NULL,
+  `created_by` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `updated_on` datetime DEFAULT NULL,
+  `updated_by` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   PRIMARY KEY (`id_reclamacion`),
   KEY `reclamaciones_FK` (`id_cliente`),
   KEY `reclamaciones_FK_2` (`id_subtipo_reclamacion`),
