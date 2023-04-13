@@ -46,6 +46,7 @@ public class ReclamacionDaoImp implements CrudDao<Reclamacion> {
     @Override
     public List<Reclamacion> buscarFiltro(String valor, String filtro) {
         Query<Reclamacion> q = null;
+
         try{
             switch (filtro){
                 case "cliente":
@@ -54,10 +55,21 @@ public class ReclamacionDaoImp implements CrudDao<Reclamacion> {
                             .setParameter("valor", Long.parseLong(valor));
                     break;
                 case "codigoSolicitud":
-                    q =	this.sessionFactory.getCurrentSession()
-                            .createQuery("from Reclamacion r where r.codigoDeSolicitud = :valor order by r.id desc", Reclamacion.class)
-                            .setParameter("valor", Long.parseLong(valor));
-                    break;
+                    String string  = valor;
+                    String[] parts = string.split("-");
+                    String codigoDeSolicitud = parts[0];
+                    String codigoDePaso = parts[1];
+                   if (parts[1].equals("0")){
+                       q =	this.sessionFactory.getCurrentSession()
+                               .createQuery("from Reclamacion r where r.codigoDeSolicitud = :valor order by r.id desc", Reclamacion.class)
+                               .setParameter("valor", Long.parseLong(codigoDeSolicitud));
+                   } else {
+                       q =	this.sessionFactory.getCurrentSession()
+                               .createQuery("from Reclamacion r where r.codigoDeSolicitud = :valor and r.codigoDePaso = :valor2 order by r.id desc", Reclamacion.class)
+                               .setParameter("valor", Long.parseLong(codigoDeSolicitud))
+                               .setParameter("valor2", Long.parseLong(codigoDePaso));
+                   }
+                   break;
             }
         } catch (NoResultException e){
             e.printStackTrace(System.out);

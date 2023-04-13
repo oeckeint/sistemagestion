@@ -31,7 +31,7 @@ public class Reclamacion {
     private int codigoEmpresaDestino;
 
     @Column(name = "codigo_de_paso")
-    private int codigoDePaso;
+    private long codigoDePaso;
 
     @Column(name = "codigo_del_proceso")
     private String codigoDelProceso;

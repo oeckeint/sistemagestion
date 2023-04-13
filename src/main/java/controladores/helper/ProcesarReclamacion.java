@@ -57,7 +57,7 @@ public class ProcesarReclamacion extends xmlHelper {
         super.nombreArchivo = nombreArchivo;
         this.iniciarVariablesR();
 
-        if (this.service.buscarFiltro(this.codigoDeSolicitud, "codigoSolicitud") == null){
+        if (this.service.buscarFiltro(this.codigoDeSolicitud + "-" + this.codigoDePaso, "codigoSolicitud") == null){
             if(super.cliente !=null){
                 registrarReclamacion();
             } else{
@@ -66,7 +66,7 @@ public class ProcesarReclamacion extends xmlHelper {
             }
         } else {
             logger.log(Level.INFO, "Ya existe un registro con el codigo de solicitud {0} por lo que no se registra.", this.codigoDeSolicitud);
-            throw new ReclamacionYaExisteException(this.codigoDeSolicitud);
+            throw new ReclamacionYaExisteException(this.codigoDeSolicitud, this.codigoDePaso);
         }
     }
 
@@ -81,7 +81,7 @@ public class ProcesarReclamacion extends xmlHelper {
                 r = this.crearReclamacionPaso2();
                 break;
             case 3:
-                System.out.println("PAso 3");
+                System.out.println("Paso 3");
                 r = this.crearReclamacionPaso3();
                 break;
             case 5:

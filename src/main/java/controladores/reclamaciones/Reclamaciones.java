@@ -57,7 +57,7 @@ public class Reclamaciones extends Operaciones<BusquedaReclamacion>{
 
     @GetMapping("/detalles")
     @Override
-    public ModelAndView detalle(@RequestParam("valor") String valor,@RequestParam("filtro") String filtro) {
+    public ModelAndView detalle(@RequestParam("valor") String valor, @RequestParam("filtro") String filtro) {
         super.mv = new ModelAndView("reclamaciones/reclamacion_detalle");
         Reclamacion reclamacion = null;
         List<Reclamacion> reclamaciones = null;
@@ -75,8 +75,9 @@ public class Reclamaciones extends Operaciones<BusquedaReclamacion>{
                 break;
             case "cliente":
             case "codigoSolicitud":
-                reclamaciones = this.reclamacionService.buscarFiltro(valor, filtro);
+                System.out.println(valor);
 
+                    reclamaciones = this.reclamacionService.buscarFiltro(valor + "-0", filtro);
                 if (reclamaciones != null){
                     if (reclamaciones.size() == 1){
                         super.mv.addObject("reclamacion", reclamaciones.get(0));
@@ -102,6 +103,7 @@ public class Reclamaciones extends Operaciones<BusquedaReclamacion>{
         super.mv.addObject("busqueda", this.busquedaReclamacion);
         super.mv.addObject("titulo", "<i class=\"fa fa-exclamation-circle\" aria-hidden=\"true\"></i> Reclamaciones");
         return super.mv;
+
     }
 
     @Override

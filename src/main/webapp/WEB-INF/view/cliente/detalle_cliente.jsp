@@ -26,7 +26,7 @@
                 </div>
                 <hr>
 
-                <!--Primer Renglón-->
+                <!--Primer Renglï¿½n-->
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-5 p-2">
                         <h3 class="list-group-item list-group-item-action active text-center h4">Cliente</h3>
@@ -102,7 +102,7 @@
                                     <ul class="list-group list-group-flush text-right">
                                         <dt class="list-group-item px-1">Dir suministro</dt>
                                         <dt class="list-group-item px-1">CP</dt>
-                                        <dt class="list-group-item px-1">Población</dt>
+                                        <dt class="list-group-item px-1">Poblaciï¿½n</dt>
                                         <dt class="list-group-item px-1">Provincia</dt>
                                         <dt class="list-group-item px-1">Distribuidora</dt>
                                         <dt class="list-group-item px-1">ATR</dt>
@@ -154,7 +154,7 @@
                                         <dt class="list-group-item px-1">CIF</dt>
                                         <dt class="list-group-item px-1">Dom social</dt>
                                         <dt class="list-group-item px-1">CP</dt>
-                                        <dt class="list-group-item px-1">Población</dt>
+                                        <dt class="list-group-item px-1">Poblaciï¿½n</dt>
                                         <dt class="list-group-item px-1">Email</dt>
                                         <dt class="list-group-item px-1">CNAES</dt>
                                         <dt class="list-group-item px-1">Grupo</dt>
