@@ -137,7 +137,7 @@
 									</c:if>
 									<c:if test="${not empty reclamacion.codigoDelProceso}">
 										<div class="row align-items-center justify-content-evenly">
-											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo del proceso</Strong></div>
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoDelProceso"/></Strong></div>
 											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDelProceso}</div>
 										</div>
 										<hr class="my-2"/>
@@ -151,14 +151,14 @@
 									</c:if>
 									<c:if test="${not empty reclamacion.secuencialDeSolicitud}">
 										<div class="row align-items-center justify-content-evenly">
-											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Secuencial de solicitud</Strong></div>
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.secuencialDeSolicitud"/></Strong></div>
 											<div class="${fullColumn} ${rightColumn}">${reclamacion.secuencialDeSolicitud}</div>
 										</div>
 										<hr class="my-2"/>
 									</c:if>
 									<c:if test="${not empty reclamacion.codigoDeSolicitud}">
 										<div class="row align-items-center justify-content-evenly">
-											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo de solicitud</Strong></div>
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoSolicitud"/></Strong></div>
 											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoDeSolicitud}</div>
 										</div>
 										<hr class="my-2"/>
@@ -186,21 +186,21 @@
 									</c:if>
 									<c:if test="${not empty reclamacion.secuencialRechazo}">
 										<div class="row align-items-center justify-content-evenly">
-											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Secuencial rechazo</Strong></div>
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.secuencialRechazo"/></Strong></div>
 											<div class="${fullColumn} ${rightColumn}">${reclamacion.secuencialRechazo}</div>
 										</div>
 										<hr class="my-2"/>
 									</c:if>
 									<c:if test="${not empty reclamacion.codigoMotivo}">
 										<div class="row align-items-center justify-content-evenly">
-											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo Motivo</Strong></div>
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoMotivo"/></Strong></div>
 											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoMotivo}</div>
 										</div>
 										<hr class="my-2"/>
 									</c:if>
 									<c:if test="${not empty reclamacion.codigoReclamacionDistribuidora}">
 										<div class="row align-items-center justify-content-evenly">
-											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong>Codigo reclamacion distribuidora</Strong></div>
+											<div class="${fullColumn} ${leftColumn} text-md-end"><Strong><fmt:message key="customers.reclamaciones.codigoReclamacionDistribuidora"/></Strong></div>
 											<div class="${fullColumn} ${rightColumn}">${reclamacion.codigoReclamacionDistribuidora}</div>
 										</div>
 										<hr class="my-2"/>
@@ -280,7 +280,7 @@
                     
                     <div class="list-group col-12 col-md-5 col-lg-5 p-2">
                     	<c:url var="detalles" value="/clientes/detalles">
-	                        <c:param name="valor" value="${ticket.cliente.idCliente}"/>
+	                        <c:param name="valor" value="${reclamacion.cliente.idCliente}"/>
 	                        <c:param name="filtro" value="id"/>
 	                    </c:url>
                         <h3 class="list-group-item list-group-item-action active text-center h4"><fmt:message key="customers.reclamaciones.cliente"/> <a href="${detalles}" class="btn btn-danger"><i class="fas fa-eye"></i></a></h3>
