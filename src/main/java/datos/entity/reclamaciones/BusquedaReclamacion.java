@@ -14,7 +14,7 @@ import java.util.Map;
 public class BusquedaReclamacion {
 
     @Size(min = 1, message = "El valor no puede estar vacío")
-    @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "Solo se aceptan valores alfanuméricos")
+    @Pattern(regexp = "^[a-zA-Z0-9._-]*$", message = "Solo se aceptan valores alfanuméricos")
     private String valorActual;
 
     private String filtroActual;

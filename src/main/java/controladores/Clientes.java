@@ -77,7 +77,10 @@ public class Clientes {
 	}
 
 	@GetMapping("/formulario")
-	public String formulario(Model model) {
+	public String formulario(Model model, @RequestParam(required = false, name = "idCliente") String idCliente) {
+		if (idCliente != null){
+			ClientesHelper.cliente = this.clienteService.encontrarId(Long.parseLong(idCliente));
+		}
 		model.addAttribute("tituloPagina", ClientesHelper.TITULO_PAGINA);
 		model.addAttribute("titulo", ClientesHelper.ENCABEZADO);
 

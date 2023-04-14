@@ -23,13 +23,20 @@
                     <div class="row col-12 col-lg-6 justify-content-sm-evenly mt-3 mt-md-0">
                         <jsp:include page="../comunes/busquedaCliente.jsp" />
                     </div>
+                    <c:url var="updateLink" value="/clientes/formulario">
+                        <c:param name="idCliente" value="${cliente.idCliente}"/>
+                    </c:url>
                 </div>
                 <hr>
 
                 <!--Primer Rengl�n-->
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-5 p-2">
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Cliente</h3>
+                        <h3 class="list-group-item list-group-item-action active text-center h4">Cliente
+                            <button class="btn btn-success" type="button" id="editButton${cliente.idCliente}" onclick="editData(${cliente.idCliente}, '${updateLink}')">
+                                <i class="fas fa-edit" id="editIcon${cliente.idCliente}"></i></a>
+                            </button>
+                        </h3>
                         <div class="row">
                             <div class="col-3 col-md-4">
                                 <ul class="list-group list-group-flush text-right">
@@ -185,3 +192,26 @@
         <jsp:include page="/WEB-INF/paginas/comunes/piePagina.jsp"></jsp:include>
     </body>
 </html>
+
+<script>
+    function loadData(id, url) {
+        let detailButton = document.querySelector("#detailButton" + id);
+        let spanDetail = document.createElement("span");
+        spanDetail.className = "spinner-border spinner-border-sm detailSpinner" + id;
+        detailButton.disabled = true;
+        detailButton.removeChild(document.getElementById("detailsIcon" + id));
+        detailButton.appendChild(spanDetail);
+        window.location = url;
+    }
+
+    function editData(id, url) {
+        let detailButton = document.querySelector("#editButton" + id);
+        let spanDetail = document.createElement("span");
+        spanDetail.className = "spinner-border spinner-border-sm detailSpinner" + id;
+        detailButton.disabled = true;
+        detailButton.removeChild(document.getElementById("editIcon" + id));
+        detailButton.appendChild(spanDetail);
+        window.location = url;
+    }
+
+</script>
