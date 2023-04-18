@@ -74,6 +74,20 @@ public class Reclamaciones extends Operaciones<BusquedaReclamacion>{
                 }
                 break;
             case "cliente":
+                reclamaciones = this.reclamacionService.buscarFiltro(valor, filtro);
+                if (reclamaciones != null){
+                    if (reclamaciones.size() == 1){
+                        super.mv.addObject("reclamacion", reclamaciones.get(0));
+                        mensaje = "registroEncontrado";
+                    } else {
+                        this.createViewForReclamacionesFilter(reclamaciones);
+                        mensaje = "registrosEncontrados";
+                    }
+                } else {
+                    super.mv = this.listar(1, 50);
+                }
+                break;
+
             case "codigoSolicitud":
                     if (valor.contains("-")){
                         if (valor.endsWith("-")){
