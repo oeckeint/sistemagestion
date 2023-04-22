@@ -27,6 +27,9 @@
                     <div class="col-6 col-lg-3 d-grid gap-3 my-2">
                         <a class="btn btn-primary" href="${pageContext.request.contextPath}/ftp"><fmt:message key="header.ftp"/></a>
                     </div>
+                    <div class="col-6 col-lg-3 d-grid gap-3 my-2">
+                        <a class="btn btn-info" href="${pageContext.request.contextPath}/scripts/moverarchivos"><fmt:message key="header.script"/></a>
+                    </div>
                 </security:authorize>
             </div>
         </div>
