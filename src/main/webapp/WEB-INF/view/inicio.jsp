@@ -11,8 +11,21 @@
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <div class="container">
                 <c:choose>
+                    <c:when test="${mensaje eq 'scriptEjecutado'}">
+                    <fmt:message key="script.error.ejecutado">
+                        <fmt:param>${nombreScript}</fmt:param>
+                    </fmt:message>
+                </c:when>
                     <c:when test="${mensaje eq 'scriptNoValido'}">
-                        <fmt:message key="mensaje.error.scriptValor"></fmt:message>
+                        <fmt:message key="script.error.extensionNoValida">
+                            <fmt:param>${nombreScript}</fmt:param>
+                            <fmt:param>.bat</fmt:param>
+                        </fmt:message>
+                    </c:when>
+                    <c:when test="${mensaje eq 'noSeEncontroScript'}">
+                        <fmt:message key="script.error.archivoNoExiste">
+                            <fmt:param>${nombreScript}</fmt:param>
+                        </fmt:message>
                     </c:when>
                     <c:otherwise>
                         <fmt:message key="mensaje.default"></fmt:message>

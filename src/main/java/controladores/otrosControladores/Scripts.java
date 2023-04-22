@@ -30,7 +30,7 @@ public class Scripts {
         try {
             this.mv = new ModelAndView("redirect:/");
             redirectAttributes.addFlashAttribute("nombreScript", this.moverArchivo);
-            if(!moverArchivo.endsWith(".bat")){
+            if(moverArchivo.endsWith(".bat")){
                 Runtime.getRuntime().exec("cmd /c start cmd.exe /K \" cd " + rutaScripts + " && " + moverArchivo + " && exit");
                 redirectAttributes.addFlashAttribute("mensaje", "scriptEjecutado");
             } else {
@@ -38,6 +38,7 @@ public class Scripts {
                 throw new ScriptSinTerminacionBatException(moverArchivo);
             }
         } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("mensaje", "noSeEncontroScript");
             e.printStackTrace(System.out);
         } catch (ScriptSinTerminacionBatException e) {
             logger.log(Level.INFO, e.getMessage());
