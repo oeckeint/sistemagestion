@@ -282,12 +282,11 @@ public class Procesamiento {
             return;
         }
 
-        if (Utilidades.existeNodo(doc, "" +
-                "")) {
+        if (Utilidades.existeNodo(doc, "CodigoREEEmpresaEmisora")) {
             this.isFactura = StringHelper.toInteger(doc.getElementsByTagName("CodigoREEEmpresaEmisora").item(0).getTextContent()) == 894;
             if (this.isFactura) {
-				return;
-			}
+                return;
+            }
         }
 
         if (Utilidades.existeNodo(doc, "RemesaPago")) {
