@@ -16,6 +16,9 @@ public class MedidasHelper {
             case "p5":
                 t = TIPO_MEDIDA.P5;
                 break;
+            case "p2":
+                t = TIPO_MEDIDA.P2;
+                break;
             default:
                 throw new MedidaTipoNoReconocido();
         }
@@ -23,7 +26,7 @@ public class MedidasHelper {
     }
 
     public enum TIPO_MEDIDA{
-        F5, DESCONOCIDO, P5
+        F5, DESCONOCIDO, P5, P2
     }
 
 }

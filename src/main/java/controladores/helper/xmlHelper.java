@@ -1524,7 +1524,10 @@ public class xmlHelper {
                                                     elementos.set(0, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                     break;
                                                 case "2":
-                                                    elementos.set(1, (double) elementos.get(0) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    elementos.set(1, (double) elementos.get(1) + Double.parseDouble(childList.item(j).getTextContent().trim()));
+                                                    break;
+                                                case "3":
+                                                    elementos.set(2, (double) elementos.get(2) + Double.parseDouble(childList.item(j).getTextContent().trim()));
                                                     break;
                                                 default:
                                                     break;

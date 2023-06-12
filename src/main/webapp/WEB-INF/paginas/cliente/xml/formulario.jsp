@@ -15,7 +15,7 @@
                 </button>
             </div>
             <div class="custom-file" id="archivosAEnviar">
-                <input type="file" name="archivosxml" accept=".xml, .0" multiple="true" class="form-control" aria-describedby="inputGroupFileAddon03" id="xmlFiles" required>
+                <input type="file" name="archivosxml" accept=".xml, .0, .1, .2, .3, .4, .5, .6, .7, .8, .9" multiple="true" class="form-control" aria-describedby="inputGroupFileAddon03" id="xmlFiles" required>
             </div>
         </div>
         <div id="nombreArchivos"></div>

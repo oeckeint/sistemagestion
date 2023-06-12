@@ -254,6 +254,15 @@ public class Utilidades {
                 case "xml":
                     return EXTENSION_ARCHIVO.XML;
                 case "0":
+                case "1":
+                case "2":
+                case "3":
+                case "4":
+                case "5":
+                case "6":
+                case "7":
+                case "8":
+                case "9":
                     return EXTENSION_ARCHIVO.MEDIDAS;
                 default:
                     return EXTENSION_ARCHIVO.DESCONOCIDO;

@@ -5,6 +5,7 @@ import controladores.helper.medidas.MedidasHelper;
 import controladores.helper.medidas.ProcesarMedida;
 import controladores.helper.medidas.ProcesarMedidaCCH;
 import controladores.helper.ProcesarReclamacion;
+import controladores.helper.medidas.ProcesarMedidaQH;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
 import datos.interfaces.DocumentoXmlService;
@@ -73,6 +74,9 @@ public class Procesamiento {
 
     @Autowired
     private ProcesarMedidaCCH procesarMedidaCCH;
+
+    @Autowired
+    private ProcesarMedidaQH procesarMedidaQH;
 
     @Autowired
     private MedidasHelper medidasHelper;
@@ -222,6 +226,9 @@ public class Procesamiento {
                     break;
                 case P5:
                     this.procesarMedidaCCH.guardar(archivo, nombreArchivo);
+                    break;
+                case P2:
+                    this.procesarMedidaQH.guardar(archivo, nombreArchivo);
                     break;
             }
             archivosCorrectos++;
