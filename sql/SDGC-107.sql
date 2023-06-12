@@ -32,6 +32,6 @@ CREATE TABLE `medidaqh` (
   KEY `medidaqh_FK` (`id_medidaQH`),
   KEY `id_cliente_FK` (`id_cliente`),
   CONSTRAINT `id_cliente_FK` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_cliente`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 commit;
