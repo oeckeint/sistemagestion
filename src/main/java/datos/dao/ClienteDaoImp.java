@@ -3,18 +3,23 @@ package datos.dao;
 import datos.entity.Cliente;
 import excepciones.MasDeUnClienteEncontrado;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import utileria.ArchivoTexto;
 
 @Repository
 public class ClienteDaoImp implements datos.interfaces.ClienteDao {
 
     @Autowired
     private SessionFactory sessionFactory;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     @Override
     public List<Cliente> listar() {
@@ -25,11 +30,20 @@ public class ClienteDaoImp implements datos.interfaces.ClienteDao {
 
     @Override
     public List<Cliente> listar(int rows, int page) {
-        return sessionFactory.getCurrentSession()
-                .createQuery("from Cliente c where c.isDeleted = 0 order by c.idCliente desc", Cliente.class)
-                .setFirstResult(rows * page)
-                .setMaxResults(rows)
-                .getResultList();
+        List<Cliente> clientes = null;
+        try{
+            clientes = sessionFactory.getCurrentSession()
+                    .createQuery("from Cliente c where c.isDeleted = 0 order by c.idCliente desc", Cliente.class)
+                    .setFirstResult(rows * page)
+                    .setMaxResults(rows)
+                    .getResultList();
+        } catch (IllegalArgumentException e){
+            String mensaje = "Argumento ilegal al obtener datos de clientes, se regresan 0 clientes, " + e.getMessage();
+            logger.log(Level.INFO, mensaje);
+            ArchivoTexto.escribirError(mensaje);
+            return null;
+        }
+        return clientes;
     }
 
     @Override

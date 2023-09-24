@@ -6,7 +6,9 @@
         <jsp:include page="/WEB-INF/paginas/comunes/contenidoHead.jsp"></jsp:include>
         </head>
         <body>
-        <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp"></jsp:include>
+        <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp">
+            <jsp:param name="titulo" value="${titulo}"/>
+        </jsp:include>
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 <div class="container">
                     <strong>${mensaje}</strong>
@@ -14,14 +16,15 @@
         </div>
         <c:if test="${ cliente != null }">
             <div class="container">
-
                 <hr>
                 <div class="row justify-content-between p-0">
                     <div class="col-6">
                         <h2 class="m-0"><a href="${pageContext.request.contextPath}/clientes"><i class="fas fa-arrow-circle-left text-success"></i></a> Detalles cliente</h2>
                     </div>
                     <div class="row col-12 col-lg-6 justify-content-sm-evenly mt-3 mt-md-0">
-                        <jsp:include page="../comunes/busquedaCliente.jsp" />
+                        <jsp:include page="../comunes/busquedaCliente.jsp">
+                            <jsp:param name="existendatos" value="true"/>
+                        </jsp:include>
                     </div>
                     <c:url var="updateLink" value="/clientes/formulario">
                         <c:param name="idCliente" value="${cliente.idCliente}"/>

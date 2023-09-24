@@ -7,29 +7,40 @@
 <c:set var="cups" scope="request" value="cups"/>
 <c:set var="sel" scope="request" value="selected"/>
 <fmt:message var="busqueda" key="customers.search"/>
+<c:set var="existendatos" value="${param.existendatos}"></c:set>
 
 <security:authorize access="hasRole('ADMIN')">
-    <div class="col-4 col-md-3">
+    <c:choose>
+        <c:when test="${existendatos}">
+            <c:set var="addbuttonsize" value="col-3 col-md-3"></c:set>
+        </c:when>
+        <c:otherwise>
+            <c:set var="addbuttonsize" value="col-7 col-md-5"></c:set>
+        </c:otherwise>
+    </c:choose>
+    <div class="${addbuttonsize}">
         <a href="${pageContext.request.contextPath}/clientes/formulario" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> <fmt:message key="customers.add"/></a>
     </div>
 </security:authorize>
-<div class="col-8 col-md-9">
-    <form:form action="${pageContext.request.contextPath}/clientes/busqueda" modelAttribute="busquedaCliente" method="post" id="myForm">
-        <div class="input-group">
-            <button class="btn btn-primary btn-block" type="button" id="btnSubmit" onclick="buscarCliente();">
-                <i class="fas fa-search" id="searchIcon"></i>
-            </button>
-            <form:input path="valor" cssClass="form-control" id="searchValue" placeholder="${busqueda}"/>
-            <div class="input-group-prepend">
-                <form:select path="filtro" cssClass="btn-primary form-select text-left" id="filterDropdown">
-                    <form:options cssClass="bg-white text-dark" items="${busquedaCliente.filtros}"></form:options>
-                </form:select>
+<c:if test="${existendatos}">
+    <div class="col-8 col-md-9">
+        <form:form action="${pageContext.request.contextPath}/clientes/busqueda" modelAttribute="busquedaCliente" method="post" id="myForm">
+            <div class="input-group">
+                <button class="btn btn-primary btn-block" type="button" id="btnSubmit" onclick="buscarCliente();">
+                    <i class="fas fa-search" id="searchIcon"></i>
+                </button>
+                <form:input path="valor" cssClass="form-control" id="searchValue" placeholder="${busqueda}"/>
+                <div class="input-group-prepend">
+                    <form:select path="filtro" cssClass="btn-primary form-select text-left" id="filterDropdown">
+                        <form:options cssClass="bg-white text-dark" items="${busquedaCliente.filtros}"></form:options>
+                    </form:select>
+                </div>
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             </div>
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </div>
-        <form:errors path="valor" cssClass="error"/>
-    </form:form>
-</div>
+            <form:errors path="valor" cssClass="error"/>
+        </form:form>
+    </div>
+</c:if>
 
 <script>
     let searchValue = document.querySelector("#searchValue");

@@ -1,11 +1,17 @@
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <header id="main-header" class="py-2 bg-info text-white">
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container-fluid">
-                <h3 id="pageHeader">${titulo}</h3>
+                <h3 id="pageHeader">
+                    <c:choose>
+                        <c:when test="${not empty param.tituloDinamico}">${param.tituloDinamico}</c:when>
+                        <c:otherwise>${titulo}</c:otherwise>
+                    </c:choose>
+                </h3>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
@@ -40,40 +41,50 @@ public class Clientes {
 	@Qualifier(value = "tarifasServiceImp")
 	private CrudDao tarifasService;
 
+	ModelAndView mv = null;
+
 	@GetMapping("")
-	public String listar(@RequestParam(required = false, defaultValue = "1", name = "page") Integer paginaActual,
-			@RequestParam(required = false, defaultValue = "50", name = "rows") Integer rows,
-			@RequestParam(required = false, name = "err") Integer error, Model model) {
+	public ModelAndView listar(
+			@RequestParam(required = false, defaultValue = "1", name = "page") Integer paginaActual,
+			@RequestParam(required = false, defaultValue = "50", name = "rows") Integer rows) {
+
+		this.mv = new ModelAndView("cliente/clientes2");
+		ModelMap modelMap = this.mv.getModelMap();
+
 		paginaActual = Utilidades.revisarPaginaActual(paginaActual);
 		rows = Utilidades.revisarRangoRows(rows, 25);
-		model.addAttribute("tituloPagina", ClientesHelper.TITULO_PAGINA);
-		model.addAttribute("titulo", ClientesHelper.ENCABEZADO);
-		model.addAttribute("tablaTitulo", ClientesHelper.TITULO_PAGINA);
-
-		ClientesHelper.mensaje = (ClientesHelper.mensaje == null) ? ClientesHelper.INSTRUCCION_LISTAR
-				: ClientesHelper.mensaje;
-		model.addAttribute("mensaje", ClientesHelper.mensaje);
-
-		List<Cliente> clientes = clienteService.listar(rows, paginaActual - 1);
 		int ultimaPagina = this.clienteService.contarPaginacion(rows);
+
+		//Si no hay clientes en la base de datos, la ultima pagina es 0 y se carga una vista vacía
+		if (ultimaPagina == 0) {
+			modelMap.addAttribute("error", "sindatos");
+			return this.mv;
+		}
+
+		//Si hay registros en la base de datos
+		List<Cliente> clientes = clienteService.listar(rows, paginaActual - 1);
 		int registrosMostrados = rows * paginaActual;
+
+		//Se llegó a la ultima página
 		if (clientes.isEmpty()) {
-			System.out.println("No hay mas elementos por mostrar");
 			clientes = this.clienteService.listar(rows, ultimaPagina - 1);
 			registrosMostrados = this.clienteService.contarRegistros();
 		}
-		model.addAttribute("clientes", clientes);
-		model.addAttribute("registrosMostrados", registrosMostrados);
-		model.addAttribute("totalRegistros", this.clienteService.contarRegistros());
-		model.addAttribute("paginaActual", paginaActual);
-		model.addAttribute("ultimaPagina", ultimaPagina);
-		model.addAttribute("controller", "clientes");
-		model.addAttribute("rows", rows);
-		if (!model.containsAttribute("busquedaCliente")) {
-			model.addAttribute("busquedaCliente", new BusquedaCliente());
+
+		modelMap.addAttribute("clientes", clientes);
+		modelMap.addAttribute("registrosMostrados", registrosMostrados);
+		modelMap.addAttribute("totalRegistros", this.clienteService.contarRegistros());
+		modelMap.addAttribute("paginaActual", paginaActual);
+		modelMap.addAttribute("ultimaPagina", ultimaPagina);
+		modelMap.addAttribute("controller", "clientes");
+		modelMap.addAttribute("rows", rows);
+		if (!modelMap.containsAttribute("busquedaCliente")) {
+			modelMap.addAttribute("busquedaCliente", new BusquedaCliente());
 		}
+
 		ClientesHelper.reiniciarVariables();
-		return "cliente/clientes2";
+
+		return this.mv;
 	}
 
 	@GetMapping("/formulario")
@@ -224,7 +235,7 @@ public class Clientes {
 			model.addAttribute("tablaTitulo", "Clientes");
 			model.addAttribute("registrosMostrados", "--");
 			model.addAttribute("totalRegistros", clientes.size());
-			model.addAttribute("mensaje", "Estos son los datos que se encontraron con el valor " + busquedaCliente.getValor() + " y el filtro de " + busquedaCliente.getFiltro());
+			model.addAttribute("mensaje", "valorBusquedaEncontrado");
 			model.addAttribute("ultimaBusqueda", busquedaCliente.getValor());
 			model.addAttribute("busquedaCliente", busquedaCliente);
 			model.addAttribute("desactivarPaginacion", true);
