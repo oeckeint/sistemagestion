@@ -78,6 +78,10 @@ public class Etiquetas {
     public static String FTP_FORMULARIO_ENCABEZADO = FTP_FORMULARIO_ICONO + " " + FTP_FORMULARIO_TITULO_PAGINA;
     public static String FTP_FORMULARIO_MENSAJE = "Archivos para subir al servidor FTP, dependiendo del tamaño de los archivos la acción podría tardar un tiempo.";
     public static String FTP_FORMULARIO_ETIQUETA_BOTON = "Subir";
-    
-    
+
+    public static String MEDIDAS_PATRON_NOMBRE_ARCHIVO =
+            "<br/>1. P2D_cemi_cdes_aaaammdd.0" +
+            "<br/>2. P5D_cemi_cdes_aaaammdd.2" +
+            "<br/>3. F5D_cemi_cdes_aaaammdd.3" ;
+
 }

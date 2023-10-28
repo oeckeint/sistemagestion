@@ -12,6 +12,7 @@ import datos.interfaces.DocumentoXmlService;
 import excepciones.*;
 
 import java.io.*;
+import java.security.cert.Extension;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,11 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import excepciones.medidas.NombreArchivoContieneEspacios;
+import excepciones.medidas.NombreArchivoElementosTamanoDiferente;
+import excepciones.medidas.NombreArchivoSinExtension;
+import excepciones.medidas.NombreArchivoTamanoDiferente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -131,6 +137,7 @@ public class Procesamiento {
             archivosTotales++;
             File f;
             FileOutputStream ous;
+            String nombreArchivo = null;
 
             //Escritura en archivos temporales por cada archivo recibido
             try (InputStream fileContent = file.getInputStream()) {
@@ -143,23 +150,33 @@ public class Procesamiento {
                     ous.write(dato);
                     dato = fileContent.read();
                 }
-            }
-            //Fin del flujo de escritura
-            ous.close();
 
-            String nombreArchivo = file.getOriginalFilename();
-            switch (Utilidades.definirExtensionArchivo(nombreArchivo)){
-                case XML:
-                    this.procesarXML(f, nombreArchivo);
-                    break;
-                case MEDIDAS:
-                    this.procesarMedidas(f, nombreArchivo);
-                    break;
-                default:
-                    System.out.println("ERROR");
+                //Fin del flujo de escritura
+                ous.close();
+
+                nombreArchivo = file.getOriginalFilename();
+                switch (Utilidades.definirExtensionArchivo(nombreArchivo)){
+                    case XML:
+                        this.procesarXML(f, nombreArchivo);
+                        break;
+                    case MEDIDAS:
+                        this.procesarMedidas(f, nombreArchivo);
+                        break;
+                    default:
+                        throw new ExtensionArchivoNoReconocida();
+                }
+
+                //Eliminación del archivo temporal
+                f.deleteOnExit();
+
+            } catch (ExtensionArchivoNoReconocida e) {
+                this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
+                utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
+            } catch (Exception e) {
+                this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + new ErrorDesconocidoException().getMessage() + " (<Strong>" + e.getMessage() + "</Strong>)");
+                utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
+                e.printStackTrace(System.out);
             }
-            //Eliminación del archivo temporal
-            f.deleteOnExit();
         }
         Etiquetas.PROCESAMIENTO_FORMULARIO_MENSAJE = "Archivos Procesados (" + archivosCorrectos + " de " + archivosTotales + ")";
         return "redirect:/procesar";
@@ -232,7 +249,8 @@ public class Procesamiento {
                     break;
             }
             archivosCorrectos++;
-        } catch (MedidaTipoNoReconocido e){
+        } catch (MedidaTipoNoReconocido | NombreArchivoTamanoDiferente | NombreArchivoContieneEspacios |
+                 NombreArchivoSinExtension | NombreArchivoElementosTamanoDiferente e){
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
             utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         }
