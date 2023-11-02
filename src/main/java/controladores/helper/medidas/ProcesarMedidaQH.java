@@ -49,7 +49,7 @@ public class ProcesarMedidaQH {
 
             while ((linea = br.readLine()) != null){
                 elementos = linea.split(";");
-                if(elementos.length == 22){
+                if(elementos.length > 20 && elementos.length < 23){
                     Cliente cliente = clienteService.encontrarCups(elementos[0]);
                     if(cliente != null){
                         medida = new MedidaQH();
@@ -74,15 +74,21 @@ public class ProcesarMedidaQH {
                         medida.setMedres2(Integer.parseInt(elementos[18]));
                         medida.setQmedres2(Integer.parseInt(elementos[19]));
                         medida.setMetodObt(Integer.parseInt(elementos[20]));
-                        medida.setTemporal(Integer.parseInt(elementos[21]));
+                        //Se verifica si la entrada de datos contiene más de 21 datos
+                        if (elementos.length > 21){
+                            medida.setTemporal(Integer.parseInt(elementos[21]));
+                        } else {
+                            logger.log(Level.INFO, ">>> No se encontré el valor en la posición 22 de los datos {0}, del archivo {1} se rellena con un valor default {2}", new Object[]{ Arrays.toString(elementos), nombreArchivo, 99});
+                            medida.setTemporal(99);
+                        }
                         medidas.add(medida);
                     } else{
                         logger.log(Level.INFO, ">>> No existe el cliente con el cups {0}", elementos[0]);
                         ArchivoTexto.escribirError("No se encontró un cliente con el cups " + elementos[0] + " en el archivo " + nombreArchivo);
                     }
-                }else {
+                } else {
                     logger.log(Level.INFO, ">>> No tiene suficientes datos especificados {0} en archivo {1} en la linea {2}", new Object[]{ Arrays.toString(elementos), nombreArchivo, lineaActual});
-                    ArchivoTexto.escribirError("No tiene suficientes datos especificados " +  Arrays.toString(elementos) + " en la linea " + lineaActual + " del archivo " + nombreArchivo);
+                    ArchivoTexto.escribirError("La entrada " +  Arrays.toString(elementos) + " en la linea " + lineaActual + " del archivo " + nombreArchivo + " no coincide con la cantidad de datos esperados");
                 }
                 lineaActual++;
             }
