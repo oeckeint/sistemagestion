@@ -84,4 +84,6 @@ public class Etiquetas {
             "<br/>2. P5D_cemi_cdes_aaaammdd.2" +
             "<br/>3. F5D_cemi_cdes_aaaammdd.3" ;
 
+    public static final String COMERCIALIZADOR_PATRON_NOMBRE_ARCHIVO =
+            "<br/>1. 0000-00XX_0000_0000_X0_00_XX0000000000000000XX0X_000000000000.xml";
 }

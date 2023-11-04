@@ -69,7 +69,6 @@ public class MedidasHelper {
         return datos;
     }
 
-
     private boolean validarNombreArchivoMedida(String nombreArchivo) throws NombreArchivoTamanoDiferente, NombreArchivoContieneEspacios {
         //Valida que no contenga espacios
         if (nombreArchivo.contains(" ")){

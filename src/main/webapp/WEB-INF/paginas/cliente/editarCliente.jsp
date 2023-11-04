@@ -73,7 +73,7 @@
             function isEmpty(campo, valor){
 
                 if( valor === null || valor.length === 0 || /^\s+$/.test(valor) ) {
-                    alert("El campo " + campo + " está vacío.");
+                    alert("El campo " + campo + " estï¿½ vacï¿½o.");
                     return true;
                 } else {
                     return false;
@@ -100,12 +100,12 @@
                         if(fin === letra1+letra2 ){
                             return true;
                         }else{
-                            alert("Revisar los carácteres " + fin);
+                            alert("Revisar los carï¿½cteres " + fin);
                             return false;
                         }
                     }
                 } else {
-                    alert("El cups debe tener entre 20 y 23 carácteres.");
+                    alert("El cups debe tener entre 20 y 23 carï¿½cteres.");
                     return false;
                 }
             }
@@ -230,7 +230,7 @@
                         return true;
                         break;
                     default:
-                        alert("La tarifa " + tarifa + " no es válida" );
+                        alert("La tarifa " + tarifa + " no es vï¿½lida" );
                         return false;
                         break;
                 }

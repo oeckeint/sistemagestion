@@ -1,5 +1,6 @@
 package controladores;
 
+import controladores.comercializador.HelperComercializador;
 import controladores.helper.*;
 import controladores.helper.medidas.MedidasHelper;
 import controladores.helper.medidas.ProcesarMedida;
@@ -12,7 +13,6 @@ import datos.interfaces.DocumentoXmlService;
 import excepciones.*;
 
 import java.io.*;
-import java.security.cert.Extension;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +22,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import excepciones.comercializador.ComercializadorNoReconocido;
+import excepciones.comercializador.NombreArchivoContieneEspaciosComercializador;
+import excepciones.comercializador.NombreArchivoElementosTamañoDiferenteComercializador;
+import excepciones.comercializador.NombreArchivoTamañoDiferenteComercializador;
 import excepciones.medidas.NombreArchivoContieneEspacios;
 import excepciones.medidas.NombreArchivoElementosTamanoDiferente;
 import excepciones.medidas.NombreArchivoSinExtension;
@@ -90,6 +94,9 @@ public class Procesamiento {
     @Autowired
     private ProcesarReclamacion procesarReclamacion;
 
+    @Autowired
+    private HelperComercializador helperComercializador;
+
     int archivosCorrectos;
     int archivosTotales;
     List<String> archivosErroneos;
@@ -99,6 +106,7 @@ public class Procesamiento {
     private boolean isOtrasFacturas;
     private boolean isMACCConCambios;
     private boolean isMACCSinCambios;
+    private boolean isMACCSaliente;
     private boolean isConsultaFacturacion;
     private boolean isPeaje;
     private boolean isReclamacion;
@@ -199,6 +207,8 @@ public class Procesamiento {
                 new CambiodeComercializador(documento, clienteService, tarifasService);
             } else if (isMACCConCambios) {
                 System.out.println("MensajeActivacionCambiodeComercializadorConCambios ");
+            } else if(isMACCSaliente){
+                this.helperComercializador.definirTipoMedida(nombreArchivo);
             } else if (isOtrasFacturas) {
                 this.procesarOtrasFacturas.procesar(documento, nombreArchivo);
             } else if (isRemesaPago) {
@@ -220,9 +230,11 @@ public class Procesamiento {
             archivosCorrectos++;
 
         } catch (FacturaYaExisteException | PeajeYaExisteException | OtraFacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado
-                | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException | TablaBusquedaNoExisteException | TablaBusquedaNoEspecificadaException
-                | NoExisteElNodoException | ArchivoNoCumpleParaSerClasificado | MasDatosdeLosEsperadosException | TarifaNoExisteException | PeajeMasDeUnRegistroException
-                | FacturaNoEspecificaCodRecticadaException | FacturaNoExisteException | FacturaCodRectNoExisteException | ReclamacionYaExisteException e) {
+                 | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException | TablaBusquedaNoExisteException | TablaBusquedaNoEspecificadaException
+                 | NoExisteElNodoException | ArchivoNoCumpleParaSerClasificado | MasDatosdeLosEsperadosException | TarifaNoExisteException | PeajeMasDeUnRegistroException
+                 | FacturaNoEspecificaCodRecticadaException | FacturaNoExisteException | FacturaCodRectNoExisteException | ReclamacionYaExisteException |
+                 NombreArchivoContieneEspaciosComercializador | NombreArchivoElementosTamañoDiferenteComercializador |
+                 ComercializadorNoReconocido | NombreArchivoTamañoDiferenteComercializador e) {
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
             utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         } catch (Exception e) {
@@ -300,6 +312,10 @@ public class Procesamiento {
             this.isMACCSinCambios = true;
             return;
         }
+         else if (Utilidades.existeNodo(doc, "MensajeAceptacionCambiodeComercializadorSaliente")){
+             this.isMACCSaliente = true;
+             return;
+        }
 
         if(Utilidades.existeNodo(doc, "MensajeReclamacionPeticion") || Utilidades.existeNodo(doc, "MensajeAceptacionReclamacion") ||
                 Utilidades.existeNodo(doc, "MensajeCierreReclamacion") || Utilidades.existeNodo(doc, "MensajePeticionInformacionAdicionalReclamacion")){
@@ -333,6 +349,7 @@ public class Procesamiento {
     }
     
     private void reiniciarVariablesBooleanas(){
+        this.isMACCSaliente = false;
         this.isOtrasFacturas = false;
         this.isMACCConCambios = false;
         this.isMACCSinCambios = false;
