@@ -88,6 +88,7 @@ public class PeajesServiceImp implements datos.interfaces.DocumentoXmlService<Pe
         peaje.setCodFisFac(documento.getCodFisFac() + "-A");
         peaje.setTipFac("Av");
         peaje.setNumDias(documento.getNumDias() * -1);
+        peaje.setImpTotFac(peaje.getImpTotFac() * -1);
         
         peaje.setExcPot1(documento.getExcPot1() * -1);
         peaje.setExcPot2(documento.getExcPot2() * -1);
