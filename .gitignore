@@ -17,3 +17,6 @@ src/main/resources/rebel.xml
 src/main/resources/persistence-mysql.properties
 src/main/resources/rebel.xml
 src/main/resources/persistence-mysql.properties
+notas.txt
+src/main/resources/persistence-mysql.properties
+src/main/resources/rebel.xml

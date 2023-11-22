@@ -1,5 +1,6 @@
 package controladores;
 
+import controladores.comercializador.Comercializador;
 import controladores.comercializador.HelperComercializador;
 import controladores.helper.*;
 import controladores.helper.medidas.MedidasHelper;
@@ -13,7 +14,6 @@ import datos.interfaces.DocumentoXmlService;
 import excepciones.*;
 
 import java.io.*;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +22,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import excepciones.comercializador.ComercializadorNoReconocido;
-import excepciones.comercializador.NombreArchivoContieneEspaciosComercializador;
-import excepciones.comercializador.NombreArchivoElementosTamañoDiferenteComercializador;
-import excepciones.comercializador.NombreArchivoTamañoDiferenteComercializador;
+import excepciones.comercializador.*;
 import excepciones.medidas.NombreArchivoContieneEspacios;
 import excepciones.medidas.NombreArchivoElementosTamanoDiferente;
 import excepciones.medidas.NombreArchivoSinExtension;
@@ -97,6 +94,9 @@ public class Procesamiento {
     @Autowired
     private HelperComercializador helperComercializador;
 
+    @Autowired
+    private Comercializador comercializador;
+
     int archivosCorrectos;
     int archivosTotales;
     List<String> archivosErroneos;
@@ -107,11 +107,11 @@ public class Procesamiento {
     private boolean isMACCConCambios;
     private boolean isMACCSinCambios;
     private boolean isMACCSaliente;
+    private boolean isComercializador;
     private boolean isConsultaFacturacion;
     private boolean isPeaje;
     private boolean isReclamacion;
-    private HashMap<String, String> elementosCF;
-	private ResultSet rs;
+    private HashMap<String, Boolean> datosAdicionales;
 
     /**
      * Muestra el fomulario que procesa los archivos
@@ -203,12 +203,8 @@ public class Procesamiento {
             Document documento = this.prepareXml(archivo, nombreArchivo);
             this.initializarVariables(documento);
 
-            if (isMACCSinCambios) {
-                new CambiodeComercializador(documento, clienteService, tarifasService);
-            } else if (isMACCConCambios) {
-                System.out.println("MensajeActivacionCambiodeComercializadorConCambios ");
-            } else if(isMACCSaliente){
-                this.helperComercializador.definirTipoMedida(nombreArchivo);
+            if (this.isComercializador){
+                this.procesarComercializador(this.helperComercializador.definirTipoMedida(nombreArchivo, this.datosAdicionales));
             } else if (isOtrasFacturas) {
                 this.procesarOtrasFacturas.procesar(documento, nombreArchivo);
             } else if (isRemesaPago) {
@@ -230,11 +226,15 @@ public class Procesamiento {
             archivosCorrectos++;
 
         } catch (FacturaYaExisteException | PeajeYaExisteException | OtraFacturaYaExisteException | ClienteNoExisteException | PeajeTipoFacturaNoSoportadaException | CodRectNoExisteException | XmlNoSoportado
-                 | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException | TablaBusquedaNoExisteException | TablaBusquedaNoEspecificadaException
-                 | NoExisteElNodoException | ArchivoNoCumpleParaSerClasificado | MasDatosdeLosEsperadosException | TarifaNoExisteException | PeajeMasDeUnRegistroException
-                 | FacturaNoEspecificaCodRecticadaException | FacturaNoExisteException | FacturaCodRectNoExisteException | ReclamacionYaExisteException |
-                 NombreArchivoContieneEspaciosComercializador | NombreArchivoElementosTamañoDiferenteComercializador |
-                 ComercializadorNoReconocido | NombreArchivoTamañoDiferenteComercializador e) {
+                | MasDeUnClienteEncontrado | ArchivoVacioException | PeajeCodRectNoExisteException | TablaBusquedaNoExisteException | TablaBusquedaNoEspecificadaException
+                | NoExisteElNodoException
+                //| ArchivoNoCumpleParaSerClasificado | MasDatosdeLosEsperadosException
+                | TarifaNoExisteException | PeajeMasDeUnRegistroException
+                | FacturaNoEspecificaCodRecticadaException | FacturaNoExisteException | FacturaCodRectNoExisteException | ReclamacionYaExisteException
+                //Excepciones comercializador
+                | NombreArchivoTamanoDiferenteComercializador | NombreArchivoContieneEspaciosComercializador | NombreArchivoElementosTamanoDiferenteComercializador | ComercializadorNoReconocido | NoCoincidenLosElementosInicialesComercializadorException
+                | CodigoProcesoNoReconocidoExeption | CodigoPasoNoReconocidoExeption | SubtipoCodigoPasoNoReconocidoException | CodigoProcesoNoPuedeSerProcesadoException
+                e) {
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
             utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         } catch (Exception e) {
@@ -305,17 +305,58 @@ public class Procesamiento {
      * @param doc es el archivo xml a tratar
      */
     private void initializarVariables(Document doc) {
-        if (Utilidades.existeNodo(doc, "MensajeActivacionCambiodeComercializadorConCambios")) {
-            this.isMACCConCambios = true;
-            return;
-        } else if (Utilidades.existeNodo(doc, "MensajeActivacionCambiodeComercializadorSinCambios")) {
-            this.isMACCSinCambios = true;
+        /* Comercializadores (Posibles cabeceros)
+            TIPO C1
+                01              MensajeCambiodeComercializadorSinCambios
+                                ns:MensajeCambiodeComercializadorSinCambios
+                02 Aceptacion   MensajeAceptacionCambiodeComercializadorSinCambios
+                02 Rechazo      MensajeRechazo
+                05              MensajeActivacionCambiodeComercializadorSinCambios
+                06              MensajeActivacionComercializadorSaliente
+                11              MensajeAceptacionCambiodeComercializadorSaliente
+
+        */
+
+        if (Utilidades.existeNodo(doc, "ns:MensajeCambiodeComercializadorSinCambios")) {
+            throw new RuntimeException("Se detecto que el nodo comienza con ns:");
+        }
+        if (Utilidades.existeNodo(doc, "MensajeCambiodeComercializadorSinCambios") ||          //Puede existir CONCAMBIOS???
+            //Utilidades.existeNodo(doc, "ns:MensajeCambiodeComercializadorSinCambios") ||        //Porque en los archivos C1_01 vienen con ns: en el cabecero???
+            Utilidades.existeNodo(doc, "MensajeAceptacionCambiodeComercializadorSinCambios") || //Puede existir CONCAMBIOS???
+            Utilidades.existeNodo(doc, "MensajeRechazo") ||
+            Utilidades.existeNodo(doc, "MensajeActivacionCambiodeComercializadorSinCambios") || //Puede existir CONCAMBIOS???
+            Utilidades.existeNodo(doc, "MensajeActivacionComercializadorSaliente") ||
+            Utilidades.existeNodo(doc, "MensajeAceptacionCambiodeComercializadorSaliente")){
+            this.datosAdicionales = new HashMap<>();
+            if (Utilidades.existeNodo(doc, "MensajeAceptacionCambiodeComercializadorSinCambios")) this.datosAdicionales.put("aceptacion", true); //Tambien existen en los C2???
+            if (Utilidades.existeNodo(doc, "MensajeRechazo") && this.datosAdicionales.get("aceptacion") == null) this.datosAdicionales.put("rechazo", true);
+            this.isComercializador = true;
+
             return;
         }
-         else if (Utilidades.existeNodo(doc, "MensajeAceptacionCambiodeComercializadorSaliente")){
-             this.isMACCSaliente = true;
-             return;
+         /* TIPO C2
+                01              MensajeCambiodeComercializadorConCambios
+                02 Aceptacion   MensajeAceptacionCambiodeComercializadorConCambios
+                02 Rechazo                                                                          ###falta por definir
+                05              MensajeActivacionCambiodeComercializadorConCambios
+                06              MensajeActivacionComercializadorSaliente                            Se repite en C1
+                11              MensajeAceptacionCambiodeComercializadorSaliente                    Se repite en C1
+         */
+        if (Utilidades.existeNodo(doc, "MensajeCambiodeComercializadorConCambios") ||
+            Utilidades.existeNodo(doc, "MensajeAceptacionCambiodeComercializadorConCambios") ||
+            Utilidades.existeNodo(doc, "MensajeActivacionCambiodeComercializadorConCambios")){
+
+            this.datosAdicionales = this.datosAdicionales == null ? new HashMap<>() : this.datosAdicionales;
+
+            if (Utilidades.existeNodo(doc, "MensajeAceptacionCambiodeComercializadorConCambios")) this.datosAdicionales.put("aceptacion", true);
+            //Aun falta definir el arhivo que pertenece a los rechazos de C2 ???
+
+            this.isComercializador = true;
+            return;
         }
+
+
+
 
         if(Utilidades.existeNodo(doc, "MensajeReclamacionPeticion") || Utilidades.existeNodo(doc, "MensajeAceptacionReclamacion") ||
                 Utilidades.existeNodo(doc, "MensajeCierreReclamacion") || Utilidades.existeNodo(doc, "MensajePeticionInformacionAdicionalReclamacion")){
@@ -353,12 +394,14 @@ public class Procesamiento {
         this.isOtrasFacturas = false;
         this.isMACCConCambios = false;
         this.isMACCSinCambios = false;
+        this.isComercializador = false;
         this.isFactura = false;
         this.isRemesaPago = false;
         this.isArchivarFactura = false;
         this.isPeaje = false;
         this.isConsultaFacturacion = false;
         this.isReclamacion = false;
+        this.datosAdicionales = null;
     }
 
     /**
@@ -401,7 +444,56 @@ public class Procesamiento {
     	}
         cf.actualizarFiltro(ref);
     }
-    
+
+
+    private void procesarComercializador(HelperComercializador.TIPO_COMERCIALIZADOR tc) throws CodigoProcesoNoPuedeSerProcesadoException {
+        switch (tc){
+            /* Tipos C1 */
+            case C1_01:
+                this.comercializador.procesarC1_01();
+                break;
+            case C1_02_ACEPTACION:
+                this.comercializador.procesarC1_02_Aceptacion();
+                break;
+            case C1_02_RECHAZO:
+                this.comercializador.procesarC1_02_Rechazo();
+                break;
+            case C1_05:
+                this.comercializador.procesarC1_05();
+                break;
+            case C1_06:
+                this.comercializador.procesarC1_06();
+                break;
+            case C1_11:
+                this.comercializador.procesarC1_11();
+                break;
+
+            /* Tipos C2 */
+
+            case C2_01:
+                this.comercializador.procesarC2_01();
+                break;
+            case C2_02_ACEPTACION:
+                this.comercializador.procesarC2_02_Aceptacion();
+                break;
+            case C2_02_RECHAZO:
+                this.comercializador.procesarC2_02_Rechazo();
+                break;
+            case C2_05:
+                this.comercializador.procesarC2_05();
+                break;
+            case C2_06:
+                this.comercializador.procesarC2_06();
+                break;
+            case C2_11:
+                this.comercializador.procesarC2_11();
+                break;
+
+            default:
+                throw new CodigoProcesoNoPuedeSerProcesadoException(tc.name());
+        }
+    }
+
     
     private TablaBusqueda definirTablaBusqueda(Document doc) throws TablaBusquedaNoExisteException, TablaBusquedaNoEspecificadaException, NoExisteElNodoException {
     	if (Utilidades.existeNodo(doc, "TablaBusqueda")) {
