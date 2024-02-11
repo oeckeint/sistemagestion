@@ -3,11 +3,8 @@ package controladores;
 import controladores.comercializador.Comercializador;
 import controladores.comercializador.HelperComercializador;
 import controladores.helper.*;
-import controladores.helper.medidas.MedidasHelper;
-import controladores.helper.medidas.ProcesarMedida;
-import controladores.helper.medidas.ProcesarMedidaCCH;
+import controladores.helper.medidas.*;
 import controladores.helper.ProcesarReclamacion;
-import controladores.helper.medidas.ProcesarMedidaQH;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
 import datos.interfaces.DocumentoXmlService;
@@ -81,6 +78,9 @@ public class Procesamiento {
 
     @Autowired
     private ProcesarMedidaCCH procesarMedidaCCH;
+
+    @Autowired
+    private MedidaHHandler medidaHHandler;
 
     @Autowired
     private ProcesarMedidaQH procesarMedidaQH;
@@ -255,6 +255,9 @@ public class Procesamiento {
                     break;
                 case P5:
                     this.procesarMedidaCCH.guardar(archivo, nombreArchivo);
+                    break;
+                case P1:
+                    this.medidaHHandler.procesarMedidasDesdeArchivo(archivo, nombreArchivo);
                     break;
                 case P2:
                     this.procesarMedidaQH.guardar(archivo, nombreArchivo);

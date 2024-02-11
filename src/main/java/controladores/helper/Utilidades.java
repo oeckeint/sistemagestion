@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.w3c.dom.Document;
@@ -135,8 +136,10 @@ public class Utilidades {
     }
     
     public static String currentUser() {
-    	Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	return (principal instanceof UserDetails) ? ((UserDetails)principal).getUsername() : principal.toString(); 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	//Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	//return (principal instanceof UserDetails) ? ((UserDetails)principal).getUsername() : principal.toString();
+        return authentication.getName();
     }
     
     /**
