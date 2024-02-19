@@ -36,7 +36,7 @@ public class MedidaHHandler {
     }
 
     public void procesarMedidasDesdeArchivo(File file, String nombreArchivo){
-        int numeroHilos = 5;
+        int numeroHilos = 1;
         String usuarioActual = SecurityContextHolder.getContext().getAuthentication().getName();
         ExecutorService executor = Executors.newFixedThreadPool(numeroHilos);
 

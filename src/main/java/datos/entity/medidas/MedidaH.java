@@ -20,7 +20,7 @@ public class MedidaH implements Serializable {
     @Column(name = "id_medida_h")
     private long idMedidaH;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
