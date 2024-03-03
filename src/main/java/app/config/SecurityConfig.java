@@ -40,7 +40,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                             "/procesar/**",
                             "/clasificar/**",
                             "/configuraciones/**",
-                            "/ftp/**").hasAnyRole("ADMIN")
+                            "/ftp/**",
+                            "/medidasqh/**",
+                            "/scripts/**").hasAnyRole("ADMIN")
+                    .antMatchers(
+                            ).permitAll()
             .and()
                 .formLogin()
                     .loginPage("/login")

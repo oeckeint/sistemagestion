@@ -7,15 +7,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 
+import com.zaxxer.hikari.HikariDataSource;
 import datos.helper.StringToLinkedHashMap;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.JpaVendorAdapter;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
@@ -27,9 +32,9 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement
-@ComponentScan(basePackages = {"app", "controladores", "controladores.helper", "datos"})
-@PropertySources({@PropertySource("classpath:persistence-mysql.properties"),
-        @PropertySource("classpath:/cfg/application.properties")})
+@EnableJpaRepositories(basePackages = {"datos.dao"})
+@ComponentScan(basePackages = {"app", "controladores", "controladores.helper", "datos.dao.medidas", "controladores.otrosControladores", "datos", "datos.dao", "datos.service"})
+@PropertySources({@PropertySource("classpath:persistence-mysql.properties"), @PropertySource("classpath:/cfg/application.properties")})
 public class AppConfig implements WebMvcConfigurer{
 
     @Autowired
@@ -81,7 +86,8 @@ public class AppConfig implements WebMvcConfigurer{
     @Bean
     public LocalSessionFactoryBean sessionFactory(javax.sql.DataSource dataSource) throws PropertyVetoException {
         LocalSessionFactoryBean lsfb = new LocalSessionFactoryBean();
-        lsfb.setDataSource(this.securityDataSource());
+        lsfb.setDataSource(dataSource);
+        //lsfb.setDataSource(this.securityDataSource());
         lsfb.setPackagesToScan(env.getProperty("hibernate.packagesToScan"));
         lsfb.setHibernateProperties(getHibernateProperties());
         return lsfb;
@@ -118,6 +124,41 @@ public class AppConfig implements WebMvcConfigurer{
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws ClassNotFoundException, PropertyVetoException {
+        LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+        emf.setDataSource(dataSource());
+        emf.setPackagesToScan(env.getProperty("hibernate.packagesToScan"));
+        emf.setJpaVendorAdapter(jpaAdapter());
+        emf.setJpaProperties(jpaProperties());
+        return emf;
+    }
+
+    @Bean
+    public DataSource dataSource() {
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setDriverClassName(env.getProperty("jdbc.driver"));
+        dataSource.setJdbcUrl(env.getProperty("jdbc.url"));
+        dataSource.setUsername(env.getProperty("jdbc.user"));
+        dataSource.setPassword(env.getProperty("jdbc.password"));
+        return dataSource;
+    }
+
+    @Bean
+    public JpaVendorAdapter jpaAdapter() {
+        HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
+        adapter.setDatabasePlatform(env.getProperty("hibernate.dialect"));
+        adapter.setShowSql(env.getProperty("hibernate.show_sql", Boolean.class));
+        return adapter;
+    }
+
+    private Properties jpaProperties() {
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+        properties.setProperty("hibernate.format_sql", env.getProperty("hibernate.format_sql"));
+        return properties;
     }
     
 }

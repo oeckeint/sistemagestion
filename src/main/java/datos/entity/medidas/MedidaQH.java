@@ -1,20 +1,23 @@
 package datos.entity.medidas;
 
 import datos.entity.Cliente;
+import datos.entity.GenericEntity;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.util.*;
 import javax.persistence.*;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "medidaqh")
-public class MedidaQH {
-    public MedidaQH() {}
+public class MedidaQH implements GenericEntity<MedidaQH> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_medidaQH")
-    private long idMedidaQH;
+    private Long id;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
@@ -95,36 +98,15 @@ public class MedidaQH {
 
     @Column(name = "temporal")
     private int temporal;
-    public MedidaQH(Cliente idCliente, int tipoMed, Date fecha, int banderaInvVer, int actent, int qactent, int actsal, int qactsal
-    , int r_q1, int qr_q1, int r_q2, int qr_q2, int r_q3, int qr_q3, int r_q4, int qr_q4, int medres1, int qmedres1, int medres2, int qmedres2, int metodObt, int temporal){
 
-        this.cliente = idCliente;
-        this.tipoMed = tipoMed;
-        this.fecha = fecha;
-        this.banderaInvVer = banderaInvVer;
-        this.actent = actent;
-        this.qactent = qactent;
-        this.actsal = actsal;
-        this.qactsal = qactsal;
-        this.r_q1 = r_q1;
-        this.r_q2 = r_q2;
-        this.r_q3 = r_q3;
-        this.r_q4 = r_q4;
-        this.qr_q1 = qr_q1;
-        this.qr_q2 = qr_q2;
-        this.qr_q3 = qr_q3;
-        this.qr_q4 = qr_q4;
-        this.medres1 = medres1;
-        this.qmedres1 = qmedres1;
-        this.medres2 = medres2;
-        this.qmedres2 = qmedres2;
-        this.metodObt = metodObt;
-        this.temporal = temporal;
+    @Override
+    public MedidaQH createNewInstance() {
+        return null;
     }
 
-    public MedidaQH(long idMedidaQH){
+    @Override
+    public void update(MedidaQH source) {
 
     }
-
 }
 
