@@ -1,0 +1,16 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <!-- Incluye todos los cambios del directorio de automatic -->
+    <includeAll path="automatic/" relativeToChangelogFile="true"/>
+
+    <!-- Incluye cambios individuales
+    <changeSet id="test" author="jesus">
+        <sqlFile path="manual/1test.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    -->
+
+</databaseChangeLog>

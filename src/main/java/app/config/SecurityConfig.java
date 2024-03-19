@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                             "/ftp/**",
                             "/medidasqh/**",
                             "/scripts/**").hasAnyRole("ADMIN")
-                    .antMatchers(
+                    .anyRequest(
                             ).permitAll()
             .and()
                 .formLogin()

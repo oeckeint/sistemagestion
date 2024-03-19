@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import com.zaxxer.hikari.HikariDataSource;
 import datos.helper.StringToLinkedHashMap;
+import liquibase.integration.spring.SpringLiquibase;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -159,6 +160,14 @@ public class AppConfig implements WebMvcConfigurer{
         properties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
         properties.setProperty("hibernate.format_sql", env.getProperty("hibernate.format_sql"));
         return properties;
+    }
+
+    @Bean
+    public SpringLiquibase liquibase() {
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setDataSource(dataSource());
+        liquibase.setChangeLog(env.getProperty("spring.liquibase.change-log"));
+        return liquibase;
     }
     
 }
