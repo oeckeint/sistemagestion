@@ -31,7 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/clientes")
+@RequestMapping("/old-clientes")
 public class Clientes {
 
 	@Autowired

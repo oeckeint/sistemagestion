@@ -1,6 +1,7 @@
 package datos.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.*;
@@ -11,13 +12,15 @@ import datos.entity.medidas.MedidaCCH;
 import datos.entity.medidas.MedidaH;
 import datos.entity.reclamaciones.Reclamacion;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name = "cliente")
-public class Cliente implements Serializable {
+public class Cliente implements Serializable, GenericEntity<Cliente> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -66,9 +69,6 @@ public class Cliente implements Serializable {
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Reclamacion> reclamaciones;
 
-    public Cliente() {
-    }
-
     public Cliente(long idCliente) {
         this.idCliente = idCliente;
     }
@@ -85,4 +85,26 @@ public class Cliente implements Serializable {
         this.cups = cups;
     }
 
+    @Override
+    public Long getId() {
+        return this.idCliente;
+    }
+
+    @Override
+    public Cliente createNewInstance() {
+        Cliente cliente = new Cliente();
+        cliente.setCups(this.cups);
+        cliente.setNombreCliente(this.nombreCliente);
+        cliente.setTarifa(this.tarifa);
+        cliente.setIsDeleted(this.isDeleted);
+        return cliente;
+    }
+
+    @Override
+    public void update(Cliente source) {
+        this.cups = source.getCups();
+        this.nombreCliente = source.nombreCliente;
+        this.tarifa = source.tarifa;
+        this.isDeleted = source.isDeleted;
+    }
 }
