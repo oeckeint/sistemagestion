@@ -107,4 +107,9 @@ public class Cliente implements Serializable, GenericEntity<Cliente> {
         this.tarifa = source.tarifa;
         this.isDeleted = source.isDeleted;
     }
+
+    @Override
+    public String toString(){
+        return "Cliente toString";
+    }
 }

@@ -11,7 +11,6 @@ import java.util.*;
 @Data
 @Entity
 @Table(name = "medida_cch")
-
 public class MedidaCCH implements Serializable {
 
     private static final long serialVersionUID = 1L;

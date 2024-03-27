@@ -31,7 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/old-clientes")
+@RequestMapping("/clientes")
 public class Clientes {
 
 	@Autowired
@@ -83,6 +83,7 @@ public class Clientes {
 		}
 
 		ClientesHelper.reiniciarVariables();
+		System.out.println("Carga completa");
 
 		return this.mv;
 	}
