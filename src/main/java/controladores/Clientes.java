@@ -83,6 +83,7 @@ public class Clientes {
 		}
 
 		ClientesHelper.reiniciarVariables();
+		System.out.println("Carga completa");
 
 		return this.mv;
 	}

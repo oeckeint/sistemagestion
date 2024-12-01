@@ -5,13 +5,14 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "medida")
-public class Medida {
+public class Medida implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
