@@ -32,61 +32,64 @@ public class MedidaH implements Serializable {
     private Date fecha;
 
     @Column(name = "bandera_inv_ver")
-    private int banderaInvVer;
+    private float banderaInvVer;
 
     @Column(name = "actent")
-    private int actent;
+    private float actent;
 
     @Column(name = "qactent")
-    private int qactent;
+    private float qactent;
 
     @Column(name = "actsal")
-    private int actsal;
+    private float actsal;
 
     @Column(name = "qactsal")
-    private int qactsal;
+    private float qactsal;
 
     @Column(name = "r_q1")
-    private int r_q1;
+    private float r_q1;
 
     @Column(name = "qr_q1")
-    private int qr_q1;
+    private float qr_q1;
 
     @Column(name = "r_q2")
-    private int r_q2;
+    private float r_q2;
 
     @Column(name = "qr_q2")
-    private int qr_q2;
+    private float qr_q2;
 
     @Column(name = "r_q3")
-    private int r_q3;
+    private float r_q3;
 
     @Column(name = "qr_q3")
-    private int qr_q3;
+    private float qr_q3;
 
     @Column(name = "r_q4")
-    private int r_q4;
+    private float r_q4;
 
     @Column(name = "qr_q4")
-    private int qr_q4;
+    private float qr_q4;
 
     @Column(name = "medres1")
-    private int medres1;
+    private float medres1;
 
     @Column(name = "qmedres1")
-    private int qmedres1;
+    private float qmedres1;
 
     @Column(name = "medres2")
-    private int medres2;
+    private float medres2;
 
     @Column(name = "qmedres2")
-    private int qmedres2;
+    private float qmedres2;
 
     @Column(name = "metod_obt")
     private int metodObt;
 
     @Column(name = "temporal")
     private int temporal;
+
+    @Column(name = "origen")
+    private String origen;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_on")
@@ -103,5 +106,10 @@ public class MedidaH implements Serializable {
     private String updatedBy;
 
     public MedidaH() {}
+
+    @PrePersist
+    public void prePersist() {
+        createdOn = Calendar.getInstance();
+    }
 
 }

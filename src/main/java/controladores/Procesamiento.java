@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Queue;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -248,6 +249,7 @@ public class Procesamiento {
 
     private void procesarMedidas(File archivo, String nombreArchivo){
         System.out.println("(Ini)************************-----------------------------" + nombreArchivo);
+        Queue<String> errores = null;
         try {
             switch (medidasHelper.definirTipoMedida(nombreArchivo)){
                 case F5:
@@ -257,13 +259,15 @@ public class Procesamiento {
                     this.procesarMedidaCCH.guardar(archivo, nombreArchivo);
                     break;
                 case P1:
-                    this.medidaHHandler.procesarMedidasDesdeArchivo(archivo, nombreArchivo);
+                    errores = this.medidaHHandler.procesarMedidasDesdeArchivo(archivo, nombreArchivo);
                     break;
                 case P2:
                     this.procesarMedidaQH.guardar(archivo, nombreArchivo);
                     break;
             }
             archivosCorrectos++;
+            if (errores != null && !errores.isEmpty())
+                this.archivosErroneos.addAll(errores);
         } catch (MedidaTipoNoReconocido | NombreArchivoTamanoDiferente | NombreArchivoContieneEspacios |
                  NombreArchivoSinExtension | NombreArchivoElementosTamanoDiferente e){
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());

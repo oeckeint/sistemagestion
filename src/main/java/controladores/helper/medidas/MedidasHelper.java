@@ -10,10 +10,8 @@ import utileria.ArchivoTexto;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +19,7 @@ import java.util.logging.Logger;
 public class MedidasHelper {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
+    public final Queue<String> errores = new ConcurrentLinkedQueue<>();
 
     public TIPO_MEDIDA definirTipoMedida(String nombreArchivo) throws MedidaTipoNoReconocido, NombreArchivoTamanoDiferente, NombreArchivoContieneEspacios, NombreArchivoSinExtension, NombreArchivoElementosTamanoDiferente {
         TIPO_MEDIDA t = TIPO_MEDIDA.DESCONOCIDO;
@@ -107,25 +106,49 @@ public class MedidasHelper {
         }
     }
 
-     protected void manejarClienteNoEncontrado(String cups, String nombreArchivo, int lineaActual) {
-        logger.log(Level.SEVERE, ">>> No existe el cliente con el cups {0}", cups);
-        ArchivoTexto.escribirError("No se encontró un cliente con el cups " + cups + " en el archivo " + nombreArchivo + " en la línea " + lineaActual);
+    protected void manejarClienteNoEncontrado(String cups, String nombreArchivo, int lineaActual) {
+        String mensaje = "No se encontró un cliente con el cups " + cups + " en el archivo " + nombreArchivo + " en la línea " + lineaActual;
+        logger.log(Level.SEVERE, ">>> " + mensaje);
+        errores.add(mensaje);
+        ArchivoTexto.escribirError(mensaje);
     }
 
     protected void manejarMasDeUnClienteEncontrado(String cups, String nombreArchivo, int lineaActual) {
-        logger.log(Level.SEVERE, ">>> Se encontró más de un cliente con el cups {0}", cups);
-        ArchivoTexto.escribirError("Se encontró más de un cliente con el cups " + cups + " en la línea " + lineaActual + " del archivo " + nombreArchivo);
+        String mensaje = "Se encontró más de un cliente con el cups " + cups + " en la línea " + lineaActual + " del archivo " + nombreArchivo;
+        logger.log(Level.SEVERE, ">>> " + mensaje);
+        errores.add(mensaje);
+        ArchivoTexto.escribirError(mensaje);
     }
 
     protected void manejarErrorDesconocido(Exception e, String nombreArchivo, int lineaActual) {
-        logger.log(Level.SEVERE, ">>> Error desconocido al procesar el archivo " + nombreArchivo + " en la línea " + lineaActual + ".");
+        String mensaje = "Error " + e.getMessage() + " " + nombreArchivo + " en la línea " + lineaActual;
+        logger.log(Level.SEVERE, ">>> " + mensaje);
+        errores.add(mensaje);
         e.printStackTrace(System.out);
-        ArchivoTexto.escribirError(">>> Error desconocido al procesar el archivo " + nombreArchivo + " en la línea " + lineaActual + ".");
+        ArchivoTexto.escribirError(mensaje);
     }
 
     protected void manejarDatosInvalidos(String[] elementos, String nombreArchivo, int lineaActual) {
-        logger.log(Level.SEVERE, ">>> No tiene suficientes datos especificados {0} en archivo {1} en la línea {2}", new Object[]{Arrays.toString(elementos), nombreArchivo, lineaActual});
-        ArchivoTexto.escribirError("La entrada " + Arrays.toString(elementos) + " en la línea " + lineaActual + " del archivo " + nombreArchivo + " no coincide con la cantidad de datos esperados");
+        String mensaje = "La entrada " + Arrays.toString(elementos) + " en la línea " + lineaActual + " del archivo " + nombreArchivo + " no coincide con la cantidad de datos esperados";
+        logger.log(Level.SEVERE, ">>> " + mensaje);
+        errores.add(mensaje);
+        ArchivoTexto.escribirError(mensaje);
+    }
+
+    protected void manejarErrorDeConversion(String elemento, String nombreArchivo, int lineaActual) {
+        String mensaje = "No se pudo convertir el elemento " + elemento + " en la línea " + lineaActual + " del archivo " + nombreArchivo;
+        logger.log(Level.SEVERE, ">>> " + mensaje);
+        errores.add(mensaje);
+        ArchivoTexto.escribirError(mensaje);
+
+    }
+
+    public void addError(String error) {
+        errores.add(error);
+    }
+
+    public void clearErrores() {
+        errores.clear();
     }
 
     public enum TIPO_MEDIDA{
