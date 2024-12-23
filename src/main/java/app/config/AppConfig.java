@@ -65,21 +65,18 @@ public class AppConfig implements WebMvcConfigurer{
         ComboPooledDataSource cpds = new ComboPooledDataSource();
         
         try {
-            cpds.setDriverClass(this.env.getProperty("jdbc.driver"));
+            cpds.setDriverClass(this.env.getProperty("spring.datasource.driver-class-name"));
         } catch (PropertyVetoException e) {
-   throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
 
-        cpds.setJdbcUrl(this.env.getProperty("jdbc.url"));
-        cpds.setUser(this.env.getProperty("jdbc.user"));
-        cpds.setPassword(this.env.getProperty("jdbc.password"));
+        cpds.setJdbcUrl(this.env.getProperty("spring.datasource.url"));
+        cpds.setUser(this.env.getProperty("spring.datasource.username"));
+        cpds.setPassword(this.env.getProperty("spring.datasource.password"));
         cpds.setInitialPoolSize(this.getIntProperty("connection.pool.initialPoolSize"));
         cpds.setMinPoolSize(this.getIntProperty("connection.pool.minPoolSize"));
         cpds.setMaxPoolSize(this.getIntProperty("connection.pool.maxPoolSize"));
         cpds.setMaxIdleTime(this.getIntProperty("connection.pool.maxIdleTime"));
-        
-        logger.log(Level.INFO, ">>> jdbc.url={0}", this.env.getProperty("jdbc.url"));
-        logger.log(Level.INFO, ">>> jdbc.user={0}", this.env.getProperty("jdbc.user"));
 
         return cpds;
     }
@@ -140,10 +137,10 @@ public class AppConfig implements WebMvcConfigurer{
     @Bean
     public DataSource dataSource() {
         HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setDriverClassName(env.getProperty("jdbc.driver"));
-        dataSource.setJdbcUrl(env.getProperty("jdbc.url"));
-        dataSource.setUsername(env.getProperty("jdbc.user"));
-        dataSource.setPassword(env.getProperty("jdbc.password"));
+        dataSource.setDriverClassName(env.getProperty("spring.datasource.driver-class-name"));
+        dataSource.setJdbcUrl(env.getProperty("spring.datasource.url"));
+        dataSource.setUsername(env.getProperty("spring.datasource.username"));
+        dataSource.setPassword(env.getProperty("spring.datasource.password"));
         return dataSource;
     }
 
