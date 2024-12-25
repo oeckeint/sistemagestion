@@ -3,12 +3,9 @@ package controladores.helper.medidas;
 import datos.entity.Cliente;
 import datos.entity.medidas.MedidaH;
 import datos.interfaces.ClienteService;
-import datos.interfaces.CrudDao;
-import datos.service.medidas.MedidaHServiceImp;
+import datos.service.medidas.MedidaHService;
 import excepciones.MasDeUnClienteEncontrado;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -16,24 +13,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.*;
-import java.util.logging.Logger;
 
 @Slf4j
 @Component
 public class MedidaHHandler {
-
-    private final Logger logger = Logger.getLogger(getClass().getName());
-    private final MedidaHServiceImp medidaHService;
+    
+    private final MedidaHService medidaHService;
     private final ClienteService clienteService;
     private final MedidasHelper medidasHelper;
     private final Set<Integer> lineasProcesadas = ConcurrentHashMap.newKeySet();
 
-    @Autowired
-    public MedidaHHandler(MedidaHServiceImp medidaHService, ClienteService clienteService, MedidasHelper medidasHelper) {
+    public MedidaHHandler(MedidaHService medidaHService, ClienteService clienteService, MedidasHelper medidasHelper) {
         this.medidaHService = medidaHService;
         this.clienteService = clienteService;
         this.medidasHelper = medidasHelper;
@@ -42,7 +35,7 @@ public class MedidaHHandler {
     public Queue<String> procesarMedidasDesdeArchivo(File file, String nombreArchivo) {
         medidasHelper.clearErrores();
 
-        if (!medidaHService.existeOrigen(nombreArchivo)) {
+        if (medidaHService.existeOrigen(nombreArchivo)) {
             medidasHelper.addError("El archivo " + nombreArchivo + " ya ha sido procesado");
             return new ConcurrentLinkedQueue<>(this.medidasHelper.errores);
         }
@@ -65,19 +58,18 @@ public class MedidaHHandler {
 
             executor.shutdown();
             if (executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
-                logger.info("Se terminó de procesar el archivo " + nombreArchivo);
+                log.info("Se terminó de procesar el archivo {}", nombreArchivo);
             } else {
-                logger.warning("El archivo " + nombreArchivo + " está siendo procesado en segundo plano");
+                log.warn("El archivo {} está siendo procesado en segundo plano", nombreArchivo);
             }
 
             verificarLineasProcesadas(totalLineas, nombreArchivo);
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.severe("El procesamiento del archivo " + nombreArchivo + " fue interrumpido");
+            log.error("El procesamiento del archivo {} fue interrumpido", nombreArchivo);
         } catch (IOException e) {
-            logger.severe("Ha ocurrido un error al leer el archivo " + nombreArchivo);
-            e.printStackTrace(System.out);
+            log.error("Ha ocurrido un error al leer el archivo {}", nombreArchivo);
         }
 
         lineasProcesadas.clear();
@@ -87,9 +79,9 @@ public class MedidaHHandler {
     private void verificarLineasProcesadas(int totalLineas, String nombreArchivo) {
         if (lineasProcesadas.size() < totalLineas) {
             int lineasFaltantes = totalLineas - lineasProcesadas.size();
-            logger.severe(String.format("No todas las líneas fueron procesadas. Faltan %d líneas en el archivo %s", lineasFaltantes, nombreArchivo));
+            log.error("No todas las líneas fueron procesadas. Faltan {} líneas en el archivo {}", lineasFaltantes, nombreArchivo);
         } else {
-            logger.info(String.format("Todas las líneas del archivo %s fueron procesadas exitosamente", nombreArchivo));
+            log.info("Todas las líneas del archivo {} fueron procesadas exitosamente", nombreArchivo);
         }
     }
 
@@ -99,7 +91,6 @@ public class MedidaHHandler {
         private final String contenidoDeLinea;
         private final String nombreArchivo;
         private final String usuario;
-        private String cups;
 
         public TareaProcesamiento(int numeroDeLinea, String contenidoDeLinea, String nombreArchivo, String usuario) {
             this.numeroDeLinea = numeroDeLinea;
@@ -111,12 +102,13 @@ public class MedidaHHandler {
         @Override
         public void run() {
             if (lineasProcesadas.add(numeroDeLinea)) {
+                String cups = null;
                 String[] elementos = contenidoDeLinea.split(";");
                 int elementoActual = 0;
                 try {
-                    logger.info(String.format("Procesando línea %d del archivo %s", numeroDeLinea, nombreArchivo));
+                    log.info("Procesando línea {} del archivo {}", numeroDeLinea, nombreArchivo);
                     if (elementos.length == 22) {
-                        this.cups = elementos[elementoActual];
+                        cups = elementos[elementoActual];
                         Cliente cliente = clienteService.encontrarCups(cups);
                         if (cliente != null) {
                             MedidaH medida = new MedidaH();
@@ -163,7 +155,7 @@ public class MedidaHHandler {
                     lineasProcesadas.remove(numeroDeLinea); // Permitir reintento
                 }
             } else {
-                logger.warning(String.format("La línea %d ya está siendo procesada", numeroDeLinea));
+                log.warn("La línea {} ya está siendo procesada", numeroDeLinea);
             }
         }
     }
