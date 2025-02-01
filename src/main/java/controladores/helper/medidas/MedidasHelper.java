@@ -128,8 +128,8 @@ public class MedidasHelper {
         ArchivoTexto.escribirError(mensaje);
     }
 
-    protected void manejarDatosInvalidos(String[] elementos, String nombreArchivo, int lineaActual) {
-        String mensaje = "La entrada " + Arrays.toString(elementos) + " en la línea " + lineaActual + " del archivo " + nombreArchivo + " no coincide con la cantidad de datos esperados";
+    protected void manejarDatosInvalidos(String[] elementos, String nombreArchivo, int lineaActual, int cantidadEsperada) {
+        String mensaje = "La entrada " + Arrays.toString(elementos) + " en la línea " + lineaActual + " del archivo " + nombreArchivo + " no coincide con la cantidad de datos esperados (" + cantidadEsperada + ").";
         logger.log(Level.SEVERE, ">>> " + mensaje);
         errores.add(mensaje);
         ArchivoTexto.escribirError(mensaje);

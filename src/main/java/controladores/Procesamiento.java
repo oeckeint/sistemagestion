@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
-import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,6 +24,8 @@ import excepciones.medidas.NombreArchivoContieneEspacios;
 import excepciones.medidas.NombreArchivoElementosTamanoDiferente;
 import excepciones.medidas.NombreArchivoSinExtension;
 import excepciones.medidas.NombreArchivoTamanoDiferente;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -38,14 +39,14 @@ import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import utileria.ArchivoTexto;
 import utileria.StringHelper;
 
 @Controller
 @RequestMapping("/procesar")
 public class Procesamiento {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
-
+    private static final Logger log = LoggerFactory.getLogger(Procesamiento.class);
     @Autowired
     @Qualifier(value = "peajesServiceImp")
     private DocumentoXmlService contenidoXmlServicePeajes;
@@ -81,10 +82,7 @@ public class Procesamiento {
     private ProcesarMedidaCCH procesarMedidaCCH;
 
     @Autowired
-    private MedidaHHandler medidaHHandler;
-
-    @Autowired
-    private ProcesarMedidaQH procesarMedidaQH;
+    private MedidasHandler medidasHandler;
 
     @Autowired
     private MedidasHelper medidasHelper;
@@ -180,10 +178,10 @@ public class Procesamiento {
 
             } catch (ExtensionArchivoNoReconocida e) {
                 this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
-                utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
+                ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
             } catch (Exception e) {
                 this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + new ErrorDesconocidoException().getMessage() + " (<Strong>" + e.getMessage() + "</Strong>)");
-                utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
+                ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
                 e.printStackTrace(System.out);
             }
         }
@@ -237,18 +235,23 @@ public class Procesamiento {
                 | CodigoProcesoNoReconocidoExeption | CodigoPasoNoReconocidoExeption | SubtipoCodigoPasoNoReconocidoException | CodigoProcesoNoPuedeSerProcesadoException
                 e) {
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
-            utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
+            ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         } catch (Exception e) {
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + new ErrorDesconocidoException().getMessage() + " (<Strong>" + e.getMessage() + "</Strong>)");
-            utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
+            ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
             e.printStackTrace(System.out);
         }
 
         System.out.println("(Fin)************************-----------------------------" + nombreArchivo);
     }
 
+    /**
+     * Procesamiento de las medidas individuales
+     *
+     * @param archivo archivo de la medida
+     * @param nombreArchivo nombre del archivo de la medida
+     */
     private void procesarMedidas(File archivo, String nombreArchivo){
-        System.out.println("(Ini)************************-----------------------------" + nombreArchivo);
         Queue<String> errores = null;
         try {
             switch (medidasHelper.definirTipoMedida(nombreArchivo)){
@@ -259,11 +262,13 @@ public class Procesamiento {
                     this.procesarMedidaCCH.guardar(archivo, nombreArchivo);
                     break;
                 case P1:
-                    errores = this.medidaHHandler.procesarMedidasDesdeArchivo(archivo, nombreArchivo);
+                    errores = this.medidasHandler.procesarMedida(archivo, nombreArchivo, MedidasHelper.TIPO_MEDIDA.P1);
                     break;
                 case P2:
-                    this.procesarMedidaQH.guardar(archivo, nombreArchivo);
+                    errores = this.medidasHandler.procesarMedida(archivo, nombreArchivo, MedidasHelper.TIPO_MEDIDA.P2);
                     break;
+                case DESCONOCIDO:
+                    throw new MedidaTipoNoReconocido();
             }
             archivosCorrectos++;
             if (errores != null && !errores.isEmpty())
@@ -271,9 +276,8 @@ public class Procesamiento {
         } catch (MedidaTipoNoReconocido | NombreArchivoTamanoDiferente | NombreArchivoContieneEspacios |
                  NombreArchivoSinExtension | NombreArchivoElementosTamanoDiferente e){
             this.archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + e.getMessage());
-            utileria.ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
+            ArchivoTexto.escribirError(this.archivosErroneos.get(this.archivosErroneos.size() - 1));
         }
-        System.out.println("(Fin)************************-----------------------------" + nombreArchivo);
     }
 
     
@@ -284,7 +288,7 @@ public class Procesamiento {
      * @param nombreArchivo nombre del archivo para indentificar el nombre con
      * el que se esta tratando
      * @return el archivo ya formateado y preparado para la lectura
-     * @throws excepciones.ArchivoVacioException
+     * @throws ArchivoVacioException
      */
     public Document prepareXml(File archivo, String nombreArchivo) throws ArchivoVacioException {
         Document doc = null;
@@ -299,7 +303,7 @@ public class Procesamiento {
             }
         } catch (IOException | ParserConfigurationException | SAXException e) {
             archivosErroneos.add("El archivo <Strong>" + nombreArchivo + "</Strong> no se proceso porque " + new ErrorDesconocidoException().getMessage() + " (<Strong>" + e.getMessage() + "</Strong>)");
-            utileria.ArchivoTexto.escribirError(archivosErroneos.get(archivosErroneos.size() - 1));
+            ArchivoTexto.escribirError(archivosErroneos.get(archivosErroneos.size() - 1));
             e.printStackTrace(System.out);
         }
         return doc;

@@ -39,7 +39,7 @@ public class ClienteServiceImp implements datos.interfaces.ClienteService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Cliente encontrarCups(String cups) throws MasDeUnClienteEncontrado{
         return this.clienteDao.encontrarCups(cups);
     }

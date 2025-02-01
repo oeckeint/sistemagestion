@@ -1,10 +1,9 @@
 package controladores.medidas;
 
-import controladores.GenericController;
 import controladores.medidas.helpers.Utilidades;
-import datos.dao.medidas.MedidaQHRepository;
 import datos.entity.medidas.MedidaQH;
 import datos.entity.medidas.MedidaValidatorForm;
+import datos.service.medidas.MedidaQHService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,20 +18,20 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/medidas")
-public class MedidasController extends GenericController<MedidaQH> {
+public class MedidasController {
 
-    private final MedidaQHRepository repository;
+    private final MedidaQHService service;
 
-    public MedidasController(MedidaQHRepository repository) {
-        super(repository);
-        this.repository = repository;
+    public MedidasController(MedidaQHService service) {
+        this.service = service;
     }
 
     @GetMapping("/form")
     public ModelAndView listar(Model model) {
-        MedidaValidatorForm medidaValidatorForm = model.containsAttribute("medidaValidatorForm") ? (MedidaValidatorForm) model.asMap().get("medidaValidatorForm") : new MedidaValidatorForm();
+        String medidaValidatorFormString = "medidaValidatorForm";
+        MedidaValidatorForm medidaValidatorForm = model.containsAttribute(medidaValidatorFormString) ? (MedidaValidatorForm) model.asMap().get(medidaValidatorFormString) : new MedidaValidatorForm();
         ModelAndView mv = new ModelAndView("medidas/inicio");
-        mv.addObject("medidaValidatorForm", medidaValidatorForm);
+        mv.addObject(medidaValidatorFormString, medidaValidatorForm);
         mv.addObject("info", model.asMap().get("info"));
         return mv;
     }
@@ -44,23 +43,30 @@ public class MedidasController extends GenericController<MedidaQH> {
             final RedirectAttributes redirectAttributes,
             HttpServletResponse response) throws IOException {
 
+        String redirectedView = "redirect:/medidas/form";
         redirectAttributes.addFlashAttribute("medidaValidatorForm", medidaValidatorForm);
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.medidaValidatorForm", bindingResult);
             redirectAttributes.addFlashAttribute("info", "errorDatosEnviados");
-            return new ModelAndView("redirect:/medidas/form");
+            return new ModelAndView(redirectedView);
         }
 
+
         switch (medidaValidatorForm.getFiltro()){
+            case "H":
+                throw new UnsupportedOperationException("No implementado");
             case "QH":
-                List<MedidaQH> medidas = repository.findAllByClienteIdCliente(Long.parseLong(medidaValidatorForm.getValorSeleccionado()));
+                List<MedidaQH> medidas = service.findAllByIdCliente(Long.parseLong(medidaValidatorForm.getValorSeleccionado()));
                 if (medidas.isEmpty()) {
                     redirectAttributes.addFlashAttribute("info", "sinMedidas");
-                    return new ModelAndView("redirect:/medidas/form");
+                    return new ModelAndView(redirectedView);
                 }
                 Utilidades.crearCsvMedidasQH(response, medidas);
                 break;
+            default:
+                redirectAttributes.addFlashAttribute("info", "errorDatosEnviados");
+                return new ModelAndView(redirectedView);
         }
 
         response.getWriter().flush();
