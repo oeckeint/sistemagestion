@@ -153,6 +153,9 @@ public class ArchivoTexto {
             case "29":
             	advertencia.append("Hay mas de dos fechas en <TerminoPotencia> de <FechaDesde> o <FechaHasta>");
             	break;
+            case "30":
+                advertencia.append("El archivo debe de contener exactamente un Autoconsumo");
+                break;
             default:
                 advertencia.append("No se reconoce la advertencia con el código, contacte con el adminstrador del sistema");
                 break;

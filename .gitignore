@@ -10,13 +10,8 @@
 .idea/workspace.xml
 .idea/**
 *.class
-*.class
 target/classes/app/config/AppConfig.class
 SistemaGestion.iml
 src/main/resources/rebel.xml
 src/main/resources/persistence-mysql.properties
-src/main/resources/rebel.xml
-src/main/resources/persistence-mysql.properties
 notas.txt
-src/main/resources/persistence-mysql.properties
-src/main/resources/rebel.xml

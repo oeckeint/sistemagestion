@@ -16,9 +16,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 
+import excepciones.nodos.energiaexcedentaria.autoconsumo.ExisteMasDeUnAutoconsumoException;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.*;
+import utileria.documentos.NodosUtil;
 import utileria.texto.Cadenas;
 import datos.interfaces.DocumentoXmlService;
 
@@ -1173,6 +1176,29 @@ public class xmlHelper {
         }
         this.imprimirResultado("energiaExcedentaria", elementos);
         return new EnergiaExcedentaria(elementos);
+    }
+
+
+    /**
+     * Carga los datos de autoconsumo en la instancia de EnergiaExcedentaria
+     *
+     * @param energiaExcedentaria instancia existente de EnergiaExcedentaria
+     * @throws ExisteMasDeUnAutoconsumoException si se encuentra más de un autoconsumo en el archivo
+     */
+    protected void cargarAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws ExisteMasDeUnAutoconsumoException {
+        NodeList instalacionGenAutoconsumoNode = NodosUtil.getSingleNodeListByName(NodosUtil.getSingleNodeListByNameFromDocument(this.nombreArchivo, this.doc, "Autoconsumo"), "InstalacionGenAutoconsumo");
+
+        NodeList terminoEnergiaNetaGenNode = NodosUtil.getSingleNodeListByChainedNames(instalacionGenAutoconsumoNode, "EnergiaNetaGen", "TerminoEnergiaNetaGen");
+        NodeList periodoTerminoEnergiaNetaGenNode = NodosUtil.getAllNodesByNameWithSpecificExpectedNodes(terminoEnergiaNetaGenNode, "Periodo", 6);
+        energiaExcedentaria.setAllNetaGenerada(NodosUtil.getAllContentNodesAsDoubleList(periodoTerminoEnergiaNetaGenNode, "ValorEnergiaNetaGen"));
+
+        NodeList terminoEnergiaAutoconsumidaNode = NodosUtil.getSingleNodeListByChainedNames(instalacionGenAutoconsumoNode, "EnergiaAutoconsumida", "TerminoEnergiaAutoconsumida");
+        energiaExcedentaria.setFechaDesde(NodosUtil.getSingleContentNodeAsLocalDateTimeWithDefaultTime(terminoEnergiaAutoconsumidaNode, "FechaDesde"));
+        energiaExcedentaria.setFechaHasta(NodosUtil.getSingleContentNodeAsLocalDateTimeWithDefaultTime(terminoEnergiaAutoconsumidaNode, "FechaHasta"));
+
+        NodeList periodosEnergiaAutoconsumidaNodes = NodosUtil.getAllNodesByNameWithSpecificExpectedNodes(terminoEnergiaAutoconsumidaNode, "Periodo", 6);
+        energiaExcedentaria.setAllAutoconsumida(NodosUtil.getAllContentNodesAsDoubleList(periodosEnergiaAutoconsumidaNodes, "ValorEnergiaAutoconsumida"));
+        energiaExcedentaria.setAllPagoTDA(NodosUtil.getAllContentNodesAsDoubleList(periodosEnergiaAutoconsumidaNodes, "PagoTDA"));
     }
 
     /**

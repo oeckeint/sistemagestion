@@ -7,8 +7,8 @@ import excepciones.*;
 
 import javax.persistence.NonUniqueResultException;
 
+import excepciones.nodos.energiaexcedentaria.autoconsumo.ExisteMasDeUnAutoconsumoException;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import utileria.xml;
@@ -24,13 +24,9 @@ import java.util.logging.Logger;
 public class ProcesarPeaje extends xmlHelper {
 
     private final DocumentoXmlService service;
-
-    @Value("${abono.factura.validaterectificadaanulada}")
-    private boolean isValidAbonoPeajeActive;
-
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    public ProcesarPeaje(@Qualifier(value = "peajesServiceImp") DocumentoXmlService service){
+    public ProcesarPeaje(@Qualifier(value = "peajesServiceImp") DocumentoXmlService service) {
         this.service = service;
     }
 
@@ -46,7 +42,7 @@ public class ProcesarPeaje extends xmlHelper {
      * @throws PeajeMasDeUnRegistroException
      */
     public void procesar(Document doc, String nombreArchivo)
-            throws ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException, PeajeYaExisteException {
+            throws ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException, PeajeYaExisteException, ExisteMasDeUnAutoconsumoException {
         this.doc = doc;
         this.nombreArchivo = nombreArchivo;
         this.iniciarVariables();
@@ -91,7 +87,7 @@ public class ProcesarPeaje extends xmlHelper {
      * @throws PeajeMasDeUnRegistroException
      * @throws CodRectNoExisteException
      */
-    private void registrarPeajeA() throws MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException {
+    private void registrarPeajeA() throws MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException, ExisteMasDeUnAutoconsumoException {
         logger.log(Level.INFO, ">>> Registrando Peaje del tipo Abono con el codFisFac {0}", xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, this.doc));
         String codRectificada = null;
         try {
@@ -112,7 +108,7 @@ public class ProcesarPeaje extends xmlHelper {
      * Registra el Peaje de tipo Abono
      * y los importes totales
      */
-    private void registrarPeajeNA() throws MasDeUnClienteEncontrado, TarifaNoExisteException {
+    private void registrarPeajeNA() throws MasDeUnClienteEncontrado, TarifaNoExisteException, ExisteMasDeUnAutoconsumoException {
         Peaje peaje = this.prepareAbono(this.crearPeaje(TIPO_FACTURA.A_ABONO));
         this.service.guardar(peaje);
     }
@@ -120,7 +116,7 @@ public class ProcesarPeaje extends xmlHelper {
     /**
      * Registra el peaje de tipo Normnal
      */
-    private void registrarPeajeN(char tipoFactura) throws MasDeUnClienteEncontrado, TarifaNoExisteException {
+    private void registrarPeajeN(char tipoFactura) throws MasDeUnClienteEncontrado, TarifaNoExisteException, ExisteMasDeUnAutoconsumoException {
         Peaje p = null;
         switch (tipoFactura) {
             case 'N':
@@ -151,7 +147,7 @@ public class ProcesarPeaje extends xmlHelper {
             String nuevaFechaLimitePago = xml.obtenerContenidoNodo(NombresNodos.FECHA_LIMITE_PAGO, this.doc);
             this.service.rectificar(peaje, nuevaRemesa, nombreArchivo, nuevaFechaLimitePago);
             this.registrarPeajeN('N');
-        } catch (RegistroVacioException e) {
+        } catch (RegistroVacioException | ExisteMasDeUnAutoconsumoException e) {
             logger.log(Level.INFO, ">>> No se encontró una factura para rectificar con {0}", codRectificada);
             throw new CodRectNoExisteException(codRectificada);
         }
@@ -327,7 +323,7 @@ public class ProcesarPeaje extends xmlHelper {
         return factura;
     }
 
-    private Peaje crearPeaje(TIPO_FACTURA tp) throws MasDeUnClienteEncontrado, TarifaNoExisteException {
+    private Peaje crearPeaje(TIPO_FACTURA tp) throws MasDeUnClienteEncontrado, TarifaNoExisteException, ExisteMasDeUnAutoconsumoException {
         Peaje peaje = new Peaje(
                 this.cliente, this.cabecera(), this.datosGenerales(), this.datosTerminoPotencia(), this.datosFacturaAtr(),
                 this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
@@ -343,17 +339,9 @@ public class ProcesarPeaje extends xmlHelper {
         EnergiaExcedentaria energiaExcedentaria = this.energiaExcedentaria();
         if (this.existeEnergiaExcedentaria) {
             this.existeEnergiaExcedentaria = false;
+            this.cargarAutoconsumo(energiaExcedentaria);
             peaje.setEnergiaExcedentaria(energiaExcedentaria);
         }
-        return peaje;
-    }
-
-    /**
-     * Crea un peaje del tipo C, este peaje es similar a los del tipo N, pero tiene menos datos embebidos en el documento xml
-     * @return
-     */
-    private Peaje crearPeajeC(){
-        Peaje peaje = new Peaje();
         return peaje;
     }
 

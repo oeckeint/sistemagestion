@@ -1,17 +1,17 @@
 package datos.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "contenido_xml_energia_excedentaria")
 public class EnergiaExcedentaria {
@@ -42,6 +42,70 @@ public class EnergiaExcedentaria {
     @Column(name = "valor_total_energia_excedentaria")
     private double valorTotalEnergiaExcedentaria;
 
+    @Column(name = "fecha_desde")
+    private LocalDateTime fechaDesde;
+
+    @Column(name = "fecha_hasta")
+    private LocalDateTime fechaHasta;
+
+    //Neta generada
+
+    @Column(name = "neta_generada_01")
+    private double netaGenerada01;
+
+    @Column(name = "neta_generada_02")
+    private double netaGenerada02;
+
+    @Column(name = "neta_generada_03")
+    private double netaGenerada03;
+
+    @Column(name = "neta_generada_04")
+    private double netaGenerada04;
+
+    @Column(name = "neta_generada_05")
+    private double netaGenerada05;
+
+    @Column(name = "neta_generada_06")
+    private double netaGenerada06;
+
+    //Autoconsumida
+
+    @Column(name = "autoconsumida_01")
+    private double autoconsumida01;
+
+    @Column(name = "pago_tda_01")
+    private double pagoTda01;
+
+    @Column(name = "autoconsumida_02")
+    private double autoconsumida02;
+
+    @Column(name = "pago_tda_02")
+    private double pagoTda02;
+
+    @Column(name = "autoconsumida_03")
+    private double autoconsumida03;
+
+    @Column(name = "pago_tda_03")
+    private double pagoTda03;
+
+    @Column(name = "autoconsumida_04")
+    private double autoconsumida04;
+
+    @Column(name = "pago_tda_04")
+    private double pagoTda04;
+
+    @Column(name = "autoconsumida_05")
+    private double autoconsumida05;
+
+    @Column(name = "pago_tda_05")
+    private double pagoTda05;
+
+    @Column(name = "autoconsumida_06")
+    private double autoconsumida06;
+
+    @Column(name = "pago_tda_06")
+    private double pagoTda06;
+
     @OneToMany(mappedBy = "energiaExcedentaria", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Peaje> peajes;
 
@@ -58,134 +122,31 @@ public class EnergiaExcedentaria {
         this.valorTotalEnergiaExcedentaria = datos.get(6);
     }
 
-    public EnergiaExcedentaria(double valorTotalEnergiaExcedentaria) {
-        this.valorTotalEnergiaExcedentaria = valorTotalEnergiaExcedentaria;
+    public void setAllNetaGenerada(List<Double> datos) {
+        this.netaGenerada01 = datos.get(0);
+        this.netaGenerada02 = datos.get(1);
+        this.netaGenerada03 = datos.get(2);
+        this.netaGenerada04 = datos.get(3);
+        this.netaGenerada05 = datos.get(4);
+        this.netaGenerada06 = datos.get(5);
     }
 
-    public int getIdEnergiaExcedentaria() {
-        return idEnergiaExcedentaria;
+    public void setAllAutoconsumida(List<Double> datosAutoconsumida) {
+        this.autoconsumida01 = datosAutoconsumida.get(0);
+        this.autoconsumida02 = datosAutoconsumida.get(1);
+        this.autoconsumida03 = datosAutoconsumida.get(2);
+        this.autoconsumida04 = datosAutoconsumida.get(3);
+        this.autoconsumida05 = datosAutoconsumida.get(4);
+        this.autoconsumida06 = datosAutoconsumida.get(5);
     }
 
-    public void setIdEnergiaExcedentaria(int idEnergiaExcedentaria) {
-        this.idEnergiaExcedentaria = idEnergiaExcedentaria;
-    }
-
-    public double getEnergiaExcedentaria01() {
-        return energiaExcedentaria01;
-    }
-
-    public void setEnergiaExcedentaria01(double energiaExcedentaria01) {
-        this.energiaExcedentaria01 = energiaExcedentaria01;
-    }
-
-    public double getEnergiaExcedentaria02() {
-        return energiaExcedentaria02;
-    }
-
-    public void setEnergiaExcedentaria02(double energiaExcedentaria02) {
-        this.energiaExcedentaria02 = energiaExcedentaria02;
-    }
-
-    public double getEnergiaExcedentaria03() {
-        return energiaExcedentaria03;
-    }
-
-    public void setEnergiaExcedentaria03(double energiaExcedentaria03) {
-        this.energiaExcedentaria03 = energiaExcedentaria03;
-    }
-
-    public double getEnergiaExcedentaria04() {
-        return energiaExcedentaria04;
-    }
-
-    public void setEnergiaExcedentaria04(double energiaExcedentaria04) {
-        this.energiaExcedentaria04 = energiaExcedentaria04;
-    }
-
-    public double getEnergiaExcedentaria05() {
-        return energiaExcedentaria05;
-    }
-
-    public void setEnergiaExcedentaria05(double energiaExcedentaria05) {
-        this.energiaExcedentaria05 = energiaExcedentaria05;
-    }
-
-    public double getEnergiaExcedentaria06() {
-        return energiaExcedentaria06;
-    }
-
-    public void setEnergiaExcedentaria06(double energiaExcedentaria06) {
-        this.energiaExcedentaria06 = energiaExcedentaria06;
-    }
-
-    public double getValorTotalEnergiaExcedentaria() {
-        return valorTotalEnergiaExcedentaria;
-    }
-
-    public void setValorTotalEnergiaExcedentaria(double valorTotalEnergiaExcedentaria) {
-        this.valorTotalEnergiaExcedentaria = valorTotalEnergiaExcedentaria;
-    }
-
-    public List<Peaje> getPeajes() {
-        return peajes;
-    }
-
-    public void setPeajes(List<Peaje> peajes) {
-        this.peajes = peajes;
-    }
-
-    @Override
-    public String toString() {
-        return "energia_excedentaria{" + "idEnergiaExcedentaria=" + idEnergiaExcedentaria + ", energiaExcedentaria01=" + energiaExcedentaria01 + ", energiaExcedentaria02=" + energiaExcedentaria02 + ", energiaExcedentaria03=" + energiaExcedentaria03 + ", energiaExcedentaria04=" + energiaExcedentaria04 + ", energiaExcedentaria05=" + energiaExcedentaria05 + ", energiaExcedentaria06=" + energiaExcedentaria06 + ", valorTotalEnergiaExcedentaria=" + valorTotalEnergiaExcedentaria + '}';
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.energiaExcedentaria01) ^ (Double.doubleToLongBits(this.energiaExcedentaria01) >>> 32));
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.energiaExcedentaria02) ^ (Double.doubleToLongBits(this.energiaExcedentaria02) >>> 32));
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.energiaExcedentaria03) ^ (Double.doubleToLongBits(this.energiaExcedentaria03) >>> 32));
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.energiaExcedentaria04) ^ (Double.doubleToLongBits(this.energiaExcedentaria04) >>> 32));
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.energiaExcedentaria05) ^ (Double.doubleToLongBits(this.energiaExcedentaria05) >>> 32));
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.energiaExcedentaria06) ^ (Double.doubleToLongBits(this.energiaExcedentaria06) >>> 32));
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.valorTotalEnergiaExcedentaria) ^ (Double.doubleToLongBits(this.valorTotalEnergiaExcedentaria) >>> 32));
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final EnergiaExcedentaria other = (EnergiaExcedentaria) obj;
-        if (Double.doubleToLongBits(this.energiaExcedentaria01) != Double.doubleToLongBits(other.energiaExcedentaria01)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.energiaExcedentaria02) != Double.doubleToLongBits(other.energiaExcedentaria02)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.energiaExcedentaria03) != Double.doubleToLongBits(other.energiaExcedentaria03)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.energiaExcedentaria04) != Double.doubleToLongBits(other.energiaExcedentaria04)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.energiaExcedentaria05) != Double.doubleToLongBits(other.energiaExcedentaria05)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.energiaExcedentaria06) != Double.doubleToLongBits(other.energiaExcedentaria06)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.valorTotalEnergiaExcedentaria) != Double.doubleToLongBits(other.valorTotalEnergiaExcedentaria)) {
-            return false;
-        }
-        return true;
+    public void setAllPagoTDA(List<Double> datos) {
+        this.pagoTda01 = datos.get(0);
+        this.pagoTda02 = datos.get(1);
+        this.pagoTda03 = datos.get(2);
+        this.pagoTda04 = datos.get(3);
+        this.pagoTda05 = datos.get(4);
+        this.pagoTda06 = datos.get(5);
     }
 
 }
