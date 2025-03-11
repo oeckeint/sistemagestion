@@ -1,5 +1,6 @@
 package utileria.documentos;
 
+import excepciones.nodos.NoCoincidenLosNodosEsperadosException;
 import excepciones.nodos.energiaexcedentaria.autoconsumo.ExisteMasDeUnAutoconsumoException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -20,14 +21,14 @@ public final class NodosUtil {
         return nodeList;
     }
 
-    public static NodeList getSingleNodeListByChainedNames(NodeList parentNode, String... nodeNames) {
+    public static NodeList getSingleNodeListByChainedNames(NodeList parentNode, String... nodeNames) throws NoCoincidenLosNodosEsperadosException {
         for (String nodeName : nodeNames) {
             parentNode = getAllNodesByNameWithSpecificExpectedNodes(parentNode, nodeName, 1);
         }
         return parentNode;
     }
 
-    public static NodeList getAllNodesByNameWithSpecificExpectedNodes(NodeList childList, String nodeName, int expectedNodes) {
+    public static NodeList getAllNodesByNameWithSpecificExpectedNodes(NodeList childList, String nodeName, int expectedNodes) throws NoCoincidenLosNodosEsperadosException {
         if (expectedNodes < 1) {
             throw new RuntimeException("Error: Los nodos esperados no pueden ser menores a 1.");
         }
@@ -45,13 +46,13 @@ public final class NodosUtil {
         }
 
         if (nodeList.size() != expectedNodes) {
-            throw new RuntimeException("Error: Se esperaban " + expectedNodes + " nodos con el nombre '" + nodeName + "' pero se encontraron " + nodeList.size() + ".");
+            throw new NoCoincidenLosNodosEsperadosException(nodeName, expectedNodes, nodeList.size());
         }
 
         return new CustomNodeList(nodeList);
     }
 
-    public static NodeList getSingleNodeListByName(NodeList parentNode, String nodeName) {
+    public static NodeList getSingleNodeListByName(NodeList parentNode, String nodeName) throws NoCoincidenLosNodosEsperadosException {
         return getAllNodesByNameWithSpecificExpectedNodes(parentNode, nodeName, 1);
     }
 
