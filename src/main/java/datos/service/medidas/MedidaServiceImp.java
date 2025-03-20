@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -28,6 +29,9 @@ public class MedidaServiceImp implements CrudDao<Medida> {
     @Override
     @Transactional
     public List<Medida> listar(int rows, int page) {
+        if (rows < 1 || page < 0) {
+            return Collections.emptyList();
+        }
         return this.medidaCrudDao.listar(rows, page);
     }
 

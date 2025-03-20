@@ -2,6 +2,8 @@ package datos.dao;
 
 import datos.entity.Cliente;
 import excepciones.MasDeUnClienteEncontrado;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,9 +32,8 @@ public class ClienteDaoImp implements datos.interfaces.ClienteDao {
 
     @Override
     public List<Cliente> listar(int rows, int page) {
-        List<Cliente> clientes = null;
         try{
-            clientes = sessionFactory.getCurrentSession()
+            return   this.sessionFactory.getCurrentSession()
                     .createQuery("from Cliente c where c.isDeleted = 0 order by c.idCliente desc", Cliente.class)
                     .setFirstResult(rows * page)
                     .setMaxResults(rows)
@@ -41,9 +42,8 @@ public class ClienteDaoImp implements datos.interfaces.ClienteDao {
             String mensaje = "Argumento ilegal al obtener datos de clientes, se regresan 0 clientes, " + e.getMessage();
             logger.log(Level.INFO, mensaje);
             ArchivoTexto.escribirError(mensaje);
-            return null;
+            return Collections.emptyList();
         }
-        return clientes;
     }
 
     @Override

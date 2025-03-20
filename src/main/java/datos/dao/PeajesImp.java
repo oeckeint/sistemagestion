@@ -4,6 +4,7 @@ import datos.entity.Peaje;
 import excepciones.NoEsUnNumeroException;
 import excepciones.PeajeMasDeUnRegistroException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +60,7 @@ public class PeajesImp implements datos.interfaces.DocumentoXmlDao<Peaje> {
                     .getResultList();
         } catch (Exception e){
             System.out.println(e.getMessage());
-            return null;
+            return Collections.emptyList();
         }
 
     }

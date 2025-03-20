@@ -3,6 +3,8 @@ package datos.service;
 import datos.entity.Cliente;
 import datos.interfaces.ClienteDao;
 import excepciones.MasDeUnClienteEncontrado;
+
+import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,9 @@ public class ClienteServiceImp implements datos.interfaces.ClienteService {
     @Override
     @Transactional
     public List<Cliente> listar(int rows, int page) {
+        if (rows < 1 || page < 0) {
+            return Collections.emptyList();
+        }
         return this.clienteDao.listar(rows, page);
     }
 

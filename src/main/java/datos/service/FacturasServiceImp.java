@@ -6,6 +6,7 @@ import datos.interfaces.DocumentoXmlDao;
 import excepciones.NoEsUnNumeroException;
 import excepciones.PeajeMasDeUnRegistroException;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +34,9 @@ public class FacturasServiceImp implements datos.interfaces.DocumentoXmlService<
     @Override
     @Transactional
     public List<Factura> listar(int rows, int page) {
+        if (rows < 1 || page < 0) {
+            return Collections.emptyList();
+        }
         return this.documentoXmlDao.listar(rows, page);
     }
 
