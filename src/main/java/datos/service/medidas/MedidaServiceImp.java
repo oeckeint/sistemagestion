@@ -6,6 +6,7 @@ import datos.interfaces.CrudDao;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import utileria.PaginacionUtil;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -29,10 +30,7 @@ public class MedidaServiceImp implements CrudDao<Medida> {
     @Override
     @Transactional
     public List<Medida> listar(int rows, int page) {
-        if (rows < 1 || page < 0) {
-            return Collections.emptyList();
-        }
-        return this.medidaCrudDao.listar(rows, page);
+        return PaginacionUtil.validarPaginacion(rows, page, () -> this.medidaCrudDao.listar(rows, page));
     }
 
     @Override

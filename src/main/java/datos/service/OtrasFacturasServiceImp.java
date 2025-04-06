@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import controladores.helper.Utilidades;
+import utileria.PaginacionUtil;
 
 /**
  *
@@ -37,10 +38,7 @@ public class OtrasFacturasServiceImp implements datos.interfaces.DocumentoXmlSer
     @Override
     @Transactional
     public List<OtraFactura> listar(int rows, int page) {
-        if (rows < 1 || page < 0) {
-            return Collections.emptyList();
-        }
-        return this.documentoXmlDao.listar(rows, page);
+        return PaginacionUtil.validarPaginacion(rows, page, () -> this.documentoXmlDao.listar(rows, page));
     }
 
     @Override

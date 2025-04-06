@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import utileria.PaginacionUtil;
 
 @Service
 public class ClienteServiceImp implements datos.interfaces.ClienteService {
@@ -25,10 +26,7 @@ public class ClienteServiceImp implements datos.interfaces.ClienteService {
     @Override
     @Transactional
     public List<Cliente> listar(int rows, int page) {
-        if (rows < 1 || page < 0) {
-            return Collections.emptyList();
-        }
-        return this.clienteDao.listar(rows, page);
+        return PaginacionUtil.validarPaginacion(rows, page, () -> this.clienteDao.listar(rows, page));
     }
 
     @Override
