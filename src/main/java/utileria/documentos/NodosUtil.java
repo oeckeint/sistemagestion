@@ -93,6 +93,10 @@ public final class NodosUtil {
         return results.get(0);
     }
 
+    public static int getSingleContentNodeAsInt(NodeList parentNode, String nodeNameReference) {
+        return StringUtils.parseStringToInt(getSingleContentNodeAsString(parentNode, nodeNameReference));
+    }
+
     public static LocalDateTime getSingleContentNodeAsLocalDateTimeWithDefaultTime(NodeList parentNode, String nodeNameReference) {
         return StringUtils.parseStringToLocalDateTimeWithDefaultTime(getSingleContentNodeAsString(parentNode, nodeNameReference));
     }

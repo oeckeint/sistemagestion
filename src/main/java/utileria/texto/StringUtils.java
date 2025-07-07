@@ -22,4 +22,8 @@ public final class StringUtils {
         return LocalDateTime.parse(stringDate + "T00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
     }
 
+    public static int parseStringToInt(@NonNull String stringNumber) {
+        return Integer.parseInt(stringNumber);
+    }
+
 }

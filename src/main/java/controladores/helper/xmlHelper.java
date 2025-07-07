@@ -1183,28 +1183,114 @@ public class xmlHelper {
 
 
     /**
-     * Carga los datos de autoconsumo en la instancia de EnergiaExcedentaria
+     * Carga la información de autoconsumo asociada a una instancia de {@link EnergiaExcedentaria}
+     * a partir del contenido de un archivo XML previamente cargado.
+     * <p>
+     * El método identifica el tipo de autoconsumo y, dependiendo del mismo,
+     * localiza y extrae del XML los datos de energía neta generada, energía autoconsumida,
+     * fechas de vigencia y pagos asociados. Estos valores se asignan a la instancia proporcionada.
+     * </p>
      *
-     * @param energiaExcedentaria instancia existente de EnergiaExcedentaria
-     * @throws ExisteMasDeUnAutoconsumoException si se encuentra más de un autoconsumo en el archivo
-     */
-    protected void cargarAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws ExisteMasDeUnAutoconsumoException {
+     * <p>Tipos de autoconsumo soportados:</p>
+     * <ul>
+     *   <li>Tipo 12: Autoconsumo es el nodo contenedor inicial, no entra a los internos</li>
+     *   <li>Tipo 42 y 43: Se accede a nodos internos específicos del XML.</li>
+     *   <li>Tipo 41 y 51: No se espera información de autoconsumo, se retorna inmediatamente.</li>
+     * </ul>
+     *
+     * <p>
+     * Si el nodo esperado de autoconsumo no se encuentra en el XML,
+     * se lanza una excepción {@link ExisteMasDeUnAutoconsumoException}.
+     * Si ocurre un error durante la verificación estructural del XML, se loguea como advertencia.
+     * </p>
+     *
+     * @param energiaExcedentaria instancia de {@link EnergiaExcedentaria} donde se almacenarán los datos extraídos del XML
+     * @throws ExisteMasDeUnAutoconsumoException si el nodo de autoconsumo no se encuentra en el documento XML
+     */protected void cargarAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws ExisteMasDeUnAutoconsumoException {
         try {
-            NodeList instalacionGenAutoconsumoNode = NodosUtil.getSingleNodeListByName(NodosUtil.getSingleNodeListByNameFromDocument(this.nombreArchivo, this.doc, "Autoconsumo"), "InstalacionGenAutoconsumo");
+            NodeList contenedorDatosAutoconsumo = NodosUtil.getSingleNodeListByNameFromDocument(this.nombreArchivo, this.doc, "Autoconsumo");
+            switch (this.determinarTipoAutoconsumo(energiaExcedentaria)) {
+                case _42:
+                case _43:
+                    contenedorDatosAutoconsumo = NodosUtil.getSingleNodeListByName(contenedorDatosAutoconsumo, "InstalacionGenAutoconsumo");
+                    break;
+                case _41:
+                case _51:
+                    return; // No se espera autoconsumo para estos tipos
+            }
 
-            NodeList terminoEnergiaNetaGenNode = NodosUtil.getSingleNodeListByChainedNames(instalacionGenAutoconsumoNode, "EnergiaNetaGen", "TerminoEnergiaNetaGen");
+            if (contenedorDatosAutoconsumo.getLength() == 0) {
+                throw new ExisteMasDeUnAutoconsumoException("No se encontró el nodo de autoconsumo esperado.");
+            }
+
+            NodeList terminoEnergiaNetaGenNode = NodosUtil.getSingleNodeListByChainedNames(contenedorDatosAutoconsumo, "EnergiaNetaGen", "TerminoEnergiaNetaGen");
             NodeList periodoTerminoEnergiaNetaGenNode = NodosUtil.getAllNodesByNameWithSpecificExpectedNodes(terminoEnergiaNetaGenNode, "Periodo", 6);
             energiaExcedentaria.setAllNetaGenerada(NodosUtil.getAllContentNodesAsDoubleList(periodoTerminoEnergiaNetaGenNode, "ValorEnergiaNetaGen"));
 
-            NodeList terminoEnergiaAutoconsumidaNode = NodosUtil.getSingleNodeListByChainedNames(instalacionGenAutoconsumoNode, "EnergiaAutoconsumida", "TerminoEnergiaAutoconsumida");
+            NodeList terminoEnergiaAutoconsumidaNode = NodosUtil.getSingleNodeListByChainedNames(contenedorDatosAutoconsumo, "EnergiaAutoconsumida", "TerminoEnergiaAutoconsumida");
             energiaExcedentaria.setFechaDesde(NodosUtil.getSingleContentNodeAsLocalDateTimeWithDefaultTime(terminoEnergiaAutoconsumidaNode, "FechaDesde"));
             energiaExcedentaria.setFechaHasta(NodosUtil.getSingleContentNodeAsLocalDateTimeWithDefaultTime(terminoEnergiaAutoconsumidaNode, "FechaHasta"));
 
             NodeList periodosEnergiaAutoconsumidaNodes = NodosUtil.getAllNodesByNameWithSpecificExpectedNodes(terminoEnergiaAutoconsumidaNode, "Periodo", 6);
             energiaExcedentaria.setAllAutoconsumida(NodosUtil.getAllContentNodesAsDoubleList(periodosEnergiaAutoconsumidaNodes, "ValorEnergiaAutoconsumida"));
             energiaExcedentaria.setAllPagoTDA(NodosUtil.getAllContentNodesAsDoubleList(periodosEnergiaAutoconsumidaNodes, "PagoTDA"));
+
+
         } catch (NoCoincidenLosNodosEsperadosException e) {
             log.warn(e.getMessage());
+        }
+    }
+
+    /**
+     * Determina el tipo de autoconsumo presente en el archivo XML y lo asigna
+     * a la instancia de {@link EnergiaExcedentaria} proporcionada.
+     * <p>
+     * El método extrae el valor del nodo <code>TipoAutoconsumo</code> desde la sección
+     * <code>DatosFacturaATR</code> del documento XML y lo convierte en una enumeración
+     * del tipo {@link TipoAutoconsumo}.
+     * </p>
+     *
+     * <p>Los valores actualmente soportados son:</p>
+     * <ul>
+     *   <li>12 → {@code TipoAutoconsumo._12}</li>
+     *   <li>41 → {@code TipoAutoconsumo._41}</li>
+     *   <li>42 → {@code TipoAutoconsumo._42}</li>
+     *   <li>43 → {@code TipoAutoconsumo._43}</li>
+     *   <li>51 → {@code TipoAutoconsumo._51}</li>
+     * </ul>
+     *
+     * <p>
+     * Si el tipo encontrado no coincide con ninguno de los valores esperados,
+     * se lanza una excepción en tiempo de ejecución indicando que el tipo es desconocido.
+     * </p>
+     *
+     * @param energiaExcedentaria instancia de {@link EnergiaExcedentaria} que será actualizada con el tipo detectado
+     * @return una instancia de {@link TipoAutoconsumo} correspondiente al valor detectado en el XML
+     * @throws ExisteMasDeUnAutoconsumoException si el nodo de tipo de autoconsumo no puede ser obtenido correctamente
+     * @throws RuntimeException si el valor numérico extraído no corresponde a ningún tipo conocido de autoconsumo
+     */
+    private TipoAutoconsumo determinarTipoAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws ExisteMasDeUnAutoconsumoException {
+        int tipoAutoconsumo = NodosUtil.getSingleContentNodeAsInt(
+                NodosUtil.getSingleNodeListByNameFromDocument(this.nombreArchivo, this.doc, "DatosFacturaATR"),
+                "TipoAutoconsumo");
+        switch (tipoAutoconsumo) {
+            case 12:
+                energiaExcedentaria.setTipoAutoconsumo(12);
+                return TipoAutoconsumo._12;
+            case 41:
+                energiaExcedentaria.setTipoAutoconsumo(41);
+                return TipoAutoconsumo._41;
+            case 42:
+                energiaExcedentaria.setTipoAutoconsumo(42);
+                return TipoAutoconsumo._42;
+            case 43:
+                energiaExcedentaria.setTipoAutoconsumo(43);
+                return TipoAutoconsumo._43;
+            case 51:
+                energiaExcedentaria.setTipoAutoconsumo(51);
+                return TipoAutoconsumo._51;
+            default:
+                throw new RuntimeException("Tipo de autoconsumo desconocido: " + tipoAutoconsumo);
         }
     }
 
@@ -5062,6 +5148,15 @@ public class xmlHelper {
     	N_NORMAL, 
     	R_RECTIFICADA,
         C_;
+    }
+
+    enum TipoAutoconsumo {
+        _12,
+        _41,
+        _42,
+        _43,
+        _51,
+        DESCONOCIDO;
     }
 
 }

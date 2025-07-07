@@ -70,6 +70,9 @@ public class EnergiaExcedentaria {
 
     //Autoconsumida
 
+    @Column(name = "tipo_autoconsumo")
+    private int tipoAutoconsumo;
+
     @Column(name = "autoconsumida_01")
     private double autoconsumida01;
 

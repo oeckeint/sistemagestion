@@ -335,6 +335,7 @@ public class ProcesarPeaje extends xmlHelper {
                 this.pmConsumo(), this.pmLecturaHasta(),
                 this.registroFin(), this.comentarios.toString(), this.errores.toString()
         );
+
         if (tp == TIPO_FACTURA.C_) return peaje;
         EnergiaExcedentaria energiaExcedentaria = this.energiaExcedentaria();
         if (this.existeEnergiaExcedentaria) {
