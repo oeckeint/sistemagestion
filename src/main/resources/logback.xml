@@ -20,6 +20,12 @@
         <appender-ref ref="CONSOLE" />
     </root>
 
+    <!-- Si quieres ver tus propios logs en DEBUG pero el resto en INFO -->
+    <logger name="datos" level="DEBUG"/>
+    <logger name="controladores" level="DEBUG"/>
+
     <!-- Silenciar logs excesivos de Spring si lo deseas -->
     <logger name="org.springframework" level="INFO"/>
+    <logger name="org.hibernate" level="INFO"/>
+    <logger name="com.zaxxer.hikari" level="INFO"/>
 </configuration>

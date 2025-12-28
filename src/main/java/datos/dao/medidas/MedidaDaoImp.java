@@ -51,8 +51,7 @@ public class MedidaDaoImp implements CrudDao<Medida> {
         if (appFeatureProperties.isEnabled("persist")) {
             this.sessionFactory.getCurrentSession().saveOrUpdate(medida);
         } else {
-            log.error("Persistence is disabled. Medida not saved: {}", medida);
-            System.out.println("Persistence is disabled. Medida not saved: " + medida);
+            log.error("Persistence disabled. Medida not saved: {}", medida);
         }
     }
 
