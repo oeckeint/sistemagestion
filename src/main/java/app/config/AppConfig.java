@@ -1,24 +1,28 @@
 package app.config;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.util.StreamUtils;
+import utileria.spring.AppFeatureProperties;
 import java.beans.PropertyVetoException;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sql.DataSource;
+import javax.persistence.EntityManagerFactory;
 
 import com.zaxxer.hikari.HikariDataSource;
 import datos.helper.StringToLinkedHashMap;
 import liquibase.integration.spring.SpringLiquibase;
 import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -30,18 +34,18 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+@Slf4j
+@RequiredArgsConstructor
 @Configuration
 @EnableWebMvc
+@EnableConfigurationProperties(AppFeatureProperties.class)
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = {"datos"})
-@ComponentScan(basePackages = {"app", "controladores", "controladores.helper", "datos.dao.medidas", "controladores.otrosControladores", "datos", "datos.dao", "datos.service", "documentos.procesamiento"})
+@ComponentScan(basePackages = {"controladores", "datos", "utileria"})
 @PropertySources({@PropertySource("classpath:persistence-mysql.properties"), @PropertySource("classpath:/cfg/application.properties")})
 public class AppConfig implements WebMvcConfigurer{
 
-    @Autowired
-    private Environment env;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private final Environment env;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -60,6 +64,7 @@ public class AppConfig implements WebMvcConfigurer{
         return cmr;
     }
 
+    /**
     @Bean(destroyMethod = "")
     public DataSource securityDataSource() throws PropertyVetoException {
         ComboPooledDataSource cpds = new ComboPooledDataSource();
@@ -80,15 +85,14 @@ public class AppConfig implements WebMvcConfigurer{
 
         return cpds;
     }
+     */
 
     @Bean
-    public LocalSessionFactoryBean sessionFactory(javax.sql.DataSource dataSource) throws PropertyVetoException {
-        LocalSessionFactoryBean lsfb = new LocalSessionFactoryBean();
-        lsfb.setDataSource(dataSource);
-        //lsfb.setDataSource(this.securityDataSource());
-        lsfb.setPackagesToScan(env.getProperty("hibernate.packagesToScan"));
-        lsfb.setHibernateProperties(getHibernateProperties());
-        return lsfb;
+    public SessionFactory sessionFactory(EntityManagerFactory emf) {
+        if (emf.unwrap(SessionFactory.class) == null) {
+            throw new NullPointerException("No es una factory de hibernate");
+        }
+        return emf.unwrap(SessionFactory.class);
     }
 
     public Properties getHibernateProperties() {
@@ -98,15 +102,24 @@ public class AppConfig implements WebMvcConfigurer{
         return props;
     }
 
+    /**
     @Bean
     public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) throws PropertyVetoException {
         HibernateTransactionManager htm = new HibernateTransactionManager();
         htm.setSessionFactory(sessionFactory);
         return htm;
     }
+    */
+
+    @Bean
+    @Primary
+    public JpaTransactionManager transactionManager(EntityManagerFactory emf) {
+        return new JpaTransactionManager(emf);
+    }
+
 
     private int getIntProperty(String propName) {
-        return Integer.parseInt(env.getProperty(propName));
+        return Integer.parseInt(Objects.requireNonNull(env.getProperty(propName)));
     }
     
     @Override
@@ -125,6 +138,7 @@ public class AppConfig implements WebMvcConfigurer{
     }
 
     @Bean
+    @Primary
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws ClassNotFoundException, PropertyVetoException {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(dataSource());
@@ -134,8 +148,8 @@ public class AppConfig implements WebMvcConfigurer{
         return emf;
     }
 
-    @Bean
-    public DataSource dataSource() {
+    @Bean(destroyMethod = "close")
+    public HikariDataSource dataSource() {
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setDriverClassName(env.getProperty("spring.datasource.driver-class-name"));
         dataSource.setJdbcUrl(env.getProperty("spring.datasource.url"));
@@ -148,7 +162,7 @@ public class AppConfig implements WebMvcConfigurer{
     public JpaVendorAdapter jpaAdapter() {
         HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
         adapter.setDatabasePlatform(env.getProperty("hibernate.dialect"));
-        adapter.setShowSql(env.getProperty("hibernate.show_sql", Boolean.class));
+        adapter.setShowSql(Boolean.TRUE.equals(env.getProperty("hibernate.show_sql", Boolean.class)));
         return adapter;
     }
 
@@ -156,6 +170,10 @@ public class AppConfig implements WebMvcConfigurer{
         Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
         properties.setProperty("hibernate.format_sql", env.getProperty("hibernate.format_sql"));
+        properties.setProperty("hibernate.current_session_context_class", "org.springframework.orm.hibernate5.SpringSessionContext");
+        properties.setProperty("hibernate.transaction.coordinator_class", "jdbc");
+        properties.setProperty("hibernate.current_session_context_class", "org.springframework.orm.hibernate5.SpringSessionContext");
+        properties.setProperty("hibernate.allow_update_outside_transaction", "true");
         return properties;
     }
 
@@ -166,5 +184,23 @@ public class AppConfig implements WebMvcConfigurer{
         liquibase.setChangeLog(env.getProperty("spring.liquibase.change-log"));
         return liquibase;
     }
-    
+
+    static {
+        try {
+            ClassPathResource resource = new ClassPathResource("banner.txt");
+            if (resource.exists()) {
+                String banner = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+                // Usamos System.out para que salga limpio o log.info para que use el formato de logback
+                System.out.println(banner);
+            }
+        } catch (Exception e) {
+            log.error("No se pudo cargar el banner...");
+        }
+
+        // deletes any existing handlers attached to j.u.l root logger
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        // redirects jul (java.util.logging) to SLF4J
+        SLF4JBridgeHandler.install();
+    }
+
 }

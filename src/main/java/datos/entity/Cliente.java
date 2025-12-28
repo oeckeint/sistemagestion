@@ -53,8 +53,7 @@ public class Cliente implements Serializable, GenericEntity<Cliente> {
     @JoinColumn(name = "id_cliente_contrato")
     private ClienteContrato clienteContrato;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ClienteTicket> clienteTickets;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

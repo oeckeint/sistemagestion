@@ -63,13 +63,13 @@ public class ClienteServiceImp implements datos.interfaces.ClienteService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public int contarPaginacion(int rows) {
         return this.clienteDao.contarPaginacion(rows);
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public int contarRegistros() {
         return this.clienteDao.contarRegistros();
     }

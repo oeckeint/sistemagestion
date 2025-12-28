@@ -9,7 +9,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import app.config.ApplicationContextUtils;
+import utileria.spring.ApplicationContextUtils;
 import controladores.Procesamiento.TablaBusqueda;
 import datos.entity.Factura;
 import datos.entity.OtraFactura;

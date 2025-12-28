@@ -1,18 +1,24 @@
 package datos.dao.medidas;
 
+import utileria.spring.AppFeatureProperties;
 import datos.entity.medidas.Medida;
 import datos.interfaces.CrudDao;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Slf4j
 @Repository
+@RequiredArgsConstructor
 public class MedidaDaoImp implements CrudDao<Medida> {
 
     @Autowired
     SessionFactory sessionFactory;
+    private final AppFeatureProperties appFeatureProperties;
 
     @Override
     public List<Medida> listar() {
@@ -42,7 +48,12 @@ public class MedidaDaoImp implements CrudDao<Medida> {
 
     @Override
     public void guardar(Medida medida) {
-        this.sessionFactory.getCurrentSession().saveOrUpdate(medida);
+        if (appFeatureProperties.isEnabled("persist")) {
+            this.sessionFactory.getCurrentSession().saveOrUpdate(medida);
+        } else {
+            log.error("Persistence is disabled. Medida not saved: {}", medida);
+            System.out.println("Persistence is disabled. Medida not saved: " + medida);
+        }
     }
 
     @Override

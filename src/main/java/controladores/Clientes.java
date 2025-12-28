@@ -53,27 +53,27 @@ public class Clientes {
 
 		paginaActual = Utilidades.revisarPaginaActual(paginaActual);
 		rows = Utilidades.revisarRangoRows(rows, 25);
-		int ultimaPagina = this.clienteService.contarPaginacion(rows);
+        int totalRegistros = this.clienteService.contarRegistros();
+        int ultimaPagina = (int) Math.ceil((double) totalRegistros / rows);
 
-		//Si no hay clientes en la base de datos, la ultima pagina es 0 y se carga una vista vacía
-		if (ultimaPagina == 0) {
-			modelMap.addAttribute("error", "sindatos");
-			return this.mv;
-		}
+        if (totalRegistros == 0) {
+            modelMap.addAttribute("error", "sindatos");
+            return this.mv;
+        }
 
-		//Si hay registros en la base de datos
 		List<Cliente> clientes = clienteService.listar(rows, paginaActual - 1);
-		int registrosMostrados = rows * paginaActual;
 
 		//Se llegó a la ultima página
-		if (clientes.isEmpty()) {
-			clientes = this.clienteService.listar(rows, ultimaPagina - 1);
-			registrosMostrados = this.clienteService.contarRegistros();
-		}
+        if (clientes.isEmpty() && totalRegistros > 0) {
+            paginaActual = ultimaPagina;
+            clientes = this.clienteService.listar(rows, paginaActual - 1);
+        }
 
-		modelMap.addAttribute("clientes", clientes);
+        int registrosMostrados = Math.min(rows * paginaActual, totalRegistros);
+
+        modelMap.addAttribute("clientes", clientes);
 		modelMap.addAttribute("registrosMostrados", registrosMostrados);
-		modelMap.addAttribute("totalRegistros", this.clienteService.contarRegistros());
+		modelMap.addAttribute("totalRegistros", totalRegistros);
 		modelMap.addAttribute("paginaActual", paginaActual);
 		modelMap.addAttribute("ultimaPagina", ultimaPagina);
 		modelMap.addAttribute("controller", "clientes");
@@ -83,8 +83,6 @@ public class Clientes {
 		}
 
 		ClientesHelper.reiniciarVariables();
-		System.out.println("Carga completa");
-
 		return this.mv;
 	}
 

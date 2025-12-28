@@ -170,6 +170,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.20</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -188,6 +189,21 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <version>4.9.1</version>
+        </dependency>
+
+        <!-- 1. Motor de logging (Logback) -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.11</version>
+        </dependency>
+
+        <!-- 2. Puente para capturar los logs de java.util.logging (JUL) -->
+        <!-- Esto hará que los logs como los de ProcesarMedida también pasen por Logback -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>1.7.32</version>
         </dependency>
 
     </dependencies>
