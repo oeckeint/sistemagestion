@@ -48,7 +48,7 @@
                 </div>
                 <hr>
 
-                <!--Primer Renglón-->
+                <!--Primer Renglï¿½n-->
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-5 p-2">
                     	<c:url var="editar" value="/clientes/tickets/editar">
@@ -141,7 +141,7 @@
                                     <li class="list-group-item px-1">${ticket.cliente.nombreCliente}</li>
                                     <li class="list-group-item px-1">${ticket.cliente.tarifa}</li>
                                     <li class="list-group-item px-1">${ticket.cliente.isDeleted}</li>
-                                    <li class="list-group-item px-1">${ticket.cliente.clienteTickets.size()}</li>
+                                    <li class="list-group-item px-1">${ticket.cliente.tickets.size()}</li>
                                 </ul>
                             </div>
                         </div>

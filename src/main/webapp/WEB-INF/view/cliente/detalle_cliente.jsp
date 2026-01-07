@@ -67,7 +67,7 @@
                                             </c:when>
                                         </c:choose>
                                     </li>
-                                    <li class="list-group-item px-1">${cliente.clienteTickets.size()}</li>
+                                    <li class="list-group-item px-1">${cliente.tickets.size()}</li>
                                 </ul>
                             </div>
                         </div>

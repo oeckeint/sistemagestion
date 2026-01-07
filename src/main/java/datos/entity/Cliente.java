@@ -1,7 +1,6 @@
 package datos.entity;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.*;
@@ -9,12 +8,9 @@ import javax.persistence.*;
 import datos.entity.cliente.tickets.ClienteTicket;
 import datos.entity.medidas.Medida;
 import datos.entity.medidas.MedidaCCH;
-import datos.entity.medidas.MedidaH;
 import datos.entity.reclamaciones.Reclamacion;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 @Data
 @NoArgsConstructor
@@ -54,7 +50,7 @@ public class Cliente implements Serializable, GenericEntity<Cliente> {
     private ClienteContrato clienteContrato;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ClienteTicket> clienteTickets;
+    private List<ClienteTicket> tickets;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Medida> medidas;

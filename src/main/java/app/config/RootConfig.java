@@ -23,7 +23,7 @@ import java.util.Properties;
 @Configuration
 @ComponentScan(basePackages = {"datos", "utileria"})
 @EnableConfigurationProperties(AppFeatureProperties.class)
-@EnableJpaRepositories(basePackages = "datos")
+@EnableJpaRepositories(basePackages = {"datos", "core.repository"})
 @EnableTransactionManagement
 @PropertySources({
         @PropertySource("classpath:persistence-mysql.properties"),

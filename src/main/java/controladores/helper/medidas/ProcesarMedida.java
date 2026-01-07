@@ -4,15 +4,13 @@ import datos.entity.Cliente;
 import datos.entity.medidas.Medida;
 import datos.interfaces.ClienteService;
 import datos.interfaces.CrudDao;
-import excepciones.MasDeUnClienteEncontrado;
 import excepciones.MedidaTipoNoReconocido;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import utileria.ArchivoTexto;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,14 +49,11 @@ public class ProcesarMedida {
     private List<Medida> obtenerMedidasArchivo(File f, String nombreArchivo){
         List<Medida> medidas = new ArrayList<>();
         Medida medida;
-        FileReader fr = null;
-        BufferedReader br = null;
-        String[] elementos = null;
+        String[] elementos;
         int lineaActual = 1;
 
-        try {
-            fr = new FileReader (f);
-            br = new BufferedReader(fr);
+        try (FileReader fr = new FileReader(f);
+             BufferedReader br = new BufferedReader(fr)) {
 
             String linea;
 
@@ -97,18 +92,12 @@ public class ProcesarMedida {
                 }
                 lineaActual++;
             }
-        } catch (MasDeUnClienteEncontrado e){
-            logger.log(Level.INFO, ">>> Se encontró mas de un cliente con el cups {0}", elementos[0]);
-            ArchivoTexto.escribirError("Se encontró mas de un cliente con el cups " + elementos[0] + " en la linea " + lineaActual + " del archivo " + nombreArchivo);
-        } catch(Exception e){
-            logger.log(Level.INFO, ">>> Error desconocido al procesar {0}", Arrays.toString(elementos));
-            e.printStackTrace();
-            ArchivoTexto.escribirError("Error desconocido con los elementos " + Arrays.toString(elementos) + " en la linea " + lineaActual + " del archivo " + nombreArchivo);
-        }finally {
-            try {
-                if (br != null) br.close();
-                if (fr != null) fr.close();
-            } catch (Exception e2) {e2.printStackTrace();}
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("No se pudo encontrar el archivo: " + nombreArchivo, e);
+        } catch (IOException e) {
+            throw new RuntimeException("Error leyendo el archivo: " + nombreArchivo, e);
+        } catch (ParseException e) {
+            throw new RuntimeException("Error parseando la fecha en el archivo: " + nombreArchivo, e);
         }
         return medidas;
     }

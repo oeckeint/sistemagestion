@@ -9,7 +9,7 @@ package excepciones;
  *
  * @author Jesus Sanchez <j.sanchez at dataWorkshop>
  */
-public class MasDeUnClienteEncontrado extends Exception{
+public class MasDeUnClienteEncontrado extends RuntimeException{
 
     public MasDeUnClienteEncontrado(String cups) {
         super("Se encontró más de un cliente con el mismo cups (<Strong>" + cups + "</Strong>).");

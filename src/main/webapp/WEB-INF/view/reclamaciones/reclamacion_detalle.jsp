@@ -306,7 +306,7 @@
                                     <li class="list-group-item px-1">${reclamacion.cliente.nombreCliente}</li>
                                     <li class="list-group-item px-1">${reclamacion.cliente.tarifa}</li>
                                     <li class="list-group-item px-1">${reclamacion.cliente.isDeleted}</li>
-                                    <li class="list-group-item px-1">${reclamacion.cliente.clienteTickets.size()}</li>
+                                    <li class="list-group-item px-1">${reclamacion.cliente.tickets.size()}</li>
                                 </ul>
                             </div>
                         </div>

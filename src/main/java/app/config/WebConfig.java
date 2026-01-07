@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-@ComponentScan(basePackages = {"controladores"})
+@ComponentScan(basePackages = {"controladores", "core"})
 @Configuration
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
