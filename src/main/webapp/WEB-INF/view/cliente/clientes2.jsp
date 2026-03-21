@@ -16,6 +16,7 @@
             <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp">
                 <jsp:param name="tituloDinamico" value="${tituloDinamico}"/>
             </jsp:include>
+            <jsp:include page="/WEB-INF/paginas/comunes/notifications.jsp"/>
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 <div class="container">
                 <c:choose>

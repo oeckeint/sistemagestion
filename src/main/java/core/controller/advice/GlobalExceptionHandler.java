@@ -1,6 +1,10 @@
 package core.controller.advice;
 
+import core.web.flash.FlashType;
+import core.web.notifications.NotificationProcess;
 import excepciones.MasDeUnClienteEncontrado;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,39 +13,56 @@ import utileria.ArchivoTexto;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final String redirect = "redirect:/";
+
     @ExceptionHandler(MasDeUnClienteEncontrado.class)
-    public String handleDuplicateCustomer(MasDeUnClienteEncontrado ex, RedirectAttributes ra) {
+    public String handleDuplicateCustomer(@NonNull MasDeUnClienteEncontrado ex, @NonNull RedirectAttributes ra) {
         // Usamos flash attributes para que el mensaje sobreviva al redirect y se vea en el JSP
-        ArchivoTexto.escribirError(ex.getMessage());
-        ra.addFlashAttribute("errorArchivo", ex.getMessage());
-        return "redirect:/procesar";
+        ra.addFlashAttribute(FlashType.ERROR.getAttributeName(), ex.getMessage());
+        this.logError(ex);
+        return redirect + "procesar";
     }
 
     // Manejo para cuando NO se encuentra un cliente (limpiando el CustomerService)
     @ExceptionHandler(EntityNotFoundException.class)
-    public String handleNotFound(EntityNotFoundException ex, RedirectAttributes ra) {
-        ArchivoTexto.escribirError(ex.getMessage());
-        ra.addFlashAttribute("mensaje", ex.getMessage());
-        return "redirect:/clientes";
+    public String handleNotFound(EntityNotFoundException ex, @NonNull RedirectAttributes ra) {
+        this.logError(ex);
+        ra.addFlashAttribute(FlashType.WARNING.getAttributeName(), ex.getMessage());
+        return redirect + "clientes";
     }
 
     @ExceptionHandler(IOException.class) // Captura FileNotFoundException y otros errores de lectura
-    public String handleFileIOError(IOException ex, RedirectAttributes ra) {
-        String mensaje = "Error crítico de acceso al archivo: " + ex.getMessage();
-        ArchivoTexto.escribirError(mensaje);
-        ra.addFlashAttribute("errorArchivo", mensaje);
-        return "redirect:/procesar";
+    public String handleFileIOError(IOException ex, @NonNull RedirectAttributes ra) {
+        this.logError(ex);
+        ra.addFlashAttribute(FlashType.ERROR.getAttributeName(),
+                "Error crítico de acceso al archivo: " + ex.getMessage());
+        return redirect + "procesar";
     }
 
     @ExceptionHandler(Exception.class)
-    public String handleGenericError(Exception ex, Model model) {
-        ArchivoTexto.escribirError(ex.getMessage());
-        model.addAttribute("error", "Ha ocurrido un error inesperado: " + ex.getMessage());
-        return "comunes/error_general";
+    public String handleGlobalError(Exception ex, RedirectAttributes ra) {
+        List<NotificationProcess> notifications = new ArrayList<>();
+        notifications.add(new NotificationProcess(
+                NotificationProcess.NotificationType.ERROR,
+                "Error crítico en el sistema: " + ex.getMessage()
+        ));
+
+        ra.addFlashAttribute("notificaciones", notifications);
+        return "redirect:/procesar";
+    }
+
+    private void logError(@NonNull Exception ex) {
+        log.error("Excepción capturada", ex);
+        ArchivoTexto.escribirError(
+                ex.getClass().getSimpleName() + " - " + ex.getMessage()
+        );
     }
 
 }

@@ -43,7 +43,7 @@ import utileria.ArchivoTexto;
 import utileria.StringHelper;
 
 @Controller
-@RequestMapping("/procesar")
+@RequestMapping("v1/procesar")
 public class Procesamiento {
 
     private static final Logger log = LoggerFactory.getLogger(Procesamiento.class);
@@ -96,9 +96,9 @@ public class Procesamiento {
     @Autowired
     private Comercializador comercializador;
 
-    int archivosCorrectos;
-    int archivosTotales;
-    List<String> archivosErroneos;
+    protected int archivosCorrectos;
+    protected int archivosTotales;
+    protected List<String> archivosErroneos;
     private boolean isFactura;
     private boolean isRemesaPago;
     private boolean isArchivarFactura;
@@ -196,7 +196,7 @@ public class Procesamiento {
      * @param archivo Archivo xml recibido
      * @param nombreArchivo Nombre del archivo xml recibido
      */
-    private void procesarXML(File archivo, String nombreArchivo) {
+    protected void procesarXML(File archivo, String nombreArchivo) {
         System.out.println("(Ini)************************-----------------------------" + nombreArchivo);
         try {
             Document documento = this.prepareXml(archivo, nombreArchivo);
@@ -251,7 +251,7 @@ public class Procesamiento {
      * @param archivo archivo de la medida
      * @param nombreArchivo nombre del archivo de la medida
      */
-    private void procesarMedidas(File archivo, String nombreArchivo){
+    protected void procesarMedidas(File archivo, String nombreArchivo){
         Queue<String> errores = null;
         try {
             switch (medidasHelper.definirTipoMedida(nombreArchivo)){
@@ -400,7 +400,7 @@ public class Procesamiento {
         }
     }
     
-    private void reiniciarVariablesBooleanas(){
+    protected void reiniciarVariablesBooleanas(){
         this.isMACCSaliente = false;
         this.isOtrasFacturas = false;
         this.isMACCConCambios = false;

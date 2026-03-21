@@ -15,10 +15,12 @@
 <c:forEach var="archivoErroneo" items="${archivosErroneos}">
 	<div class="alert alert-danger alert-dismissible fade show container" role="alert">
 		<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
-		${archivoErroneo}
+		${archivoErroneo} asdas
 		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"/>
 	</div>
 </c:forEach>
+
+<jsp:include page="/WEB-INF/paginas/comunes/notifications.jsp"/>
 
 	<!--<div class="alert alert-warning alert-dismissible fade show container" role="alert">
 		<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>

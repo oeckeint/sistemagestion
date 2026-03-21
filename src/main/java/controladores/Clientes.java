@@ -22,7 +22,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @Controller
-@RequestMapping("/clientes-legacy")
+@RequestMapping("v1/clientes")
 public class Clientes {
 
 	@Autowired
