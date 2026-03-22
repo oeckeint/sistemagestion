@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 USER_ENV_FILE="$HOME/.sistema_gestion_env.sh"
+COMPOSE_PROJECT_NAME="com4energy"
 NETWORK_NAME="com4energy_default"
 BASE_IMAGE="tomcat:9.0-jdk8-corretto"
 
@@ -103,24 +104,27 @@ stop_existing_deployment() {
   cd "$ROOT_DIR"
 
   log "Deteniendo despliegue previo de SistemaGestion (si existe)..."
-  docker compose down --remove-orphans >/dev/null 2>&1 || true
+  docker compose -p "$COMPOSE_PROJECT_NAME" down --remove-orphans >/dev/null 2>&1 || true
+
+  if docker ps -a --format '{{.Names}}' | grep -qx 'sistemagestion'; then
+    docker rm -f sistemagestion >/dev/null
+    log "Contenedor previo sistemagestion eliminado."
+  fi
 
   if docker ps -a --format '{{.Names}}' | grep -qx 'sistemagestion-app'; then
     docker rm -f sistemagestion-app >/dev/null
-    log "Contenedor previo sistemagestion-app eliminado."
-  else
-    log "No hay contenedor previo sistemagestion-app."
+    log "Contenedor previo sistemagestion-app eliminado (legacy)."
   fi
 }
 
 start_stack() {
   cd "$ROOT_DIR"
 
-  log "Levantando SistemaGestion con Docker Compose..."
-  docker compose up --build -d
+  log "Levantando SistemaGestion con Docker Compose (proyecto ${COMPOSE_PROJECT_NAME})..."
+  docker compose -p "$COMPOSE_PROJECT_NAME" up --build -d
 
   log "Servicios activos:"
-  docker compose ps
+  docker compose -p "$COMPOSE_PROJECT_NAME" ps
 
   log "Tip: valida health con curl http://localhost:7001/sistemagestion/health/storage"
 }

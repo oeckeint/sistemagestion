@@ -1,8 +1,8 @@
 services:
 
-  app:
+  sistemagestion:
     build: .
-    container_name: sistemagestion-app
+    container_name: sistemagestion
     ports:
       - "7001:8080"
     environment:
