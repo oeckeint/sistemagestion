@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 USER_ENV_FILE="$HOME/.sistema_gestion_env.sh"
 NETWORK_NAME="com4energy_default"
+BASE_IMAGE="tomcat:9.0-jdk8-corretto"
 
 # Variables requeridas por docker-compose.yml
 REQUIRED_VARS=(
@@ -35,6 +36,25 @@ check_prerequisites() {
   docker info >/dev/null 2>&1 || fail "Docker daemon no esta corriendo. Inicia Docker Desktop."
   command -v mvn >/dev/null 2>&1 || fail "Maven no esta instalado o no esta en PATH."
   [[ -f "$USER_ENV_FILE" ]] || fail "No existe $USER_ENV_FILE. Ejecuta ./scripts/onboarding.sh primero."
+}
+
+check_registry_access() {
+  local pull_output
+
+  log "Validando acceso a imagen base Docker (${BASE_IMAGE})..."
+
+  if pull_output=$(docker pull "$BASE_IMAGE" 2>&1 >/dev/null); then
+    log "Acceso a Docker Hub OK."
+    return
+  fi
+
+  if grep -qi "keychain cannot be accessed" <<<"$pull_output"; then
+    printf '%s\n' "$pull_output" >&2
+    fail "No se puede leer el keychain de macOS en esta sesion. Ejecuta: security -v unlock-keychain \"$HOME/Library/Keychains/login.keychain-db\" y luego repite este script."
+  fi
+
+  printf '%s\n' "$pull_output" >&2
+  fail "No se pudo descargar ${BASE_IMAGE}. Revisa conectividad, Docker login o credenciales del helper."
 }
 
 build_project() {
@@ -107,6 +127,7 @@ start_stack() {
 
 main() {
   check_prerequisites
+  check_registry_access
   build_project
   load_user_env
   validate_required_vars
