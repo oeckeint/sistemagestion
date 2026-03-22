@@ -101,20 +101,17 @@ ensure_network() {
 }
 
 stop_existing_deployment() {
-  cd "$ROOT_DIR"
+  local stopped=false
 
-  log "Deteniendo despliegue previo de SistemaGestion (si existe)..."
-  docker compose -p "$COMPOSE_PROJECT_NAME" down --remove-orphans >/dev/null 2>&1 || true
+  for name in sistemagestion sistemagestion-app; do
+    if docker ps -a --format '{{.Names}}' | grep -qx "$name"; then
+      log "Deteniendo contenedor previo: ${name}..."
+      docker rm -f "$name" >/dev/null
+      stopped=true
+    fi
+  done
 
-  if docker ps -a --format '{{.Names}}' | grep -qx 'sistemagestion'; then
-    docker rm -f sistemagestion >/dev/null
-    log "Contenedor previo sistemagestion eliminado."
-  fi
-
-  if docker ps -a --format '{{.Names}}' | grep -qx 'sistemagestion-app'; then
-    docker rm -f sistemagestion-app >/dev/null
-    log "Contenedor previo sistemagestion-app eliminado (legacy)."
-  fi
+  [[ "$stopped" == false ]] && log "No hay contenedor previo de SistemaGestion."
 }
 
 start_stack() {
