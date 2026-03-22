@@ -429,7 +429,7 @@ public class EvaluacionXml extends HttpServlet {
             String subCarpeta = "NoProcesados";
 
             String nuevoArchivo =
-                    System.getProperty("user.dir") + env.getProperty("peajes.procesados") + subCarpeta + "/" + nombreArchivo;
+                    env.getProperty("peajes.procesados") + subCarpeta + "/" + nombreArchivo;
             File f = new File(nuevoArchivo);
             f.createNewFile();
 

@@ -194,14 +194,14 @@ public class ClasificarXml {
     }
 
     private void generarValidacionPagoXML(String rutaOriginal) {
-        String pathNuevoArchivo = System.getProperty("user.dir") + env.getProperty("peajes.remesa");;
+        String pathNuevoArchivo = env.getProperty("peajes.remesa");
         if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
             this.archivosCorrectos++;
         }
     }
 
     private void generarArchivarFacturaXML(String rutaOriginal) {
-        String pathNuevoArchivo = System.getProperty("user.dir") + env.getProperty("peajes.archivarfactura");
+        String pathNuevoArchivo = env.getProperty("peajes.archivarfactura");
         if (Utilidades.crearArchivo(this.nombreArchivo, rutaOriginal, pathNuevoArchivo)) {
             this.archivosCorrectos++;
         }
@@ -219,7 +219,7 @@ public class ClasificarXml {
 
                     switch (elementosXml.get(NombresNodos.TIP_FAC)) {
                         case "A":
-                            subCarpeta += "\\A";
+                            subCarpeta += "/A";
                         case "N":
                             switch (elementosXml.get(NombresNodos.MOT_FAC)) {
                                 case "01":
@@ -228,25 +228,25 @@ public class ClasificarXml {
                                     break;
                                 case "04":
                                 case "08":
-                                    subCarpeta += "\\M04";
+                                    subCarpeta += "/M04";
                                     break;
                                 default:
-                                    subCarpeta += "\\MotivosNoSoportados";
+                                    subCarpeta += "/MotivosNoSoportados";
                                     archivosErroneos.add("El motivo de factura (" + elementosXml.get(NombresNodos.MOT_FAC) + ") del archivo (" + nombreArchivoOriginal + ") no esta soportado");
                                     break;
                             }
                             break;
                         case "C":
-                            subCarpeta += "\\C";
+                            subCarpeta += "/C";
                             break;
                         case "R":
-                            subCarpeta += "\\R";
+                            subCarpeta += "/R";
                             break;
                         case "G":
-                            subCarpeta += "\\G";
+                            subCarpeta += "/G";
                             break;
                         default:
-                            subCarpeta += "\\TiposNoSoportados";
+                            subCarpeta += "/TiposNoSoportados";
                             archivosErroneos.add("El tipo de factura (" + elementosXml.get(NombresNodos.TIP_FAC) + ") del archivo (" + nombreArchivoOriginal + ") no esta soportado");
                             break;
                     }
@@ -278,7 +278,7 @@ public class ClasificarXml {
             finString = this.elementosXml.get(NombresNodos.COD_FIS_FAC);
         }
 
-        String pathNuevoArchivo = System.getProperty("user.dir") + env.getProperty("peajes.procesados") + subCarpeta;
+        String pathNuevoArchivo = env.getProperty("peajes.procesados") + subCarpeta;
         String nombreNuevoArchivo = formater.format(this.cliente.getIdCliente()) + "-" + this.cliente.getTarifa() + "_"
                 + this.elementosXml.get(NombresNodos.EMP_EMI) + "_" + this.elementosXml.get(NombresNodos.EMP_DES) + "_" + this.elementosXml.get(NombresNodos.COD_PRO) + "_"
                 + this.elementosXml.get(NombresNodos.COD_PAS) + "_" + this.elementosXml.get(NombresNodos.CUPS) + "_" + finString

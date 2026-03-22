@@ -1,0 +1,45 @@
+services:
+
+  app:
+    build: .
+    container_name: sistemagestion-app
+    ports:
+      - "7001:8080"
+    environment:
+      # Base de datos existente (contenedor externo en com4energy_default)
+      - DB_HOST=${DB_HOST:?Define DB_HOST en tu entorno o carga ~/.sistema_gestion_env.sh}
+      - SGE_LOCAL_DB_ROOT_PWD=${SGE_LOCAL_DB_ROOT_PWD:?Define SGE_LOCAL_DB_ROOT_PWD en tu entorno o carga ~/.sistema_gestion_env.sh}
+      - SGE_LOCAL_DB_NAME=${SGE_LOCAL_DB_NAME:?Define SGE_LOCAL_DB_NAME en tu entorno o carga ~/.sistema_gestion_env.sh}
+      - DB_URL_SGE=${DB_URL_SGE:?Define DB_URL_SGE en tu entorno o carga ~/.sistema_gestion_env.sh}
+      - DB_USER_SGE=${DB_USER_SGE:?Define DB_USER_SGE en tu entorno o carga ~/.sistema_gestion_env.sh}
+      - DB_PASSWORD_SGE=${DB_PASSWORD_SGE:?Define DB_PASSWORD_SGE en tu entorno o carga ~/.sistema_gestion_env.sh}
+      # Raiz de almacenamiento dentro del contenedor (alineada con path.properties)
+      - C4E_STORAGE_ROOT=/usr/local/tomcat/resources
+      # SFTP
+      - SFTP_HOST=${SFTP_HOST:?Define SFTP_HOST en tu entorno o carga ~/.sistema_gestion_env.sh}
+      - SFTP_PORT=${SFTP_PORT:?Define SFTP_PORT en tu entorno o carga ~/.sistema_gestion_env.sh}
+      - SFTP_USER=${SFTP_USER:?Define SFTP_USER en tu entorno o carga ~/.sistema_gestion_env.sh}
+      - SFTP_PASSWORD=${SFTP_PASSWORD:?Define SFTP_PASSWORD en tu entorno o carga ~/.sistema_gestion_env.sh}
+    volumes:
+      # Directorio raiz de almacenamiento en host (macOS) -> contenedor
+      # C4E_HOST_STORAGE_ROOT debe venir del entorno del usuario (ej. ~/.sistema_gestion_env.sh)
+      - ${C4E_HOST_STORAGE_ROOT:?Define C4E_HOST_STORAGE_ROOT en tu entorno o carga ~/.sistema_gestion_env.sh}:/usr/local/tomcat/resources
+    networks:
+      - com4energy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://127.0.0.1:8080/sistemagestion/health/storage | grep -q '\"status\":\"UP\"'"
+        ]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+      start_period: 40s
+
+networks:
+  com4energy:
+    external: true
+    name: com4energy_default
+

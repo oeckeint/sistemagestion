@@ -46,7 +46,7 @@ public class Configuraciones {
     public String respaldarDB(Model model) throws IOException {
         String rutaMySqlDump = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe";
         String rutaMySql = "C:\\Archivos de programa\\MySQL\\MySQL Server 5.0\\bin\\mysql.exe";
-        String rutaRespaldoDefault = System.getProperty("user.dir") + env.getProperty("sql.backup") + this.momentoActual() + ".sql";
+        String rutaRespaldoDefault = env.getProperty("sql.backup") + this.momentoActual() + ".sql";
 
         //Revisión de que exista el directorio de Backups de lo contrario lo creará
         Process p = Runtime.getRuntime().exec("C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump -u root -padmin sge");
@@ -80,12 +80,12 @@ public class Configuraciones {
 
     @PostMapping("/procesar")
     public String restaurarDB(@RequestParam("archivosql") MultipartFile file, Model model) throws IOException {
-        File f = new File(System.getProperty("user.dir") + env.getProperty("sql.restauraciones") + file.getOriginalFilename());
+        File f = new File(env.getProperty("sql.restauraciones") + file.getOriginalFilename());
         file.transferTo(f);
         Process p = Runtime.getRuntime().exec("C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysql -u root -padmin sge");
         //Process p = Runtime.getRuntime().exec("mysql -u root -padmin sge");
         OutputStream os = p.getOutputStream();
-        FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + env.getProperty("sql.restauraciones") + file.getOriginalFilename());
+        FileInputStream fis = new FileInputStream(env.getProperty("sql.restauraciones") + file.getOriginalFilename());
 
         byte[] buffer = new byte[1000];
         int leido = fis.read(buffer);
@@ -108,7 +108,7 @@ public class Configuraciones {
 
     public void creacionDirectorios() {
         try {
-            String fileName = System.getProperty("user.dir") + env.getProperty("sql.restauraciones");
+            String fileName = env.getProperty("sql.restauraciones");
             Path pathDB = Paths.get(fileName);
             if (!Files.exists(pathDB)) {
                 Files.createDirectories(pathDB);

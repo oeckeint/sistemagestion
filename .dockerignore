@@ -1,0 +1,19 @@
+# Carpetas de build
+target/*
+!target/SistemaGestion.war
+
+# Archivos de IDE
+*.iml
+.idea/
+*.class
+
+# Logs
+*.log
+
+# Variables de entorno reales (nunca al repo)
+.env
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
