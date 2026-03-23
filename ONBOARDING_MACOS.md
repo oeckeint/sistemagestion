@@ -1,60 +1,81 @@
 # Onboarding macOS - SistemaGestion
 
-Script para preparar el entorno local de desarrollo en macOS.
-
-## Que hace
-
-1. Verifica/instala Homebrew.
-2. Verifica/instala SDKMAN.
-3. Instala y activa versiones del proyecto desde `.sdkmanrc`:
-   - Java
-   - Maven
-   - Tomcat
-4. Verifica/instala Docker Desktop (opcional).
-5. Configura usuario de Tomcat Manager:
-   - Usuario: `Tomcat`
-   - Password: `Welcome1`
-6. Configura todas las variables de entorno de `sistema_gestion` en `~/.sistema_gestion_env.sh`:
-   - DB (`DB_HOST`, `SGE_LOCAL_DB_ROOT_PWD`, `SGE_LOCAL_DB_NAME`, `DB_URL_SGE`, `DB_USER_SGE`, `DB_PASSWORD_SGE`)
-   - Storage (`C4E_HOST_STORAGE_ROOT`, `C4E_SCRIPTS_ROOT`)
-   - SFTP (`SFTP_HOST`, `SFTP_PORT`, `SFTP_USER`, `SFTP_PASSWORD`)
-7. Crea `~/.my.cnf` con credenciales cliente MySQL.
-8. Ejecuta `git pull --ff-only` en la **rama actual** (si el repo esta limpio, sin cambios locales).
-
-> Las rutas de usuario se construyen de forma dinamica con `whoami`.
-
-## Uso rapido
+**Un solo comando instala y configura TODO.**
 
 ```bash
-cd "$HOME/Development/Com4Energy/sistemagestion"
+cd /Users/jesus/Development/Com4Energy
 chmod +x ./scripts/onboarding.sh
 ./scripts/onboarding.sh
 ```
 
-## Opciones
+Eso es todo.
+
+## Qué hace
+
+1. ✓ Instala Homebrew (si no está).
+2. ✓ Instala mysql-client y lo agrega al PATH.
+3. ✓ Instala SDKMAN (si no está).
+4. ✓ Instala SDKs desde los `.sdkmanrc` de cada proyecto (por ejemplo Java 8 para `sistemagestion` y Java 17 para servicios C4E).
+5. ✓ Instala apps adicionales (meld).
+6. ✓ Genera `~/.sistema_gestion_env.sh` con TODAS las variables que necesitas:
+   ```bash
+   export DB_HOST="127.0.0.1"
+   export DB_URL_SGE="jdbc:mysql://127.0.0.1:3306/sge"
+   export DB_HOST_DOCKER="database"
+   export DB_URL_SGE_DOCKER="jdbc:mysql://database:3306/sge"
+   # ... todas las demás
+   ```
+7. ✓ Agrega `source "$HOME/.sistema_gestion_env.sh"` a `~/.zshrc`.
+8. ✓ Actualiza el repo (`git pull --ff-only`, se omite si hay cambios locales).
+9. ✓ Levanta el stack Docker de Com4Energy usando `/Users/jesus/Development/Com4Energy/start-sistemagestion-docker.sh` (`docker compose down && build && up`)
+
+## Escapes (opcional, para casos especiales)
+
+| Flag | Usar si... |
+|------|-----------|
+| `--skip-git` | No quieres que haga `git pull` |
+| `--skip-docker` | Solo quieres configurar, sin levantar Docker |
+
+Ejemplos:
 
 ```bash
-./scripts/onboarding.sh --dry-run
-./scripts/onboarding.sh --non-interactive
-./scripts/onboarding.sh --skip-docker
-./scripts/onboarding.sh --skip-git-pull
-./scripts/onboarding.sh --skip-tomcat-user
-./scripts/onboarding.sh --skip-env
-./scripts/onboarding.sh --help
+# Solo configuración, sin tocar git ni Docker
+./scripts/onboarding.sh --skip-git --skip-docker
 ```
+
+## Variables generadas
+
+El archivo `~/.sistema_gestion_env.sh` incluye:
+
+**Locales** (tu Mac):
+- `DB_HOST=127.0.0.1`
+- `DB_URL_SGE=jdbc:mysql://127.0.0.1:3306/sge`
+- `RABBITMQ_HOST=127.0.0.1`
+
+**Docker** (para docker-compose):
+- `DB_HOST_DOCKER=database`
+- `DB_URL_SGE_DOCKER=jdbc:mysql://database:3306/sge`
+- `RABBITMQ_HOST_DOCKER=rabbitmq`
+
+**Compartidas** (igual para ambos):
+- `DB_USER_SGE=admin`, `DB_PASSWORD_SGE=qexkaq-7bodXo`
+- `SFTP_HOST=127.0.0.1`, `SFTP_PORT=21`, `SFTP_USER=user1`
+- `C4E_HOST_STORAGE_ROOT=$HOME/Downloads/com4energy`
+- `SPRING_PROFILES_ACTIVE=dev`
 
 ## Notas
 
-- Si hay cambios locales sin commit, el `git pull` se cancela para evitar conflictos. No cambia de rama: hace pull en la rama en que estés.
-- El script crea backup de `tomcat-users.xml` en `tomcat-users.xml.bak`.
-- Para aplicar cambios de `tomcat-users.xml`, reinicia Tomcat.
-- Con `--dry-run`, solo muestra lo que haria sin instalar ni modificar archivos.
-- El script agrega `source "$HOME/.sistema_gestion_env.sh"` a `~/.zshrc` si no existe.
-- `docker-compose.yml` toma toda la configuracion sensible directo del entorno del usuario. Si tu terminal/IDE no hereda `~/.zshrc`, ejecuta `source "$HOME/.sistema_gestion_env.sh"` antes de levantar Docker Compose.
-- El onboarding exporta `COMPOSE_DISABLE_ENV_FILE=1` para evitar que Docker Compose use valores del `.env` del proyecto por accidente.
-- El archivo `.env` del repo queda solo como recordatorio/documentacion local; no es la fuente de verdad del runtime.
-
-
-
-
-
+- El onboarding invoca el script maestro en la raiz de Com4Energy: `/Users/jesus/Development/Com4Energy/start-sistemagestion-docker.sh`.
+- El onboarding ahora vive en la raiz de Com4Energy (`/Users/jesus/Development/Com4Energy/scripts/onboarding.sh`) y opera sobre el proyecto `sistemagestion`.
+- Si `sistemagestion` no esta en la ruta por defecto, puedes usar `C4E_PROJECT_ROOT` para apuntar al proyecto antes de ejecutar onboarding.
+- Docker ejecuta `down && build && up` en **foreground** (puedes ver los logs en tiempo real).
+  - `down` detiene y elimina contenedores **sin borrar volúmenes ni datos** (preserva todo).
+  - `build` construye/actualiza las imágenes.
+  - `up` levanta nuevos contenedores con los volúmenes intactos.
+- Si necesitas borrar todo (reset destructivo), ejecuta manualmente:
+  ```bash
+  docker compose down -v
+  ```
+- Si tu IDE no hereda `~/.zshrc`, ejecuta `source "$HOME/.sistema_gestion_env.sh"` manualmente antes de usarlo.
+- El archivo `~/.sistema_gestion_env.sh` se regenera cada vez que ejecutas onboarding, pero solo se actualiza si hay cambios (idempotente).
+- El `.env` del repo es solo documentación; la fuente de verdad es `~/.sistema_gestion_env.sh`.
