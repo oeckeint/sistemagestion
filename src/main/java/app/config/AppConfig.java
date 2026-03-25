@@ -35,7 +35,11 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = {"datos"})
 @ComponentScan(basePackages = {"app", "controladores", "controladores.helper", "datos.dao.medidas", "controladores.otrosControladores", "datos", "datos.dao", "datos.service", "documentos.procesamiento"})
-@PropertySources({@PropertySource("classpath:persistence-mysql.properties"), @PropertySource("classpath:/cfg/application.properties")})
+@PropertySources({
+        @PropertySource("classpath:persistence-mysql.properties"),
+        @PropertySource("classpath:/cfg/application.properties"),
+        @PropertySource("classpath:/cfg/path.properties")
+})
 public class AppConfig implements WebMvcConfigurer{
 
     @Autowired

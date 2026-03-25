@@ -3,10 +3,10 @@
 <%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:choose>
-    <c:when test="${documento.class.simpleName eq 'Factura'}">
+    <c:when test="${controller eq 'facturas'}">
         <c:set var="isFactura" value="true"/>
     </c:when>
-    <c:when test="${documento.class.simpleName eq 'Peaje'}">
+    <c:when test="${controller eq 'peajes'}">
         <c:set var="isPeaje" value="true"/>
     </c:when>
 </c:choose>
@@ -82,7 +82,7 @@
                     </ul>
                 </div>
 
-                <!--Primer Renglón-->
+                <!--Primer Renglï¿½n-->
                 <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
@@ -231,7 +231,7 @@
                                     <dt class="list-group-item px-1">MarcaMedida</dt>
                                     <dt class="list-group-item px-1">VAsTrafo</dt>
                                     <dt class="list-group-item px-1">Perdidas</dt>
-                                    <dt class="list-group-item px-1">Días</dt>
+                                    <dt class="list-group-item px-1">Dï¿½as</dt>
                                 </ul>
                             </div>
                             <div class="col-7">
@@ -247,7 +247,7 @@
                         </div>
                     </div>
                 </div>
-                <!--Segundo Renglón-->
+                <!--Segundo Renglï¿½n-->
                 <hr>
                 <h2 class="display-4">Potencia</h2>
                 <hr>
@@ -330,7 +330,7 @@
                         </div>
                     </div>
                 </div>                
-                <!--Tercer Renglón-->
+                <!--Tercer Renglï¿½n-->
                 <div class="row justify-content-between">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
                         <h3 class="list-group-item list-group-item-action active text-center h4">Potencia a Facturar</h3>
@@ -344,9 +344,9 @@
                             </div>
                             <div class="col-7">
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item px-1">${documentopotFac1}</li>
-                                    <li class="list-group-item px-1">${documentopotFac2}</li>
-                                    <li class="list-group-item px-1">${documentopotFac3}</li>
+                                    <li class="list-group-item px-1">${documento.potFac1}</li>
+                                    <li class="list-group-item px-1">${documento.potFac2}</li>
+                                    <li class="list-group-item px-1">${documento.potFac3}</li>
                                 </ul>
                             </div>
                         </div>
@@ -412,9 +412,9 @@
                         </div>
 					</div>
                 </div>
-                <!--Cuarto Renglón-->
+                <!--Cuarto Renglï¿½n-->
                 <hr>
-                <h2 class="display-4">Energía Activa</h2>
+                <h2 class="display-4">Energï¿½a Activa</h2>
                 <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
@@ -511,7 +511,7 @@
                     </div>
                 </div>
 
-                <!-- Renglón-->
+                <!-- Renglï¿½n-->
                 <c:if test="${controller!='facturas'}">
                     <hr>
                     <h2 class="display-4">Cargos</h2>
@@ -574,13 +574,13 @@
                     </div>
                 </c:if>
 
-                <!-- Renglón-->
+                <!-- Renglï¿½n-->
                 <hr>
                 <h2 class="display-4">Otros Datos</h2>
                 <hr>
                 <div class="row justify-content-around">
                     <div class="list-group col-12 col-md-5 col-lg-4 p-2">
-                        <h3 class="list-group-item list-group-item-action active text-center h4">Impuesto Eléctrico</h3>
+                        <h3 class="list-group-item list-group-item-action active text-center h4">Impuesto Elï¿½ctrico</h3>
                         <div class="row">
                             <div class="col-5">
                                 <ul class="list-group list-group-flush text-right">
@@ -627,7 +627,7 @@
                 </div>
 
 
-                <!-- Renglón-->
+                <!-- Renglï¿½n-->
                 <hr>
                 <h2 class="display-4">AE</h2>
                 <hr>
@@ -711,7 +711,7 @@
                     </div>
                 </div>
 
-                <!-- Renglón-->
+                <!-- Renglï¿½n-->
                 <hr>
                 <h2 class="display-4">Reactiva</h2>
                 <hr>
@@ -814,7 +814,7 @@
                 </div>
 
 
-                <!-- Renglón-->
+                <!-- Renglï¿½n-->
                 <hr>
                 <h2 class="display-4">PM</h2>
                 <hr>
@@ -874,7 +874,7 @@
                 </div>
 
 
-                <!-- Renglón-->
+                <!-- Renglï¿½n-->
                 <hr>
                 <h2 class="display-4">Fin de Registro</h2>
                 <hr>

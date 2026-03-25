@@ -189,7 +189,7 @@ public class FTP {
             this.channelSftp.cd("/");
             is = this.channelSftp.get(pathArchivo + "/" + nombreArchivo);
             byte[] bytes = IOUtils.toByteArray(is);
-            File f = new File(System.getProperty("user.dir") + env.getProperty("peajes.ftp") + nombreArchivo);
+            File f = new File(env.getProperty("peajes.ftp") + nombreArchivo);
             fw = new FileWriter(f);
             fw.write(new String(bytes));
 
