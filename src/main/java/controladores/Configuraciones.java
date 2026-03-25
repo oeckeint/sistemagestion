@@ -80,27 +80,35 @@ public class Configuraciones {
 
     @PostMapping("/procesar")
     public String restaurarDB(@RequestParam("archivosql") MultipartFile file, Model model) throws IOException {
-        File f = new File(env.getProperty("sql.restauraciones") + file.getOriginalFilename());
+        String baseDirProperty = env.getProperty("sql.restauraciones");
+        assert baseDirProperty != null;
+        Path baseDir = Paths.get(baseDirProperty).normalize().toAbsolutePath();
+        String originalFilename = file.getOriginalFilename();
+        assert originalFilename != null;
+        Path targetPath = baseDir.resolve(originalFilename).normalize().toAbsolutePath();
+        if (!targetPath.startsWith(baseDir)) {
+            throw new IllegalArgumentException("Nombre de archivo inválido");
+        }
+        File f = targetPath.toFile();
         file.transferTo(f);
         Process p = Runtime.getRuntime().exec("C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysql -u root -padmin sge");
-        //Process p = Runtime.getRuntime().exec("mysql -u root -padmin sge");
-        OutputStream os = p.getOutputStream();
-        FileInputStream fis = new FileInputStream(env.getProperty("sql.restauraciones") + file.getOriginalFilename());
+        try (OutputStream os = p.getOutputStream();
+             FileInputStream fis = new FileInputStream(targetPath.toFile())) {
 
-        byte[] buffer = new byte[1000];
-        int leido = fis.read(buffer);
-        while (leido > 0) {
-            os.write(buffer, 0, leido);
-            leido = fis.read(buffer);
+            byte[] buffer = new byte[1000];
+            int leido = fis.read(buffer);
+            while (leido > 0) {
+                os.write(buffer, 0, leido);
+                leido = fis.read(buffer);
+            }
+
+            os.flush();
         }
 
-        os.flush();
-        os.close();
-        fis.close();
-
-        Etiquetas.CONFIGURACIONES__MENSAJE = "Se ha restaurado la información de la base de datos desde el archivo " + file.getOriginalFilename();
+        Etiquetas.CONFIGURACIONES__MENSAJE = "Se ha restaurado la información de la base de datos desde el archivo " + targetPath.getFileName();
         return "redirect:/configuraciones";
     }
+
 
     public String momentoActual() {
         return new SimpleDateFormat("ddMMyyyy_HH-mm-ss").format(new Date());
