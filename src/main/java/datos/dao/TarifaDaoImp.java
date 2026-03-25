@@ -14,9 +14,18 @@ public class TarifaDaoImp implements datos.interfaces.CrudDao<Tarifa>{
     
     @Override
     public List<Tarifa> listar() {
-        return this.sessionFactory.getCurrentSession()
+        List<Tarifa> tarifasActivas = this.sessionFactory.getCurrentSession()
                 .createQuery("from Tarifa t where t.status = 1 order by t.nombreTarifa asc", Tarifa.class)
                 .getResultList();
+
+        // Fallback defensivo: evita romper formularios si no hay tarifas activas por configuración/datos.
+        if (tarifasActivas == null || tarifasActivas.isEmpty()) {
+            return this.sessionFactory.getCurrentSession()
+                    .createQuery("from Tarifa t order by t.nombreTarifa asc", Tarifa.class)
+                    .getResultList();
+        }
+
+        return tarifasActivas;
     }
     
     @Override

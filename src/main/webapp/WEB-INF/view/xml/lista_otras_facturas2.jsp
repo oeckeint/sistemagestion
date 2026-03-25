@@ -1,5 +1,10 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="existendatos" value="true"/>
+<c:set var="language" value="${not empty param.language ? param.language : not empty language ? language : 'es'}" scope="session"/>
+<fmt:setLocale value="${language}"/>
+<fmt:setBundle basename="labels"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -10,7 +15,13 @@
         <jsp:include page="/WEB-INF/paginas/comunes/cabecero.jsp"></jsp:include>
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 <div class="container">
-                ${mensaje}
+                <c:choose>
+                    <c:when test="${error eq 'sindatos'}">
+                        <fmt:message key="otherbills.error.sindatos"/>
+                        <c:set var="existendatos" value="false"/>
+                    </c:when>
+                    <c:otherwise>${mensaje}</c:otherwise>
+                </c:choose>
             </div>
         </div>
 
@@ -22,16 +33,18 @@
                     <h2 class="m-0"><a href="${pageContext.request.contextPath}/">
                             <i class="fas fa-arrow-circle-left text-success"></i></a> 
                             ${tablaTitulo} 
-                        <span class="badge bg-success">
-                            <c:choose>
-                                <c:when test="${paginaActual != ultimaPagina}">
-                                    ${registrosMostrados} / ${totalRegistros}
-                                </c:when>
-                                <c:otherwise>
-                                    ${totalRegistros} / ${totalRegistros}
-                                </c:otherwise>
-                            </c:choose>
-                        </span>
+                        <c:if test="${existendatos}">
+                            <span class="badge bg-success">
+                                <c:choose>
+                                    <c:when test="${paginaActual != ultimaPagina}">
+                                        ${registrosMostrados} / ${totalRegistros}
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${totalRegistros} / ${totalRegistros}
+                                    </c:otherwise>
+                                </c:choose>
+                            </span>
+                        </c:if>
                     </h2>
                 </div>
 
@@ -42,6 +55,9 @@
             </div>
             <hr>
             <c:choose>
+                <c:when test="${!existendatos}">
+                    <h4><fmt:message key="otherbills.empty"/></h4>
+                </c:when>
                 <c:when test="${contenidoVisible == 'no' }">
 
                 </c:when>
@@ -97,16 +113,16 @@
 
         <script>            
             $("#details").click(function () {
-                $(this).prop("disabled", true); //deshabilitamos el botón
+                $(this).prop("disabled", true); //deshabilitamos el botï¿½n
                 $(this).html(
-                        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  ${etiquetaBoton}` //añadimos el spinner
+                        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  ${etiquetaBoton}` //aï¿½adimos el spinner
                         );
             });
 
             $("#details").click(function () {
-                $(this).prop("disabled", true); //deshabilitamos el botón
+                $(this).prop("disabled", true); //deshabilitamos el botï¿½n
                 $(this).html(
-                        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  ${etiquetaBoton}` //añadimos el spinner
+                        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  ${etiquetaBoton}` //aï¿½adimos el spinner
                         );
                 document.getElementById("myForm").submit();
             });
