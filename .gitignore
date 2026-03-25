@@ -20,3 +20,6 @@ notas.txt
 .env
 
 /scripts/
+
+# Documentacion local no versionada
+JIRA_TICKET_GUIDE.md
