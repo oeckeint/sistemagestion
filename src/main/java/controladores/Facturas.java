@@ -50,16 +50,30 @@ public class Facturas {
 				: Etiquetas.FACTURAS_MENSAJE;
 		model.addAttribute("mensaje", Etiquetas.FACTURAS_MENSAJE);
 
-		List<Factura> peajes = this.documentoXmlService.listar(rows, paginaActual - 1);
 		int ultimaPagina = this.documentoXmlService.contarPaginacion(rows);
+		if (ultimaPagina == 0) {
+			model.addAttribute("error", "sindatos");
+			model.addAttribute("botonVisible", "no");
+			model.addAttribute("documentos", new ArrayList<>());
+			model.addAttribute("registrosMostrados", 0);
+			model.addAttribute("totalRegistros", 0);
+			model.addAttribute("paginaActual", 1);
+			model.addAttribute("ultimaPagina", 0);
+			model.addAttribute("controller", Etiquetas.FACTURAS_CONTROLLER);
+			model.addAttribute("rows", rows);
+			this.reiniciarVariables();
+			return "xml/lista2";
+		}
+
+		List<Factura> peajes = this.documentoXmlService.listar(rows, paginaActual - 1);
 		int registrosMostrados = rows * paginaActual;
-		if (peajes.isEmpty()) {
+		if (peajes == null || peajes.isEmpty()) {
 			System.out.println("No hay mas elementos por mostrar");
 			peajes = this.documentoXmlService.listar(rows, ultimaPagina - 1);
 			registrosMostrados = this.documentoXmlService.contarRegistros();
 		}
 		model.addAttribute("documentos", peajes);
-		model.addAttribute("registrosMostrados", rows * paginaActual);
+		model.addAttribute("registrosMostrados", registrosMostrados);
 		model.addAttribute("totalRegistros", this.documentoXmlService.contarRegistros());
 		model.addAttribute("paginaActual", paginaActual);
 		model.addAttribute("ultimaPagina", ultimaPagina);

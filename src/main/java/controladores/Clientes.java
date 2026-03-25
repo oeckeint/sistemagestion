@@ -10,6 +10,7 @@ import datos.interfaces.CrudDao;
 import excepciones.MasDeUnClienteEncontrado;
 
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -109,6 +110,20 @@ public class Clientes {
 		model.addAttribute("showDelete", ClientesHelper.SHOW_DELETE);
 
 		List<Tarifa> tarifas = this.tarifasService.listar();
+		if (tarifas == null) {
+			tarifas = new ArrayList<>();
+		}
+
+		// Mantiene visible la tarifa previamente asignada al editar, aunque no esté activa.
+		if (ClientesHelper.cliente != null && ClientesHelper.cliente.getTarifa() != null) {
+			String tarifaCliente = ClientesHelper.cliente.getTarifa();
+			boolean tarifaPresente = tarifas.stream()
+					.anyMatch(t -> tarifaCliente.equals(t.getNombreTarifa()));
+
+			if (!tarifaPresente) {
+				tarifas.add(0, new Tarifa(tarifaCliente));
+			}
+		}
 		model.addAttribute("tarifas", tarifas);
 
 		ClientesHelper.reiniciarVariables();

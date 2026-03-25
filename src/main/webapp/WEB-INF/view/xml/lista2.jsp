@@ -1,6 +1,8 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="existendatos" value="true"/>
 <c:set var="language" value="${not empty param.language ? param.language : not empty language ? language : 'es'}" scope="session"/>
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="labels"/>
@@ -17,6 +19,13 @@
                 <c:choose>
                     <c:when test="${param.error != null}"><fmt:message key="login.badcredentials"/></c:when>
                     <c:when test="${param.logout != null}"><fmt:message key="login.logout.message"/></c:when>
+                    <c:when test="${error eq 'sindatos'}">
+                        <c:choose>
+                            <c:when test="${controller eq 'facturas'}"><fmt:message key="bills.error.sindatos"/></c:when>
+                            <c:otherwise><fmt:message key="tolls.error.sindatos"/></c:otherwise>
+                        </c:choose>
+                        <c:set var="existendatos" value="false"/>
+                    </c:when>
                     <c:otherwise>${mensaje}</c:otherwise>
                 </c:choose>
             </div>
@@ -30,16 +39,18 @@
                     <h2 class="m-0"><a href="${pageContext.request.contextPath}/">
                             <i class="fas fa-arrow-circle-left text-success"></i></a> 
                             ${tablaTitulo} 
-                        <span class="badge bg-success">
-                            <c:choose>
-                                <c:when test="${paginaActual < ultimaPagina}">
-                                    ${registrosMostrados} / ${totalRegistros}
-                                </c:when>
-                                <c:otherwise>
-                                    ${totalRegistros} / ${totalRegistros}
-                                </c:otherwise>
-                            </c:choose>
-                        </span>
+                        <c:if test="${existendatos}">
+                            <span class="badge bg-success">
+                                <c:choose>
+                                    <c:when test="${paginaActual < ultimaPagina}">
+                                        ${registrosMostrados} / ${totalRegistros}
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${totalRegistros} / ${totalRegistros}
+                                    </c:otherwise>
+                                </c:choose>
+                            </span>
+                        </c:if>
                     </h2>
                 </div>
                 <div class="col-6 row justify-content-end">
@@ -48,6 +59,14 @@
             </div>
             <hr>
             <c:choose>
+                <c:when test="${!existendatos}">
+                    <h4>
+                        <c:choose>
+                            <c:when test="${controller eq 'facturas'}"><fmt:message key="bills.empty"/></c:when>
+                            <c:otherwise><fmt:message key="tolls.empty"/></c:otherwise>
+                        </c:choose>
+                    </h4>
+                </c:when>
                 <c:when test="${contenidoVisible == 'no' }">
 
                 </c:when>

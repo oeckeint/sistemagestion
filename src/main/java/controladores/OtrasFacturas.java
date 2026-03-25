@@ -49,10 +49,24 @@ public class OtrasFacturas {
         Etiquetas.OTRAS_FACTURAS_MENSAJE = (Etiquetas.OTRAS_FACTURAS_MENSAJE == null) ? Etiquetas.OTRAS_FACTURAS_INSTRUCCION_LISTAR : Etiquetas.OTRAS_FACTURAS_MENSAJE;
         model.addAttribute("mensaje", Etiquetas.OTRAS_FACTURAS_MENSAJE);
 
-        List<OtrasFacturas> facturas = this.documentoXmlService.listar(rows, paginaActual - 1);
         int ultimaPagina = this.documentoXmlService.contarPaginacion(rows);
+        if (ultimaPagina == 0) {
+            model.addAttribute("error", "sindatos");
+            model.addAttribute("botonVisible", "no");
+            model.addAttribute("documentos", new ArrayList<>());
+            model.addAttribute("registrosMostrados", 0);
+            model.addAttribute("totalRegistros", 0);
+            model.addAttribute("paginaActual", 1);
+            model.addAttribute("ultimaPagina", 0);
+            model.addAttribute("controller", Etiquetas.OTRAS_FACTURAS_CONTROLLER);
+            model.addAttribute("rows", rows);
+            this.reiniciarVariables();
+            return "xml/lista_otras_facturas2";
+        }
+
+        List<OtraFactura> facturas = this.documentoXmlService.listar(rows, paginaActual - 1);
         int registrosMostrados =  rows * paginaActual;
-        if (facturas.isEmpty()) {
+        if (facturas == null || facturas.isEmpty()) {
             System.out.println("No hay mas elementos por mostrar");
             facturas = this.documentoXmlService.listar(rows, ultimaPagina - 1);
             registrosMostrados = this.documentoXmlService.contarRegistros();
