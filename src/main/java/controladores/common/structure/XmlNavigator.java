@@ -20,6 +20,13 @@ public class XmlNavigator {
             if (target.equals(node.getNodeName())) {
                 return true;
             }
+
+            NodeList children = node.getChildNodes();
+            for (int j = 0; j < children.getLength(); j++) {
+                if (target.equals(children.item(j).getNodeName())) {
+                    return true;
+                }
+            }
         }
 
         return false;

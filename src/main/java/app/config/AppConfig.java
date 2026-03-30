@@ -34,7 +34,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @EnableWebMvc
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = {"datos"})
-@ComponentScan(basePackages = {"app", "common.publisher.incident", "controladores", "controladores.helper", "datos.dao.medidas", "controladores.otrosControladores", "datos", "datos.dao", "datos.service", "documentos.procesamiento"})
+@ComponentScan(basePackages = {"app", "common.publisher.incident", "controladores", "controladores.helper", "datos.dao.medidas", "controladores.otrosControladores", "datos", "datos.dao", "datos.service", "service.warning"})
 @PropertySources({
         @PropertySource(value = "classpath:config/persistence-mysql.yml", factory = YamlPropertySourceFactory.class),
         @PropertySource(value = "classpath:config/application.yml", factory = YamlPropertySourceFactory.class),

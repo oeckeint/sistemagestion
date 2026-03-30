@@ -8,14 +8,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 @Getter
-public class XmlParsingContext {
+public class XmlContext {
 
     private final Document document;
 
     // Lazy-loaded extractors (opcional)
     private FacturaAtrExtractor facturaAtrExtractor;
 
-    public XmlParsingContext(Document document) {
+    public XmlContext(Document document) {
         this.document = document;
     }
 

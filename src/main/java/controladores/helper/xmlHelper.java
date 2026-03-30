@@ -1,13 +1,8 @@
 package controladores.helper;
 
 import common.i18n.Messages;
-import common.documentstructure.AutoconsumoNodes;
-import common.documentstructure.FacturaAtrNodes;
-import common.publisher.incident.publisher.model.*;
 import controladores.common.ControladoresMessageKey;
 import controladores.common.ControladoresMessagesLogger;
-import controladores.common.WarningType;
-import controladores.common.XmlParsingContext;
 import datos.entity.Cliente;
 import datos.entity.EnergiaExcedentaria;
 import datos.entity.Factura;
@@ -22,11 +17,9 @@ import dominio.componentesxml.reclamaciones.*;
 import excepciones.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
+import java.util.*;
 
-import excepciones.nodos.NoCoincidenLosNodosEsperadosException;
-import excepciones.nodos.energiaexcedentaria.autoconsumo.ExisteMasDeUnAutoconsumoException;
-import lombok.NonNull;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,8 +28,6 @@ import utileria.documentos.NodosUtil;
 import utileria.texto.Cadenas;
 import datos.interfaces.DocumentoXmlService;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -65,10 +56,9 @@ public class xmlHelper {
     protected String nombreArchivo;
     private String codigoRemesa;
     protected boolean existeEnergiaExcedentaria;
-    private XmlParsingContext context;
 
     public xmlHelper(){}
-
+    
     public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService) throws MasDeUnClienteEncontrado {
         this.loadDocument(doc);
         this.contenidoXmlService = contenidoXmlService;
@@ -1187,159 +1177,6 @@ public class xmlHelper {
         }
         this.imprimirResultado("energiaExcedentaria", elementos);
         return new EnergiaExcedentaria(elementos);
-    }
-
-
-    /**
-     * Carga la información de autoconsumo asociada a una instancia de {@link EnergiaExcedentaria}
-     * a partir del contenido de un archivo XML previamente cargado.
-     * <p>
-     * El método identifica el tipo de autoconsumo y, dependiendo del mismo,
-     * localiza y extrae del XML los datos de energía neta generada, energía autoconsumida,
-     * fechas de vigencia y pagos asociados. Estos valores se asignan a la instancia proporcionada.
-     * </p>
-     *
-     * <p>Tipos de autoconsumo soportados:</p>
-     * <ul>
-     *   <li>Tipo 12: Autoconsumo es el nodo contenedor inicial, no entra a los internos</li>
-     *   <li>Tipo 42 y 43: Se accede a nodos internos específicos del XML.</li>
-     *   <li>Tipo 41 y 51: No se espera información de autoconsumo, se retorna inmediatamente.</li>
-     * </ul>
-     *
-     * <p>
-     * Si el nodo esperado de autoconsumo no se encuentra en el XML,
-     * se lanza una excepción {@link ExisteMasDeUnAutoconsumoException}.
-     * Si ocurre un error durante la verificación estructural del XML, se loguea como advertencia.
-     * </p>
-     *
-     * @param energiaExcedentaria instancia de {@link EnergiaExcedentaria} donde se almacenarán los datos extraídos del XML
-     * @throws ExisteMasDeUnAutoconsumoException si el nodo de autoconsumo no se encuentra en el documento XML
-     */
-    protected void cargarAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws ExisteMasDeUnAutoconsumoException {
-        TipoAutoconsumo tipoAutoconsumo = this.determinarTipoAutoconsumo(energiaExcedentaria);
-        try {
-            NodeList contenedorDatosAutoconsumo = NodosUtil.getSingleNodeListByNameFromDocument(this.nombreArchivo, this.doc, "Autoconsumo");
-            switch (tipoAutoconsumo) {
-                case _42:
-                case _43:
-                    contenedorDatosAutoconsumo = NodosUtil.getSingleNodeListByName(contenedorDatosAutoconsumo, "InstalacionGenAutoconsumo");
-                    break;
-                case _41:
-                case _51:
-                    return; // No se espera autoconsumo para estos tipos
-                case _12:
-                    if (this.parsingContext().containerHasNode(contenedorDatosAutoconsumo, AutoconsumoNodes.ENERGIA_NETA_GENERADA)
-                            || this.parsingContext().containerHasNode(contenedorDatosAutoconsumo, AutoconsumoNodes.ENERGIA_AUTOCONSUMIDA)) {
-                        // Estructura alternativa detectada para tipo 12: no hay detalle de autoconsumo para poblar.
-
-                        String warningMessage = Messages.format(ControladoresMessageKey.XML_HELPER_AUTOCONSUMO_TYPE_12_WITHOUT_DETAIL, this.nombreArchivo, tipoAutoconsumo);
-                        TechnicalContext technicalContext = TechnicalContextResolver.resolveTyped();
-
-                        CONTROLADORES_MESSAGES_LOGGER.warn(log, warningMessage);
-
-                        String tipoSubseccion = this.parsingContext().facturaAtr().obtenerValor(FacturaAtrNodes.TIPO_SUBSECCION);
-
-                        Map<DataKeys, Object> data = new HashMap<>();
-                        data.put(DataKeys.TIPO_SUBSECCION, tipoSubseccion);
-                        data.put(DataKeys.TIPO_AUTOCONSUMO, tipoAutoconsumo.name());
-
-                        DocumentWarning warning = DocumentWarning.builder()
-                                .warning(WarningType.AUTOCONSUMO_TIPO_12_SIN_DETALLE)
-                                .messageOverride(warningMessage)
-                                .fileName(this.nombreArchivo)
-                                .fileType(FileType.PEAJES)
-                                .flow(Flow.AUTOCONSUMO_VALIDATION)
-                                .data(data)
-                                .technicalContext(technicalContext)
-                                .build();
-
-                        utileria.ArchivoTexto.publishWarning(warning);
-                        this.agregarError(warning.resolvedCode());
-                        return;
-                    }
-                    break;
-                case DESCONOCIDO:
-                    log.warn("Tipo de autoconsumo DESCONOCIDO; no se puede extraer datos de autoconsumo. archivo='{}'", this.nombreArchivo);
-                    this.agregarError("33");
-                    return;
-            }
-
-            if (contenedorDatosAutoconsumo.getLength() == 0) {
-                throw new ExisteMasDeUnAutoconsumoException("No se encontró el nodo de autoconsumo esperado.");
-            }
-
-            NodeList terminoEnergiaNetaGenNode = NodosUtil.getSingleNodeListByChainedNames(contenedorDatosAutoconsumo, "EnergiaNetaGen", "TerminoEnergiaNetaGen");
-            NodeList periodoTerminoEnergiaNetaGenNode = NodosUtil.getAllNodesByNameWithSpecificExpectedNodes(terminoEnergiaNetaGenNode, "Periodo", 6);
-            energiaExcedentaria.setAllNetaGenerada(NodosUtil.getAllContentNodesAsDoubleList(periodoTerminoEnergiaNetaGenNode, "ValorEnergiaNetaGen"));
-
-            NodeList terminoEnergiaAutoconsumidaNode = NodosUtil.getSingleNodeListByChainedNames(contenedorDatosAutoconsumo, "EnergiaAutoconsumida", "TerminoEnergiaAutoconsumida");
-            energiaExcedentaria.setFechaDesde(NodosUtil.getSingleContentNodeAsLocalDateTimeWithDefaultTime(terminoEnergiaAutoconsumidaNode, "FechaDesde"));
-            energiaExcedentaria.setFechaHasta(NodosUtil.getSingleContentNodeAsLocalDateTimeWithDefaultTime(terminoEnergiaAutoconsumidaNode, "FechaHasta"));
-
-            NodeList periodosEnergiaAutoconsumidaNodes = NodosUtil.getAllNodesByNameWithSpecificExpectedNodes(terminoEnergiaAutoconsumidaNode, "Periodo", 6);
-            energiaExcedentaria.setAllAutoconsumida(NodosUtil.getAllContentNodesAsDoubleList(periodosEnergiaAutoconsumidaNodes, "ValorEnergiaAutoconsumida"));
-            energiaExcedentaria.setAllPagoTDA(NodosUtil.getAllContentNodesAsDoubleList(periodosEnergiaAutoconsumidaNodes, "PagoTDA"));
-
-
-        } catch (NoCoincidenLosNodosEsperadosException e) {
-            log.error("No fue posible extraer los nodos esperados de autoconsumo. archivo='{}', tipo='{}', detalle='{}'", this.nombreArchivo, tipoAutoconsumo, e.getMessage());
-            this.agregarError("32");
-        }
-    }
-
-    /**
-     * Determina el tipo de autoconsumo presente en el archivo XML y lo asigna
-     * a la instancia de {@link EnergiaExcedentaria} proporcionada.
-     * <p>
-     * El método extrae el valor del nodo <code>TipoAutoconsumo</code> desde la sección
-     * <code>DatosFacturaATR</code> del documento XML y lo convierte en una enumeración
-     * del tipo {@link TipoAutoconsumo}.
-     * </p>
-     *
-     * <p>Los valores actualmente soportados son:</p>
-     * <ul>
-     *   <li>12 → {@code TipoAutoconsumo._12}</li>
-     *   <li>41 → {@code TipoAutoconsumo._41}</li>
-     *   <li>42 → {@code TipoAutoconsumo._42}</li>
-     *   <li>43 → {@code TipoAutoconsumo._43}</li>
-     *   <li>51 → {@code TipoAutoconsumo._51}</li>
-     * </ul>
-     *
-     * <p>
-     * Si el tipo encontrado no coincide con ninguno de los valores esperados,
-     * se lanza una excepción en tiempo de ejecución indicando que el tipo es desconocido.
-     * </p>
-     *
-     * @param energiaExcedentaria instancia de {@link EnergiaExcedentaria} que será actualizada con el tipo detectado
-     * @return una instancia de {@link TipoAutoconsumo} correspondiente al valor detectado en el XML
-     * @throws ExisteMasDeUnAutoconsumoException si el nodo de tipo de autoconsumo no puede ser obtenido correctamente
-     * @throws RuntimeException si el valor numérico extraído no corresponde a ningún tipo conocido de autoconsumo
-     */
-    private TipoAutoconsumo determinarTipoAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws ExisteMasDeUnAutoconsumoException {
-        int tipoAutoconsumo = NodosUtil.getSingleContentNodeAsInt(
-                NodosUtil.getSingleNodeListByNameFromDocument(this.nombreArchivo, this.doc, "DatosFacturaATR"),
-                "TipoAutoconsumo");
-        switch (tipoAutoconsumo) {
-            case 12:
-                energiaExcedentaria.setTipoAutoconsumo(12);
-                return TipoAutoconsumo._12;
-            case 41:
-                energiaExcedentaria.setTipoAutoconsumo(41);
-                return TipoAutoconsumo._41;
-            case 42:
-                energiaExcedentaria.setTipoAutoconsumo(42);
-                return TipoAutoconsumo._42;
-            case 43:
-                energiaExcedentaria.setTipoAutoconsumo(43);
-                return TipoAutoconsumo._43;
-            case 51:
-                energiaExcedentaria.setTipoAutoconsumo(51);
-                return TipoAutoconsumo._51;
-            default:
-                log.warn("Tipo de autoconsumo no reconocido: {}. archivo='{}'. Se tratará como DESCONOCIDO.", tipoAutoconsumo, this.nombreArchivo);
-                energiaExcedentaria.setTipoAutoconsumo(tipoAutoconsumo);
-                return TipoAutoconsumo.DESCONOCIDO;
-        }
     }
 
     /**
@@ -5106,32 +4943,15 @@ public class xmlHelper {
     }
 
     protected final void loadDocument(Document doc) {
-        this.context = null;
         this.doc = doc;
-
-        if (doc != null) {
-            this.context = new XmlParsingContext(doc);
-        }
     }
 
     protected final void clearDocumentContext() {
-        this.context = null;
         this.doc = null;
     }
 
-    private XmlParsingContext parsingContext() {
-        if (this.doc == null) {
-            throw new IllegalStateException("No hay documento XML cargado para inicializar XmlParsingContext");
-        }
 
-        if (this.context == null || this.context.getDocument() != this.doc) {
-            this.context = new XmlParsingContext(this.doc);
-        }
-
-        return this.context;
-    }
-
-    private void agregarError(String codError) {
+    protected void agregarError(String codError) {
         if (this.errores.toString().isEmpty()) {
             this.errores.append(codError);
         } else {
@@ -5224,13 +5044,30 @@ public class xmlHelper {
         C_;
     }
 
-    enum TipoAutoconsumo {
-        _12,
-        _41,
-        _42,
-        _43,
-        _51,
-        DESCONOCIDO;
+    @Getter
+    public enum TipoAutoconsumo {
+
+        TIPO_12("12"),
+        TIPO_41("41"),
+        TIPO_42("42"),
+        TIPO_43("43"),
+        TIPO_51("51"),
+        DESCONOCIDO("-1");
+
+        private final String code;
+
+        private static final Map<String, TipoAutoconsumo> BY_CODE =
+                Arrays.stream(values())
+                        .collect(Collectors.toMap(TipoAutoconsumo::getCode, t -> t));
+
+        TipoAutoconsumo(String code) {
+            this.code = code;
+        }
+
+        public static TipoAutoconsumo fromCode(String code) {
+            return BY_CODE.getOrDefault(code, DESCONOCIDO);
+        }
+
     }
 
 }

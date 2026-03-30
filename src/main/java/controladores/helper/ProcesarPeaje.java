@@ -1,16 +1,31 @@
 package controladores.helper;
 
+import common.documentstructure.AutoconsumoNodes;
+import common.documentstructure.FacturaAtrNodes;
+import common.publisher.incident.publisher.model.DataKeys;
+import common.publisher.incident.publisher.model.FileType;
+import common.publisher.incident.publisher.model.Flow;
+import common.publisher.incident.publisher.model.TechnicalContextResolver;
+import controladores.common.ControladoresMessageKey;
+import controladores.common.ControladoresMessagesLogger;
+import controladores.common.WarningType;
+import controladores.common.XmlContext;
 import datos.entity.EnergiaExcedentaria;
 import datos.entity.Peaje;
 import datos.interfaces.DocumentoXmlService;
 import excepciones.*;
+import excepciones.nodos.NodeCardinalityException;
+import excepciones.nodos.NoCoincidenLosNodosEsperadosException;
 
 import javax.persistence.NonUniqueResultException;
 
-import excepciones.nodos.energiaexcedentaria.autoconsumo.ExisteMasDeUnAutoconsumoException;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import service.warning.WarningService;
+import utileria.documentos.NodosUtil;
 import utileria.xml;
 
 import java.util.logging.Level;
@@ -20,29 +35,29 @@ import java.util.logging.Logger;
  *
  * @author Jesus Sanchez <j.sanchez at dataWorkshop>
  */
+@Slf4j
 @Component
 public class ProcesarPeaje extends xmlHelper {
 
-    private final DocumentoXmlService service;
+    private final DocumentoXmlService<Peaje> service;
     private final Logger logger = Logger.getLogger(getClass().getName());
+    private final WarningService warningService;
+    private static final ControladoresMessagesLogger controladoresMessagesLogger = new ControladoresMessagesLogger();
 
-    public ProcesarPeaje(@Qualifier(value = "peajesServiceImp") DocumentoXmlService service) {
+    public ProcesarPeaje(
+            DocumentoXmlService<Peaje> service,
+            WarningService warningService
+    ) {
         this.service = service;
+        this.warningService = warningService;
     }
 
     /**
      * Lee los datos y registra en la tabla denominada "contenido_xml"
      *
-     * @param nombreArchivo referencia al nombre del archivo actual
-     * @throws FacturaYaExisteException
-     * @throws ClienteNoExisteException
-     * @throws PeajeTipoFacturaNoSoportadaException
-     * @throws CodRectNoExisteException
-     * @throws excepciones.MasDeUnClienteEncontrado
-     * @throws PeajeMasDeUnRegistroException
      */
     public void procesar(Document doc, String nombreArchivo)
-            throws ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException, PeajeYaExisteException, ExisteMasDeUnAutoconsumoException {
+            throws ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException, PeajeYaExisteException, NodeCardinalityException {
         this.loadDocument(doc);
         this.nombreArchivo = nombreArchivo;
 
@@ -90,15 +105,13 @@ public class ProcesarPeaje extends xmlHelper {
     /**
      * Busca la factura para Abonar, de lo contrario arroja una exception
      *
-     * @throws PeajeMasDeUnRegistroException
-     * @throws CodRectNoExisteException
      */
-    private void registrarPeajeA() throws MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException, ExisteMasDeUnAutoconsumoException {
+    private void registrarPeajeA() throws MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException, NodeCardinalityException {
         logger.log(Level.INFO, ">>> Registrando Peaje del tipo Abono con el codFisFac {0}", xml.obtenerContenidoNodo(NombresNodos.COD_FIS_FAC, this.doc));
         String codRectificada = null;
         try {
             codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
-            Peaje peaje = (Peaje) this.service.buscarByCodFiscal(codRectificada);
+            Peaje peaje = this.service.buscarByCodFiscal(codRectificada);
             comentarios.append(", este abono hace referencia al CodigoFacturaRectificadaAnulada <Strong> ").append(peaje.getCodFisFac()).append("</Strong>");
             this.registrarPeajeNA();
         }catch (RegistroVacioException e) {
@@ -114,7 +127,7 @@ public class ProcesarPeaje extends xmlHelper {
      * Registra el Peaje de tipo Abono
      * y los importes totales
      */
-    private void registrarPeajeNA() throws MasDeUnClienteEncontrado, TarifaNoExisteException, ExisteMasDeUnAutoconsumoException {
+    private void registrarPeajeNA() throws MasDeUnClienteEncontrado, TarifaNoExisteException, NodeCardinalityException {
         Peaje peaje = this.prepareAbono(this.crearPeaje(TIPO_FACTURA.A_ABONO));
         this.service.guardar(peaje);
     }
@@ -122,18 +135,22 @@ public class ProcesarPeaje extends xmlHelper {
     /**
      * Registra el peaje de tipo Normnal
      */
-    private void registrarPeajeN(char tipoFactura) throws MasDeUnClienteEncontrado, TarifaNoExisteException, ExisteMasDeUnAutoconsumoException {
-        Peaje p = null;
+    private void registrarPeajeN(char tipoFactura) throws MasDeUnClienteEncontrado, TarifaNoExisteException, NodeCardinalityException {
+        TIPO_FACTURA tipoFacturaRegistro;
         switch (tipoFactura) {
             case 'N':
             case 'G':
-                p = this.crearPeaje(TIPO_FACTURA.N_NORMAL);
+                tipoFacturaRegistro = TIPO_FACTURA.N_NORMAL;
                 break;
             case 'C':
-                p = this.crearPeaje(TIPO_FACTURA.C_);
+                tipoFacturaRegistro = TIPO_FACTURA.C_;
                 break;
+            default:
+                throw new IllegalArgumentException("Tipo de factura no soportada para registrar peaje normal: " + tipoFactura);
         }
-        this.service.guardar(p);
+
+        Peaje peaje = this.crearPeaje(tipoFacturaRegistro);
+        this.service.guardar(peaje);
     }
 
     /**
@@ -141,19 +158,16 @@ public class ProcesarPeaje extends xmlHelper {
      * arroja una excepcion, de lo contraro hara un proceso de rectificación y
      * usara el metodo registrarN para guardar en registro en la BD
      *
-     * @param nombreArchivo
-     * @throws CodRectNoExisteException
-     * @throws PeajeMasDeUnRegistroException
      */
     private void registrarPeajeR(String nombreArchivo) throws CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException {
         String codRectificada = xml.obtenerContenidoNodo(NombresNodos.COD_FAC_REC_ANU, this.doc);
         try {
-            Peaje peaje = (Peaje) this.service.buscarByCodFiscal(codRectificada);
+            Peaje peaje = this.service.buscarByCodFiscal(codRectificada);
             String nuevaRemesa = String.valueOf(Long.parseLong(xml.obtenerContenidoNodo(NombresNodos.ID_REM, this.doc)));
             String nuevaFechaLimitePago = xml.obtenerContenidoNodo(NombresNodos.FECHA_LIMITE_PAGO, this.doc);
             this.service.rectificar(peaje, nuevaRemesa, nombreArchivo, nuevaFechaLimitePago);
             this.registrarPeajeN('N');
-        } catch (RegistroVacioException | ExisteMasDeUnAutoconsumoException e) {
+        } catch (RegistroVacioException | NodeCardinalityException e) {
             logger.log(Level.INFO, ">>> No se encontró una factura para rectificar con {0}", codRectificada);
             throw new CodRectNoExisteException(codRectificada);
         }
@@ -161,8 +175,6 @@ public class ProcesarPeaje extends xmlHelper {
 
     /**
      * Pasa los valores obtenidos en la factura a negativo en los tipos de factura de abono
-     * @param factura
-     * @return
      */
     protected Peaje prepareAbono(Peaje factura){
         logger.log(Level.INFO, ">>> Pasando valores especificos a negativo del abono {0}", factura.getCodFisFac());
@@ -329,7 +341,7 @@ public class ProcesarPeaje extends xmlHelper {
         return factura;
     }
 
-    private Peaje crearPeaje(TIPO_FACTURA tp) throws MasDeUnClienteEncontrado, TarifaNoExisteException, ExisteMasDeUnAutoconsumoException {
+    private Peaje crearPeaje(TIPO_FACTURA tp) throws MasDeUnClienteEncontrado, TarifaNoExisteException, NodeCardinalityException {
         Peaje peaje = new Peaje(
                 this.cliente, this.cabecera(), this.datosGenerales(), this.datosTerminoPotencia(), this.datosFacturaAtr(),
                 this.potenciaExcesos(), this.potenciaContratada(), this.potenciaDemandada(), this.potenciaAFacturar(), this.potenciaPrecio(), this.potenciaImporteTotal(),
@@ -351,6 +363,95 @@ public class ProcesarPeaje extends xmlHelper {
             throw new RuntimeException("Evita guardado");
         }
         return peaje;
+    }
+
+    protected void cargarAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws NodeCardinalityException {
+        TipoAutoconsumo tipoAutoconsumo = this.determinarTipoAutoconsumo(energiaExcedentaria);
+        XmlContext context = new XmlContext(this.doc);
+
+        try {
+            NodeList contenedorDatosAutoconsumo = NodosUtil.getSingleNodeListByNameFromDocument(this.nombreArchivo, this.doc, AutoconsumoNodes.AUTOCONSUMO);
+            switch (tipoAutoconsumo) {
+                case TIPO_42:
+                case TIPO_43:
+                    contenedorDatosAutoconsumo = NodosUtil.getSingleNodeListByName(contenedorDatosAutoconsumo, AutoconsumoNodes.INSTALACION_GEN_AUTOCONSUMO);
+                    break;
+                case TIPO_41:
+                case TIPO_51:
+                    return;
+                case TIPO_12:
+                    if (!context.containerHasNode(contenedorDatosAutoconsumo, AutoconsumoNodes.ENERGIA_NETA_GENERADA)
+                            || !context.containerHasNode(contenedorDatosAutoconsumo, AutoconsumoNodes.ENERGIA_AUTOCONSUMIDA)) {
+
+                        String tipoSubseccion = context.facturaAtr().obtenerValor(FacturaAtrNodes.TIPO_SUBSECCION);
+
+                        warningService.emitAndRegister(
+                            WarningType.AUTOCONSUMO_TIPO_12_SIN_DETALLE,
+                            builder -> builder
+                                .fileName(this.nombreArchivo)
+                                .fileType(FileType.PEAJES)
+                                .flow(Flow.AUTOCONSUMO_VALIDATION)
+                                .put(DataKeys.TIPO_SUBSECCION, tipoSubseccion)
+                                .put(DataKeys.TIPO_AUTOCONSUMO, tipoAutoconsumo.getCode())
+                                .technicalContext(TechnicalContextResolver.resolveTyped())
+                                .errorConsumer(this::agregarError)
+                        );
+
+                        return;
+                    }
+                    break;
+                case DESCONOCIDO:
+                    controladoresMessagesLogger.warn(log, ControladoresMessageKey.XML_HELPER_AUTOCONSUMO_UNKNOWN_TYPE_NO_DATA, this.nombreArchivo);
+                    this.agregarError(WarningType.AUTOCONSUMO_TIPO_DESCONOCIDO.getCode());
+                    return;
+                default:
+                    break;
+            }
+
+            NodeList terminoEnergiaNetaGenNode = NodosUtil.getSingleNodeListByChainedNames(contenedorDatosAutoconsumo, "EnergiaNetaGen", "TerminoEnergiaNetaGen");
+            NodeList periodoTerminoEnergiaNetaGenNode = NodosUtil.getAllNodesByNameWithSpecificExpectedNodes(terminoEnergiaNetaGenNode, "Periodo", 6);
+            energiaExcedentaria.setAllNetaGenerada(NodosUtil.getAllContentNodesAsDoubleList(periodoTerminoEnergiaNetaGenNode, "ValorEnergiaNetaGen"));
+
+            NodeList terminoEnergiaAutoconsumidaNode = NodosUtil.getSingleNodeListByChainedNames(contenedorDatosAutoconsumo, "EnergiaAutoconsumida", "TerminoEnergiaAutoconsumida");
+            energiaExcedentaria.setFechaDesde(NodosUtil.getSingleContentNodeAsLocalDateTimeWithDefaultTime(terminoEnergiaAutoconsumidaNode, "FechaDesde"));
+            energiaExcedentaria.setFechaHasta(NodosUtil.getSingleContentNodeAsLocalDateTimeWithDefaultTime(terminoEnergiaAutoconsumidaNode, "FechaHasta"));
+
+            NodeList periodosEnergiaAutoconsumidaNodes = NodosUtil.getAllNodesByNameWithSpecificExpectedNodes(terminoEnergiaAutoconsumidaNode, "Periodo", 6);
+            energiaExcedentaria.setAllAutoconsumida(NodosUtil.getAllContentNodesAsDoubleList(periodosEnergiaAutoconsumidaNodes, "ValorEnergiaAutoconsumida"));
+            energiaExcedentaria.setAllPagoTDA(NodosUtil.getAllContentNodesAsDoubleList(periodosEnergiaAutoconsumidaNodes, "PagoTDA"));
+
+        } catch (NoCoincidenLosNodosEsperadosException e) {
+            logger.log(Level.SEVERE,
+                    "No fue posible extraer los nodos esperados de autoconsumo. archivo=''{0}'', tipo=''{1}'', detalle=''{2}''",
+                    new Object[]{this.nombreArchivo, tipoAutoconsumo, e.getMessage()});
+            this.agregarError(WarningType.AUTOCONSUMO_NODOS_ESPERADOS_NO_ENCONTRADOS.getCode());
+        }
+    }
+
+    private TipoAutoconsumo determinarTipoAutoconsumo(
+            @NonNull EnergiaExcedentaria energiaExcedentaria
+    ) throws NodeCardinalityException {
+
+        int tipoAutoconsumoCode = NodosUtil.getSingleContentNodeAsInt(
+                NodosUtil.getSingleNodeListByNameFromDocument(
+                        this.nombreArchivo,
+                        this.doc,
+                        "DatosFacturaATR"
+                ),
+                "TipoAutoconsumo"
+        );
+
+        TipoAutoconsumo tipo = TipoAutoconsumo.fromCode(String.valueOf(tipoAutoconsumoCode));
+
+        if (tipo == TipoAutoconsumo.DESCONOCIDO) {
+            logger.log(Level.WARNING,
+                    "Tipo de autoconsumo no reconocido: {0}. archivo=''{1}''. Se tratará como DESCONOCIDO.",
+                    new Object[]{tipoAutoconsumoCode, this.nombreArchivo});
+        }
+
+        energiaExcedentaria.setTipoAutoconsumo(tipoAutoconsumoCode);
+
+        return tipo;
     }
 
 }

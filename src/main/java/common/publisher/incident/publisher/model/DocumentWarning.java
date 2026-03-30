@@ -20,7 +20,7 @@ public class DocumentWarning {
     private final FileType fileType;
     private final Flow flow;
 
-    private final Map<DataKeys, Object> data;
+    private final Map<DataKeys, String> data;
     private final TechnicalContext technicalContext;
 
 
