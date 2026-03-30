@@ -6,10 +6,7 @@ import common.publisher.incident.publisher.model.DataKeys;
 import common.publisher.incident.publisher.model.FileType;
 import common.publisher.incident.publisher.model.Flow;
 import common.publisher.incident.publisher.model.TechnicalContextResolver;
-import controladores.common.ControladoresMessageKey;
-import controladores.common.ControladoresMessagesLogger;
-import controladores.common.WarningType;
-import controladores.common.XmlContext;
+import controladores.common.*;
 import datos.entity.EnergiaExcedentaria;
 import datos.entity.Peaje;
 import datos.interfaces.DocumentoXmlService;
@@ -390,6 +387,8 @@ public class ProcesarPeaje extends xmlHelper {
                             builder -> builder
                                 .fileName(this.nombreArchivo)
                                 .fileType(FileType.PEAJES)
+                                .endpoint(Paths.Procesamiento.PROCESAR)
+                                .httpMethod(HTTPMethod.POST)
                                 .flow(Flow.AUTOCONSUMO_VALIDATION)
                                 .put(DataKeys.TIPO_SUBSECCION, tipoSubseccion)
                                 .put(DataKeys.TIPO_AUTOCONSUMO, tipoAutoconsumo.getCode())

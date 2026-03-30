@@ -24,7 +24,7 @@ spring:
 app:
   incident-publisher:
     service-name: ${APP_INCIDENT_SERVICE_NAME:sistemagestion}
-    environment: ${APP_INCIDENT_ENV:DEV}
+    environment: ${SPRING_PROFILES_ACTIVE:PROD}
     default-type: ${APP_INCIDENT_DEFAULT_TYPE:system}
 
 c4e:

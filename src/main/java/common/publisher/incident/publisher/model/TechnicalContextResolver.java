@@ -82,11 +82,36 @@ public final class TechnicalContextResolver {
     ) {
         return new TechnicalContext(
                 el.getClassName(),
-                el.getMethodName(),
+                normalizeMethodName(el.getMethodName()),
                 el.getLineNumber(),
                 Thread.currentThread().getName(),
                 strategy
         );
+    }
+
+    /**
+     * Normaliza el nombre del método generado por la JVM.
+     * <p>
+     * Las lambdas tienen la forma {@code lambda$metodoOrigen$N} → se extrae {@code metodoOrigen}.
+     * Los métodos sintéticos de acceso tienen la forma {@code access$N} → se devuelve "access".
+     * El resto se devuelve sin cambios.
+     * </p>
+     */
+    private static String normalizeMethodName(String methodName) {
+        if (methodName == null) {
+            return "UNKNOWN";
+        }
+        // lambda$cargarAutoconsumo$0  →  cargarAutoconsumo
+        if (methodName.startsWith("lambda$")) {
+            String withoutPrefix = methodName.substring("lambda$".length());
+            int lastDollar = withoutPrefix.lastIndexOf('$');
+            return lastDollar >= 0 ? withoutPrefix.substring(0, lastDollar) : withoutPrefix;
+        }
+        // access$000, access$100, ...  →  access
+        if (methodName.startsWith("access$")) {
+            return "access";
+        }
+        return methodName;
     }
 
     private static TechnicalContext buildTypedFallback(StackTraceElement[] stack) {

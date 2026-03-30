@@ -1,7 +1,6 @@
 package utileria;
 
 import common.i18n.Messages;
-import common.publisher.incident.publisher.model.CallerMethodResolveraa;
 import common.publisher.incident.publisher.IncidentPublisherServiceBridge;
 import common.publisher.incident.publisher.model.DocumentWarning;
 import controladores.common.structure.ArchivoTextoMessageKey;
@@ -58,16 +57,10 @@ public class ArchivoTexto {
     }
 
     public static void publishWarning(DocumentWarning warning) {
-        escribirAdvertencia(
-                warning.getFileName(),
-                warning.resolvedCode()
-        );
-
+        escribirAdvertencia(warning.getFileName(), warning.resolvedCode());
         IncidentPublisherServiceBridge.publishDocumentWarning(warning);
     }
 
-
-    //Utilileria
     private static String momentoActual() {
         return new SimpleDateFormat("<dd/MM/yyyy HH:mm:ss> ").format(new Date());
     }
