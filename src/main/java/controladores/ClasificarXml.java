@@ -26,7 +26,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,7 +42,6 @@ import utileria.xml;
  *
  * @author Jesus Sanchez <j.sanchez at dataWorkshop>
  */
-@PropertySource("classpath:cfg/path.properties")
 @Controller
 @RequestMapping("/clasificar")
 public class ClasificarXml {

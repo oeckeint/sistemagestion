@@ -1,0 +1,12 @@
+storage:
+  root: "${C4E_STORAGE_ROOT:${user.home}/Downloads/com4energy}"
+
+peajes: "${storage.root}/Peajes/"
+peajes.procesados: "${peajes}Procesados/"
+peajes.remesa: "${peajes.procesados}RemesaPago/"
+peajes.archivarfactura: "${peajes.procesados}ArchivarFactura/"
+peajes.ftp: "${peajes}ftp/"
+
+sql.backup: "${peajes}Backups/"
+sql.restauraciones: "${sql.backup}restauraciones/"
+

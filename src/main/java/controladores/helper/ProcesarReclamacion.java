@@ -53,20 +53,26 @@ public class ProcesarReclamacion extends xmlHelper {
     }
 
     public void procesar(Document doc, String nombreArchivo) throws MasDeUnClienteEncontrado, ClienteNoExisteException, ReclamacionYaExisteException {
-        super.doc = doc;
+        this.loadDocument(doc);
         super.nombreArchivo = nombreArchivo;
-        this.iniciarVariablesR();
 
-        if (this.service.buscarFiltro(this.codigoDeSolicitud + "-" + this.codigoDePaso, "codigoSolicitud") == null){
-            if(super.cliente !=null){
-                registrarReclamacion();
-            } else{
-                logger.log(Level.INFO, "No existe un cliente con el cups {0} por lo que no se registra el archivo con codigo de solicitud " + this.codigoDeSolicitud, super.cups);
-                throw new ClienteNoExisteException(super.cups);
+        try {
+            this.iniciarVariablesR();
+
+            if (this.service.buscarFiltro(this.codigoDeSolicitud + "-" + this.codigoDePaso, "codigoSolicitud") == null){
+                if(super.cliente !=null){
+                    registrarReclamacion();
+                } else{
+                    logger.log(Level.INFO, "No existe un cliente con el cups {0} por lo que no se registra el archivo con codigo de solicitud " + this.codigoDeSolicitud, super.cups);
+                    throw new ClienteNoExisteException(super.cups);
+                }
+            } else {
+                logger.log(Level.INFO, "Ya existe un registro con el codigo de solicitud {0} por lo que no se registra.", this.codigoDeSolicitud);
+                throw new ReclamacionYaExisteException(this.codigoDeSolicitud, this.codigoDePaso);
             }
-        } else {
-            logger.log(Level.INFO, "Ya existe un registro con el codigo de solicitud {0} por lo que no se registra.", this.codigoDeSolicitud);
-            throw new ReclamacionYaExisteException(this.codigoDeSolicitud, this.codigoDePaso);
+        } finally {
+            this.clearDocumentContext();
+            this.nombreArchivo = null;
         }
     }
 

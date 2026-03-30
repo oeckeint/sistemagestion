@@ -43,41 +43,47 @@ public class ProcesarPeaje extends xmlHelper {
      */
     public void procesar(Document doc, String nombreArchivo)
             throws ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, NonUniqueResultException, MasDeUnClienteEncontrado, PeajeCodRectNoExisteException, TarifaNoExisteException, PeajeMasDeUnRegistroException, PeajeYaExisteException, ExisteMasDeUnAutoconsumoException {
-        this.doc = doc;
+        this.loadDocument(doc);
         this.nombreArchivo = nombreArchivo;
-        this.iniciarVariables();
 
-        if (this.cliente != null) {
-            //Se revisa que la factura no exista
-            try {
-                this.service.buscarByCodFiscal(this.codFactura);
-                logger.log(Level.INFO, ">>> Ya existe un peaje con el codigo Fiscal {0}", this.codFactura);
-                throw new PeajeYaExisteException(this.codFactura);
-            }catch (RegistroVacioException e){
-                logger.log(Level.INFO, ">>> Nuevo registro en Peajes {0}", this.codFactura);
+        try {
+            this.iniciarVariables();
+
+            if (this.cliente != null) {
+                //Se revisa que la factura no exista
+                try {
+                    this.service.buscarByCodFiscal(this.codFactura);
+                    logger.log(Level.INFO, ">>> Ya existe un peaje con el codigo Fiscal {0}", this.codFactura);
+                    throw new PeajeYaExisteException(this.codFactura);
+                }catch (RegistroVacioException e){
+                    logger.log(Level.INFO, ">>> Nuevo registro en Peajes {0}", this.codFactura);
+                }
+
+                this.nombreArchivo = nombreArchivo;
+                this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
+                logger.log(Level.INFO, ">>> Tipo Factura {0}", this.tipoFactura);
+                switch (this.tipoFactura) {
+                    case "A":
+                        this.registrarPeajeA();
+                        break;
+                    case "N":
+                    case "G":
+                    case "C":
+                        this.registrarPeajeN(this.tipoFactura.charAt(0));
+                        break;
+                    case "R":
+                        this.registrarPeajeR(nombreArchivo);
+                        break;
+                    default:
+                        throw new PeajeTipoFacturaNoSoportadaException(tipoFactura);
+                }
+
+            } else {
+                throw new ClienteNoExisteException(cups);
             }
-
-            this.nombreArchivo = nombreArchivo;
-            this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
-            logger.log(Level.INFO, ">>> Tipo Factura {0}", this.tipoFactura);
-            switch (this.tipoFactura) {
-                case "A":
-                    this.registrarPeajeA();
-                    break;
-                case "N":
-                case "G":
-                case "C":
-                    this.registrarPeajeN(this.tipoFactura.charAt(0));
-                    break;
-                case "R":
-                    this.registrarPeajeR(nombreArchivo);
-                    break;
-                default:
-                    throw new PeajeTipoFacturaNoSoportadaException(tipoFactura);
-            }
-
-        } else {
-            throw new ClienteNoExisteException(cups);
+        } finally {
+            this.clearDocumentContext();
+            this.nombreArchivo = null;
         }
     }
 
@@ -342,6 +348,7 @@ public class ProcesarPeaje extends xmlHelper {
             this.existeEnergiaExcedentaria = false;
             this.cargarAutoconsumo(energiaExcedentaria);
             peaje.setEnergiaExcedentaria(energiaExcedentaria);
+            throw new RuntimeException("Evita guardado");
         }
         return peaje;
     }

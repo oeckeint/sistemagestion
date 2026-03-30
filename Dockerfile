@@ -7,7 +7,7 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Crear la estructura de directorios de trabajo que usa la aplicación
 # Equivalente a /resources/Peajes/* en el servidor WebLogic
-# La ruta completa se construye como: System.getProperty("user.dir") + path.properties
+# La ruta completa se construye como: System.getProperty("user.dir") + path.yml
 # En Tomcat: user.dir = /usr/local/tomcat
 RUN mkdir -p \
     /usr/local/tomcat/resources/Peajes/Procesados/RemesaPago \

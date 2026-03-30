@@ -1,0 +1,52 @@
+abono:
+  factura:
+    validaterectificadaanulada: true
+  peaje:
+    validaterectificadaanulada: true
+
+reclamaciones:
+  filtros: "{reclamacion: 'Reclamacion', cliente: 'Cliente', codigoSolicitud: 'Codigo de solitud'}"
+
+scripts:
+  ruta: "${C4E_SCRIPTS_ROOT:${C4E_STORAGE_ROOT:${user.home}/Downloads/com4energy}/scripts}"
+  moverArchivos: "${C4E_MOVER_SCRIPT:moverArchivos.bat}"
+
+spring:
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    virtual-host: ${RABBITMQ_VHOST:/}
+
+app:
+  incident-publisher:
+    service-name: ${APP_INCIDENT_SERVICE_NAME:sistemagestion}
+    environment: ${APP_INCIDENT_ENV:DEV}
+    default-type: ${APP_INCIDENT_DEFAULT_TYPE:system}
+
+c4e:
+  incidents:
+    enabled: ${C4E_INCIDENTS_ENABLED:true}
+    types:
+      validation:
+        exchange: ${C4E_INCIDENT_VALIDATION_EXCHANGE:incident.validation.exchange}
+        routing-key: ${C4E_INCIDENT_VALIDATION_ROUTING_KEY:incident.validation.key}
+        queue: ${C4E_INCIDENT_VALIDATION_QUEUE:incident.validation.queue}
+        dead-letter-exchange: ${C4E_INCIDENT_VALIDATION_DLX:incident.validation.exchange.dlx}
+        dead-letter-queue: ${C4E_INCIDENT_VALIDATION_DLQ:incident.validation.queue.dlq}
+      integration:
+        exchange: ${C4E_INCIDENT_INTEGRATION_EXCHANGE:incident.integration.exchange}
+        routing-key: ${C4E_INCIDENT_INTEGRATION_ROUTING_KEY:incident.integration.key}
+        queue: ${C4E_INCIDENT_INTEGRATION_QUEUE:incident.integration.queue}
+        dead-letter-exchange: ${C4E_INCIDENT_INTEGRATION_DLX:incident.integration.exchange.dlx}
+        dead-letter-queue: ${C4E_INCIDENT_INTEGRATION_DLQ:incident.integration.queue.dlq}
+      system:
+        exchange: ${C4E_INCIDENT_SYSTEM_EXCHANGE:incident.system.exchange}
+        routing-key: ${C4E_INCIDENT_SYSTEM_ROUTING_KEY:incident.system.key}
+        queue: ${C4E_INCIDENT_SYSTEM_QUEUE:incident.system.queue}
+        dead-letter-exchange: ${C4E_INCIDENT_SYSTEM_DLX:incident.system.exchange.dlx}
+        dead-letter-queue: ${C4E_INCIDENT_SYSTEM_DLQ:incident.system.queue.dlq}
+

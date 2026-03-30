@@ -1,0 +1,6 @@
+sftp:
+  host: ${SFTP_HOST:127.0.0.1}
+  port: ${SFTP_PORT:21}
+  user: ${SFTP_USER:user1}
+  password: ${SFTP_PASSWORD:test}
+

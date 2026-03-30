@@ -1,5 +1,13 @@
 package controladores.helper;
 
+import common.i18n.Messages;
+import common.documentstructure.AutoconsumoNodes;
+import common.documentstructure.FacturaAtrNodes;
+import common.publisher.incident.publisher.model.*;
+import controladores.common.ControladoresMessageKey;
+import controladores.common.ControladoresMessagesLogger;
+import controladores.common.WarningType;
+import controladores.common.XmlParsingContext;
 import datos.entity.Cliente;
 import datos.entity.EnergiaExcedentaria;
 import datos.entity.Factura;
@@ -19,7 +27,7 @@ import java.util.ArrayList;
 import excepciones.nodos.NoCoincidenLosNodosEsperadosException;
 import excepciones.nodos.energiaexcedentaria.autoconsumo.ExisteMasDeUnAutoconsumoException;
 import lombok.NonNull;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.*;
@@ -28,18 +36,18 @@ import utileria.texto.Cadenas;
 import datos.interfaces.DocumentoXmlService;
 
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import utileria.StringHelper;
 import utileria.xml;
 
+@Slf4j
 @Component
 public class xmlHelper {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(xmlHelper.class);
+    private static final ControladoresMessagesLogger CONTROLADORES_MESSAGES_LOGGER = new ControladoresMessagesLogger();
     private DocumentoXmlService contenidoXmlService;
     @Autowired
     protected ClienteService clienteService;
@@ -57,20 +65,19 @@ public class xmlHelper {
     protected String nombreArchivo;
     private String codigoRemesa;
     protected boolean existeEnergiaExcedentaria;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private XmlParsingContext context;
 
     public xmlHelper(){}
 
     public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService) throws MasDeUnClienteEncontrado {
-        this.doc = doc;
+        this.loadDocument(doc);
         this.contenidoXmlService = contenidoXmlService;
         this.clienteService = clienteService;
         this.iniciarVariables();
     }
 
     public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService) {
-        this.doc = doc;
+        this.loadDocument(doc);
         this.contenidoXmlService = contenidoXmlService;
         this.iniciarVariablesPagoRemesa();
     }
@@ -84,7 +91,7 @@ public class xmlHelper {
     public xmlHelper(Document doc, ClienteService clienteService) {
         this.errores = new StringBuilder("");
         this.comentarios = new StringBuilder("");
-        this.doc = doc;
+        this.loadDocument(doc);
         this.clienteService = clienteService;
         this.iniciarVariablesCambioComercializador();
     }
@@ -138,13 +145,14 @@ public class xmlHelper {
                     peaje.setRemesaPago(this.codigoRemesa);
                     peaje.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
                     this.contenidoXmlService.actualizar(peaje);
-                    logger.log(Level.INFO, ">>> xmlHelper=\"Se ha cambiado el estadoDePago = {0} con el codFisFac = {1}\"", new Object[]{elementos.get("Estado"), elementos.get("codFisFac")});
+                    log.info(">>> xmlHelper=\"Se ha cambiado el estadoDePago = {} con el codFisFac = {}\"", elementos.get("Estado"), elementos.get("codFisFac"));
                 } else {
                     utileria.ArchivoTexto.escribirError("contenido_xml. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + peaje.getEstadoPago() + " por lo que no se pudo procesar");
                 }
             } catch (RegistroVacioException e) {
-                logger.log(Level.INFO, ">>> No se encontró un Peaje con {0}", elementos.get("codFisFac"));
-                utileria.ArchivoTexto.escribirError("contenido_xml. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
+                log.info(">>> No se encontró un Peaje con {}", elementos.get("codFisFac"));
+                utileria.ArchivoTexto.escribirError(
+                        "contenido_xml. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
             }
 
         }
@@ -185,12 +193,12 @@ public class xmlHelper {
                     factura.setRemesaPago(this.codigoRemesa);
                     factura.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
                     this.contenidoXmlService.actualizar(factura);
-                    logger.log(Level.INFO, ">>> xmlHelper=\"Se ha cambiado el estadoDePago = {0} con el codFisFac = {1}\"", new Object[]{elementos.get("Estado"), elementos.get("codFisFac")});
+                    log.info(">>> xmlHelper=\"Se ha cambiado el estadoDePago = {} con el codFisFac = {}\"", elementos.get("Estado"), elementos.get("codFisFac"));
                 } else {
                     utileria.ArchivoTexto.escribirError("contenido_xml_factura. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + factura.getEstadoPago() + " por lo que no se pudo procesar");
                 }
             } catch (RegistroVacioException e) {
-                logger.log(Level.INFO, ">>> No se encontró una Factura con {0}", elementos.get("codFisFac"));
+                log.info(">>> No se encontró una Factura con {}", elementos.get("codFisFac"));
                 utileria.ArchivoTexto.escribirError("contenido_xml. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
             }
         }
@@ -231,12 +239,12 @@ public class xmlHelper {
                     factura.setRemesaPago(this.codigoRemesa);
                     factura.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
                     this.contenidoXmlService.actualizar(factura);
-                    logger.log(Level.INFO, ">>> xmlHelper=\"Se ha cambiado el estadoDePago = {0} con el codFisFac = {1}\"", new Object[]{elementos.get("Estado"), elementos.get("codFisFac")});
+                    log.info(">>> xmlHelper=\"Se ha cambiado el estadoDePago = {} con el codFisFac = {}\"", elementos.get("Estado"), elementos.get("codFisFac"));
                 } else {
                     utileria.ArchivoTexto.escribirError("contenido_xml_otras_facturas. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + factura.getEstadoPago() + " por lo que no se pudo procesar");
                 }
             } catch (RegistroVacioException e) {
-                logger.log(Level.INFO, ">>> No se encontró OtraFactura con {0}", elementos.get("codFisFac"));
+                log.info(">>> No se encontró OtraFactura con {}", elementos.get("codFisFac"));
                 utileria.ArchivoTexto.escribirError("contenido_xml_otras_facturas. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
             }
         }
@@ -1206,10 +1214,12 @@ public class xmlHelper {
      *
      * @param energiaExcedentaria instancia de {@link EnergiaExcedentaria} donde se almacenarán los datos extraídos del XML
      * @throws ExisteMasDeUnAutoconsumoException si el nodo de autoconsumo no se encuentra en el documento XML
-     */protected void cargarAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws ExisteMasDeUnAutoconsumoException {
+     */
+    protected void cargarAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws ExisteMasDeUnAutoconsumoException {
+        TipoAutoconsumo tipoAutoconsumo = this.determinarTipoAutoconsumo(energiaExcedentaria);
         try {
             NodeList contenedorDatosAutoconsumo = NodosUtil.getSingleNodeListByNameFromDocument(this.nombreArchivo, this.doc, "Autoconsumo");
-            switch (this.determinarTipoAutoconsumo(energiaExcedentaria)) {
+            switch (tipoAutoconsumo) {
                 case _42:
                 case _43:
                     contenedorDatosAutoconsumo = NodosUtil.getSingleNodeListByName(contenedorDatosAutoconsumo, "InstalacionGenAutoconsumo");
@@ -1217,6 +1227,41 @@ public class xmlHelper {
                 case _41:
                 case _51:
                     return; // No se espera autoconsumo para estos tipos
+                case _12:
+                    if (this.parsingContext().containerHasNode(contenedorDatosAutoconsumo, AutoconsumoNodes.ENERGIA_NETA_GENERADA)
+                            || this.parsingContext().containerHasNode(contenedorDatosAutoconsumo, AutoconsumoNodes.ENERGIA_AUTOCONSUMIDA)) {
+                        // Estructura alternativa detectada para tipo 12: no hay detalle de autoconsumo para poblar.
+
+                        String warningMessage = Messages.format(ControladoresMessageKey.XML_HELPER_AUTOCONSUMO_TYPE_12_WITHOUT_DETAIL, this.nombreArchivo, tipoAutoconsumo);
+                        TechnicalContext technicalContext = TechnicalContextResolver.resolveTyped();
+
+                        CONTROLADORES_MESSAGES_LOGGER.warn(log, warningMessage);
+
+                        String tipoSubseccion = this.parsingContext().facturaAtr().obtenerValor(FacturaAtrNodes.TIPO_SUBSECCION);
+
+                        Map<DataKeys, Object> data = new HashMap<>();
+                        data.put(DataKeys.TIPO_SUBSECCION, tipoSubseccion);
+                        data.put(DataKeys.TIPO_AUTOCONSUMO, tipoAutoconsumo.name());
+
+                        DocumentWarning warning = DocumentWarning.builder()
+                                .warning(WarningType.AUTOCONSUMO_TIPO_12_SIN_DETALLE)
+                                .messageOverride(warningMessage)
+                                .fileName(this.nombreArchivo)
+                                .fileType(FileType.PEAJES)
+                                .flow(Flow.AUTOCONSUMO_VALIDATION)
+                                .data(data)
+                                .technicalContext(technicalContext)
+                                .build();
+
+                        utileria.ArchivoTexto.publishWarning(warning);
+                        this.agregarError(warning.resolvedCode());
+                        return;
+                    }
+                    break;
+                case DESCONOCIDO:
+                    log.warn("Tipo de autoconsumo DESCONOCIDO; no se puede extraer datos de autoconsumo. archivo='{}'", this.nombreArchivo);
+                    this.agregarError("33");
+                    return;
             }
 
             if (contenedorDatosAutoconsumo.getLength() == 0) {
@@ -1237,7 +1282,8 @@ public class xmlHelper {
 
 
         } catch (NoCoincidenLosNodosEsperadosException e) {
-            log.warn(e.getMessage());
+            log.error("No fue posible extraer los nodos esperados de autoconsumo. archivo='{}', tipo='{}', detalle='{}'", this.nombreArchivo, tipoAutoconsumo, e.getMessage());
+            this.agregarError("32");
         }
     }
 
@@ -1290,7 +1336,9 @@ public class xmlHelper {
                 energiaExcedentaria.setTipoAutoconsumo(51);
                 return TipoAutoconsumo._51;
             default:
-                throw new RuntimeException("Tipo de autoconsumo desconocido: " + tipoAutoconsumo);
+                log.warn("Tipo de autoconsumo no reconocido: {}. archivo='{}'. Se tratará como DESCONOCIDO.", tipoAutoconsumo, this.nombreArchivo);
+                energiaExcedentaria.setTipoAutoconsumo(tipoAutoconsumo);
+                return TipoAutoconsumo.DESCONOCIDO;
         }
     }
 
@@ -1303,7 +1351,7 @@ public class xmlHelper {
     protected Cargos Cargos(String tipoCargoValue, TIPO_FACTURA tp) {
         elementos =  (ArrayList) IntStream.range(0, 12).mapToDouble(i -> 0.0).boxed().collect(Collectors.toList());
         if (tp == TIPO_FACTURA.C_){
-            this.logger.log(Level.INFO, "Las facturas de tipo C, no tienen Cargos");
+            log.info("Las facturas de tipo C, no tienen Cargos");
             return new Cargos(elementos);
         }
         boolean continuar = true;
@@ -1357,7 +1405,7 @@ public class xmlHelper {
     protected CargoImporteTotal ImporteTotalCargos(String tipoCargoValue, TIPO_FACTURA tp) {
     	elementos =  (ArrayList) IntStream.range(0, 1).mapToDouble(i -> 0.0).boxed().collect(Collectors.toList());
         if (tp == TIPO_FACTURA.C_){
-            this.logger.log(Level.INFO, "Las facturas de tipo C, no tienen Cargos");
+            log.info("Las facturas de tipo C, no tienen Cargos");
             return new CargoImporteTotal(elementos);
         }
         int indice = 0;
@@ -5057,8 +5105,34 @@ public class xmlHelper {
         System.out.println(Cadenas.LINEA + nombreMetodo + elementos);
     }
 
+    protected final void loadDocument(Document doc) {
+        this.context = null;
+        this.doc = doc;
+
+        if (doc != null) {
+            this.context = new XmlParsingContext(doc);
+        }
+    }
+
+    protected final void clearDocumentContext() {
+        this.context = null;
+        this.doc = null;
+    }
+
+    private XmlParsingContext parsingContext() {
+        if (this.doc == null) {
+            throw new IllegalStateException("No hay documento XML cargado para inicializar XmlParsingContext");
+        }
+
+        if (this.context == null || this.context.getDocument() != this.doc) {
+            this.context = new XmlParsingContext(this.doc);
+        }
+
+        return this.context;
+    }
+
     private void agregarError(String codError) {
-        if (this.errores.toString().equals("")) {
+        if (this.errores.toString().isEmpty()) {
             this.errores.append(codError);
         } else {
             this.errores.append(", ").append(codError);

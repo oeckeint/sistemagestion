@@ -3,5 +3,8 @@
     <context-root>/sistemagestion</context-root> 
     <container-descriptor>
         <show-archived-real-path-enabled>true</show-archived-real-path-enabled>
+        <prefer-application-packages>
+            <package-name>com.fasterxml.jackson.*</package-name>
+        </prefer-application-packages>
     </container-descriptor>
 </weblogic-web-app>
