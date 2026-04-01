@@ -5,8 +5,6 @@ import dominio.Cliente;
 import dominio.componentesxml.DatosGeneralesFactura;
 import java.io.*;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,12 +14,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import javax.xml.parsers.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
-@PropertySource("classpath:cfg/path.properties")
 @WebServlet("/EvaluacionXML")
 @MultipartConfig
 public class EvaluacionXml extends HttpServlet {

@@ -42,26 +42,32 @@ public class ProcesarOtrasFacturas extends xmlHelper {
      */
     public void procesar(Document doc, String nombreArchivo)
             throws OtraFacturaYaExisteException, ClienteNoExisteException, MasDeUnClienteEncontrado, PeajeMasDeUnRegistroException {
-        this.doc = doc;
+        this.loadDocument(doc);
         this.nombreArchivo = nombreArchivo;
-        this.iniciarVariables();
 
-        if (this.cliente != null) {
-            //Se revisa que la factura no exista
-            try {
-                this.service.buscarByCodFiscal(codFactura);
-                logger.log(Level.INFO, ">>> Ya existe un registro con el codigo Fiscal {0} en OtrasFacturas", this.codFactura);
-                throw new OtraFacturaYaExisteException(codFactura);
-            }catch (RegistroVacioException e){
-                logger.log(Level.INFO, ">>> Nuevo registro en OtrasFacturas {0}", this.codFactura);
+        try {
+            this.iniciarVariables();
+
+            if (this.cliente != null) {
+                //Se revisa que la factura no exista
+                try {
+                    this.service.buscarByCodFiscal(codFactura);
+                    logger.log(Level.INFO, ">>> Ya existe un registro con el codigo Fiscal {0} en OtrasFacturas", this.codFactura);
+                    throw new OtraFacturaYaExisteException(codFactura);
+                }catch (RegistroVacioException e){
+                    logger.log(Level.INFO, ">>> Nuevo registro en OtrasFacturas {0}", this.codFactura);
+                }
+
+                this.nombreArchivo = nombreArchivo;
+                this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
+                this.registrarOtraFactura();
+
+            } else {
+                throw new ClienteNoExisteException(cups);
             }
-
-            this.nombreArchivo = nombreArchivo;
-            this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
-            this.registrarOtraFactura();
-
-        } else {
-            throw new ClienteNoExisteException(cups);
+        } finally {
+            this.clearDocumentContext();
+            this.nombreArchivo = null;
         }
     }
 

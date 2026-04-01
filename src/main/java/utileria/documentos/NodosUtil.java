@@ -1,7 +1,8 @@
 package utileria.documentos;
 
+import common.publisher.common.XmlNodeKey;
+import excepciones.nodos.NodeCardinalityException;
 import excepciones.nodos.NoCoincidenLosNodosEsperadosException;
-import excepciones.nodos.energiaexcedentaria.autoconsumo.ExisteMasDeUnAutoconsumoException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -13,10 +14,20 @@ import java.util.List;
 
 public final class NodosUtil {
 
-    public static NodeList getSingleNodeListByNameFromDocument(String nombreArchivo, Document document, String nodeName) throws ExisteMasDeUnAutoconsumoException {
+    public static NodeList getSingleNodeListByNameFromDocument(String nombreArchivo, Document document, String nodeName) throws NodeCardinalityException {
         NodeList nodeList = document.getElementsByTagName(nodeName);
-        if (nodeList.getLength() != 1) {
-            throw new ExisteMasDeUnAutoconsumoException("Error: No se encontró el nodo " + nodeName + " en el archivo " + nombreArchivo + ".");
+        int totalNodes = nodeList.getLength();
+
+        if (totalNodes == 0) {
+            throw new NodeCardinalityException(
+                    "Error: No se encontró el nodo '" + nodeName + "' en el archivo '" + nombreArchivo + "'."
+            );
+        }
+
+        if (totalNodes > 1) {
+            throw new NodeCardinalityException(
+                    "Error: Se encontraron " + totalNodes + " nodos '" + nodeName + "' en el archivo '" + nombreArchivo + "'. Se esperaba exactamente 1."
+            );
         }
         return nodeList;
     }
@@ -118,6 +129,41 @@ public final class NodosUtil {
             return nodes.size();
         }
     }
+
+    public static NodeList getSingleNodeListByNameFromDocument(
+            String nombreArchivo,
+            Document document,
+            XmlNodeKey nodeKey
+    ) throws NodeCardinalityException {
+
+        return getSingleNodeListByNameFromDocument(
+                nombreArchivo,
+                document,
+                nodeKey.value()
+        );
+    }
+
+    public static NodeList getSingleNodeListByName(
+            NodeList parentNode,
+            XmlNodeKey nodeKey
+    ) throws NoCoincidenLosNodosEsperadosException {
+
+        return getSingleNodeListByName(parentNode, nodeKey.value());
+    }
+
+    public static NodeList getAllNodesByNameWithSpecificExpectedNodes(
+            NodeList childList,
+            XmlNodeKey nodeKey,
+            int expectedNodes
+    ) throws NoCoincidenLosNodosEsperadosException {
+
+        return getAllNodesByNameWithSpecificExpectedNodes(
+                childList,
+                nodeKey.value(),
+                expectedNodes
+        );
+    }
+
 
     private NodosUtil() {
         throw new IllegalStateException("Utility class");

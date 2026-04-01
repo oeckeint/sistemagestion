@@ -42,41 +42,47 @@ public class ProcesarFactura extends xmlHelper {
      */
     public void procesarFactura(Document doc, String nombreArchivo)
             throws FacturaYaExisteException, ClienteNoExisteException, PeajeTipoFacturaNoSoportadaException, CodRectNoExisteException, MasDeUnClienteEncontrado, TarifaNoExisteException, PeajeMasDeUnRegistroException, PeajeCodRectNoExisteException, FacturaNoExisteException, FacturaNoEspecificaCodRecticadaException, FacturaCodRectNoExisteException {
-        this.doc = doc;
+        this.loadDocument(doc);
         this.nombreArchivo = nombreArchivo;
-        this.iniciarVariables();
 
-        if (this.cliente != null) {
-            //Se revisa que la factura no exista
-            try {
-                this.service.buscarByCodFiscal(this.codFactura);
-                logger.log(Level.INFO, ">>> Ya existe una factura con el codigo Fiscal {0}", this.codFactura);
-                throw new FacturaYaExisteException(this.codFactura);
-            } catch (RegistroVacioException e) {
-                logger.log(Level.INFO, ">>> Nuevo registro en Facturas {0}", this.codFactura);
-            }
+        try {
+            this.iniciarVariables();
 
-            this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
-            logger.log(Level.INFO, ">>> Tipo Factura {0}", this.tipoFactura);
-            switch (this.tipoFactura) {
-                case "A":
-                    this.registrarFacturaA();
-                    break;
-                case "N":
-                case "G":
-                    this.registrarFacturaN(TIPO_FACTURA.N_NORMAL);
-                    break;
-                case "C":
-                    this.registrarFacturaN(TIPO_FACTURA.C_);
-                    break;
-                case "R":
-                    this.registrarFacturaR(nombreArchivo);
-                    break;
-                default:
-                    throw new PeajeTipoFacturaNoSoportadaException(this.tipoFactura);
+            if (this.cliente != null) {
+                //Se revisa que la factura no exista
+                try {
+                    this.service.buscarByCodFiscal(this.codFactura);
+                    logger.log(Level.INFO, ">>> Ya existe una factura con el codigo Fiscal {0}", this.codFactura);
+                    throw new FacturaYaExisteException(this.codFactura);
+                } catch (RegistroVacioException e) {
+                    logger.log(Level.INFO, ">>> Nuevo registro en Facturas {0}", this.codFactura);
+                }
+
+                this.comentarios.append("Nombre de archivo original: <Strong>").append(this.nombreArchivo).append("</Strong><br/>");
+                logger.log(Level.INFO, ">>> Tipo Factura {0}", this.tipoFactura);
+                switch (this.tipoFactura) {
+                    case "A":
+                        this.registrarFacturaA();
+                        break;
+                    case "N":
+                    case "G":
+                        this.registrarFacturaN(TIPO_FACTURA.N_NORMAL);
+                        break;
+                    case "C":
+                        this.registrarFacturaN(TIPO_FACTURA.C_);
+                        break;
+                    case "R":
+                        this.registrarFacturaR(nombreArchivo);
+                        break;
+                    default:
+                        throw new PeajeTipoFacturaNoSoportadaException(this.tipoFactura);
+                }
+            } else {
+                throw new ClienteNoExisteException(this.cups);
             }
-        } else {
-            throw new ClienteNoExisteException(this.cups);
+        } finally {
+            this.clearDocumentContext();
+            this.nombreArchivo = null;
         }
     }
 

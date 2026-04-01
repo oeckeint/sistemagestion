@@ -6,8 +6,6 @@ import com.jcraft.jsch.Session;
 import controladores.helper.Etiquetas;
 import excepciones.CredencialesIncorrectasException;
 import excepciones.ErrorAlConectarConElServidorException;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,16 +13,11 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.util.Properties;
 import java.util.Vector;
-import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -38,7 +31,6 @@ import utileria.StringHelper;
 
 @Controller
 @RequestMapping("/ftp")
-@PropertySource("classpath:ftp.properties")
 public class FTP {
 	
 	@Autowired
@@ -67,13 +59,6 @@ public class FTP {
         return "comunes/formulario_sftp";
     }
 
-    /**
-     * For testing use filezilla server
-     * Directory where everything is stored is C:\Peajes\ftp\*user1*\httpdocs 
-     * @param files
-     * @return
-     * @throws IOException
-     */
     @PostMapping(path = "/subir", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String subirArchivos(@RequestParam("archivos") MultipartFile[] files) throws IOException {
         FileInputStream fis = null;
@@ -93,11 +78,8 @@ public class FTP {
                 fs = new FileInputStream(f);
                 if (this.cargarConfiguraciones()) {
                 	this.clienteFTP.setFileType(FTPClient.BINARY_FILE_TYPE);
-                    //this.clienteFTP.enterRemotePassiveMode();
-                    //this.clienteFTP.changeWorkingDirectory(".\\httpdocs\\" + this.definirCarpeta(file.getOriginalFilename()));
                     this.clienteFTP.storeFile("httpdocs/" + this.definirCarpeta(file.getOriginalFilename()) + "/" + file.getOriginalFilename(), fs);
                     fs.close();
-                    //this.clienteFTP.rename(file.getOriginalFilename(), "httpdocs/" + file.getOriginalFilename());
 
                     this.clienteFTP.logout();
                     this.clienteFTP.disconnect();
@@ -227,20 +209,12 @@ public class FTP {
     public boolean cargarConfiguraciones() throws ErrorAlConectarConElServidorException, CredencialesIncorrectasException, FileNotFoundException, IOException {
         FileInputStream fis = null;
         boolean completado = false;
-		try (InputStream inputStream = getClass().getResourceAsStream("/ftp.properties");
-		    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-		    String contents = reader.lines()
-		      .collect(Collectors.joining(System.lineSeparator()));
+        try {
             this.dir = "C:\\";
-            Properties prop = new Properties();
-            //String propFile = "/ftp.properties";
-            InputStream inputStreamRef = new ByteArrayInputStream(contents.getBytes(Charset.forName("UTF-8")));
-            //fis = new FileInputStream(propFile);
-            prop.load(inputStreamRef);
-            this.host = prop.getProperty("sftp.host");
-            this.port = Integer.parseInt(prop.getProperty("sftp.port"));
-            this.user = prop.getProperty("sftp.user");
-            this.password = prop.getProperty("sftp.password");
+            this.host = env.getProperty("sftp.host");
+            this.port = Integer.parseInt(env.getProperty("sftp.port", "21"));
+            this.user = env.getProperty("sftp.user");
+            this.password = env.getProperty("sftp.password");
             this.clienteFTP = new FTPClient();
             this.clienteFTP.connect(this.host, this.port);
             int respuestaServer = clienteFTP.getReplyCode();

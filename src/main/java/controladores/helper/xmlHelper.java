@@ -1,5 +1,8 @@
 package controladores.helper;
 
+import common.i18n.Messages;
+import controladores.common.ControladoresMessageKey;
+import controladores.common.ControladoresMessagesLogger;
 import datos.entity.Cliente;
 import datos.entity.EnergiaExcedentaria;
 import datos.entity.Factura;
@@ -14,12 +17,10 @@ import dominio.componentesxml.reclamaciones.*;
 import excepciones.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
+import java.util.*;
 
-import excepciones.nodos.NoCoincidenLosNodosEsperadosException;
-import excepciones.nodos.energiaexcedentaria.autoconsumo.ExisteMasDeUnAutoconsumoException;
-import lombok.NonNull;
-import org.slf4j.LoggerFactory;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.*;
@@ -27,19 +28,17 @@ import utileria.documentos.NodosUtil;
 import utileria.texto.Cadenas;
 import datos.interfaces.DocumentoXmlService;
 
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import utileria.StringHelper;
 import utileria.xml;
 
+@Slf4j
 @Component
 public class xmlHelper {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(xmlHelper.class);
+    private static final ControladoresMessagesLogger CONTROLADORES_MESSAGES_LOGGER = new ControladoresMessagesLogger();
     private DocumentoXmlService contenidoXmlService;
     @Autowired
     protected ClienteService clienteService;
@@ -58,19 +57,17 @@ public class xmlHelper {
     private String codigoRemesa;
     protected boolean existeEnergiaExcedentaria;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
-
     public xmlHelper(){}
-
+    
     public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService, ClienteService clienteService) throws MasDeUnClienteEncontrado {
-        this.doc = doc;
+        this.loadDocument(doc);
         this.contenidoXmlService = contenidoXmlService;
         this.clienteService = clienteService;
         this.iniciarVariables();
     }
 
     public xmlHelper(Document doc, DocumentoXmlService contenidoXmlService) {
-        this.doc = doc;
+        this.loadDocument(doc);
         this.contenidoXmlService = contenidoXmlService;
         this.iniciarVariablesPagoRemesa();
     }
@@ -84,7 +81,7 @@ public class xmlHelper {
     public xmlHelper(Document doc, ClienteService clienteService) {
         this.errores = new StringBuilder("");
         this.comentarios = new StringBuilder("");
-        this.doc = doc;
+        this.loadDocument(doc);
         this.clienteService = clienteService;
         this.iniciarVariablesCambioComercializador();
     }
@@ -138,13 +135,14 @@ public class xmlHelper {
                     peaje.setRemesaPago(this.codigoRemesa);
                     peaje.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
                     this.contenidoXmlService.actualizar(peaje);
-                    logger.log(Level.INFO, ">>> xmlHelper=\"Se ha cambiado el estadoDePago = {0} con el codFisFac = {1}\"", new Object[]{elementos.get("Estado"), elementos.get("codFisFac")});
+                    log.info(">>> xmlHelper=\"Se ha cambiado el estadoDePago = {} con el codFisFac = {}\"", elementos.get("Estado"), elementos.get("codFisFac"));
                 } else {
                     utileria.ArchivoTexto.escribirError("contenido_xml. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + peaje.getEstadoPago() + " por lo que no se pudo procesar");
                 }
             } catch (RegistroVacioException e) {
-                logger.log(Level.INFO, ">>> No se encontró un Peaje con {0}", elementos.get("codFisFac"));
-                utileria.ArchivoTexto.escribirError("contenido_xml. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
+                log.info(">>> No se encontró un Peaje con {}", elementos.get("codFisFac"));
+                utileria.ArchivoTexto.escribirError(
+                        "contenido_xml. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
             }
 
         }
@@ -185,12 +183,12 @@ public class xmlHelper {
                     factura.setRemesaPago(this.codigoRemesa);
                     factura.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
                     this.contenidoXmlService.actualizar(factura);
-                    logger.log(Level.INFO, ">>> xmlHelper=\"Se ha cambiado el estadoDePago = {0} con el codFisFac = {1}\"", new Object[]{elementos.get("Estado"), elementos.get("codFisFac")});
+                    log.info(">>> xmlHelper=\"Se ha cambiado el estadoDePago = {} con el codFisFac = {}\"", elementos.get("Estado"), elementos.get("codFisFac"));
                 } else {
                     utileria.ArchivoTexto.escribirError("contenido_xml_factura. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + factura.getEstadoPago() + " por lo que no se pudo procesar");
                 }
             } catch (RegistroVacioException e) {
-                logger.log(Level.INFO, ">>> No se encontró una Factura con {0}", elementos.get("codFisFac"));
+                log.info(">>> No se encontró una Factura con {}", elementos.get("codFisFac"));
                 utileria.ArchivoTexto.escribirError("contenido_xml. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
             }
         }
@@ -231,12 +229,12 @@ public class xmlHelper {
                     factura.setRemesaPago(this.codigoRemesa);
                     factura.setEstadoPago(Integer.parseInt(elementos.get("Estado")));
                     this.contenidoXmlService.actualizar(factura);
-                    logger.log(Level.INFO, ">>> xmlHelper=\"Se ha cambiado el estadoDePago = {0} con el codFisFac = {1}\"", new Object[]{elementos.get("Estado"), elementos.get("codFisFac")});
+                    log.info(">>> xmlHelper=\"Se ha cambiado el estadoDePago = {} con el codFisFac = {}\"", elementos.get("Estado"), elementos.get("codFisFac"));
                 } else {
                     utileria.ArchivoTexto.escribirError("contenido_xml_otras_facturas. El registro con el codFisFac " + elementos.get("codFisFac") + " tiene el estado de " + factura.getEstadoPago() + " por lo que no se pudo procesar");
                 }
             } catch (RegistroVacioException e) {
-                logger.log(Level.INFO, ">>> No se encontró OtraFactura con {0}", elementos.get("codFisFac"));
+                log.info(">>> No se encontró OtraFactura con {}", elementos.get("codFisFac"));
                 utileria.ArchivoTexto.escribirError("contenido_xml_otras_facturas. No se encontró un registro con el codFisFac " + elementos.get("codFisFac"));
             }
         }
@@ -1181,119 +1179,6 @@ public class xmlHelper {
         return new EnergiaExcedentaria(elementos);
     }
 
-
-    /**
-     * Carga la información de autoconsumo asociada a una instancia de {@link EnergiaExcedentaria}
-     * a partir del contenido de un archivo XML previamente cargado.
-     * <p>
-     * El método identifica el tipo de autoconsumo y, dependiendo del mismo,
-     * localiza y extrae del XML los datos de energía neta generada, energía autoconsumida,
-     * fechas de vigencia y pagos asociados. Estos valores se asignan a la instancia proporcionada.
-     * </p>
-     *
-     * <p>Tipos de autoconsumo soportados:</p>
-     * <ul>
-     *   <li>Tipo 12: Autoconsumo es el nodo contenedor inicial, no entra a los internos</li>
-     *   <li>Tipo 42 y 43: Se accede a nodos internos específicos del XML.</li>
-     *   <li>Tipo 41 y 51: No se espera información de autoconsumo, se retorna inmediatamente.</li>
-     * </ul>
-     *
-     * <p>
-     * Si el nodo esperado de autoconsumo no se encuentra en el XML,
-     * se lanza una excepción {@link ExisteMasDeUnAutoconsumoException}.
-     * Si ocurre un error durante la verificación estructural del XML, se loguea como advertencia.
-     * </p>
-     *
-     * @param energiaExcedentaria instancia de {@link EnergiaExcedentaria} donde se almacenarán los datos extraídos del XML
-     * @throws ExisteMasDeUnAutoconsumoException si el nodo de autoconsumo no se encuentra en el documento XML
-     */protected void cargarAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws ExisteMasDeUnAutoconsumoException {
-        try {
-            NodeList contenedorDatosAutoconsumo = NodosUtil.getSingleNodeListByNameFromDocument(this.nombreArchivo, this.doc, "Autoconsumo");
-            switch (this.determinarTipoAutoconsumo(energiaExcedentaria)) {
-                case _42:
-                case _43:
-                    contenedorDatosAutoconsumo = NodosUtil.getSingleNodeListByName(contenedorDatosAutoconsumo, "InstalacionGenAutoconsumo");
-                    break;
-                case _41:
-                case _51:
-                    return; // No se espera autoconsumo para estos tipos
-            }
-
-            if (contenedorDatosAutoconsumo.getLength() == 0) {
-                throw new ExisteMasDeUnAutoconsumoException("No se encontró el nodo de autoconsumo esperado.");
-            }
-
-            NodeList terminoEnergiaNetaGenNode = NodosUtil.getSingleNodeListByChainedNames(contenedorDatosAutoconsumo, "EnergiaNetaGen", "TerminoEnergiaNetaGen");
-            NodeList periodoTerminoEnergiaNetaGenNode = NodosUtil.getAllNodesByNameWithSpecificExpectedNodes(terminoEnergiaNetaGenNode, "Periodo", 6);
-            energiaExcedentaria.setAllNetaGenerada(NodosUtil.getAllContentNodesAsDoubleList(periodoTerminoEnergiaNetaGenNode, "ValorEnergiaNetaGen"));
-
-            NodeList terminoEnergiaAutoconsumidaNode = NodosUtil.getSingleNodeListByChainedNames(contenedorDatosAutoconsumo, "EnergiaAutoconsumida", "TerminoEnergiaAutoconsumida");
-            energiaExcedentaria.setFechaDesde(NodosUtil.getSingleContentNodeAsLocalDateTimeWithDefaultTime(terminoEnergiaAutoconsumidaNode, "FechaDesde"));
-            energiaExcedentaria.setFechaHasta(NodosUtil.getSingleContentNodeAsLocalDateTimeWithDefaultTime(terminoEnergiaAutoconsumidaNode, "FechaHasta"));
-
-            NodeList periodosEnergiaAutoconsumidaNodes = NodosUtil.getAllNodesByNameWithSpecificExpectedNodes(terminoEnergiaAutoconsumidaNode, "Periodo", 6);
-            energiaExcedentaria.setAllAutoconsumida(NodosUtil.getAllContentNodesAsDoubleList(periodosEnergiaAutoconsumidaNodes, "ValorEnergiaAutoconsumida"));
-            energiaExcedentaria.setAllPagoTDA(NodosUtil.getAllContentNodesAsDoubleList(periodosEnergiaAutoconsumidaNodes, "PagoTDA"));
-
-
-        } catch (NoCoincidenLosNodosEsperadosException e) {
-            log.warn(e.getMessage());
-        }
-    }
-
-    /**
-     * Determina el tipo de autoconsumo presente en el archivo XML y lo asigna
-     * a la instancia de {@link EnergiaExcedentaria} proporcionada.
-     * <p>
-     * El método extrae el valor del nodo <code>TipoAutoconsumo</code> desde la sección
-     * <code>DatosFacturaATR</code> del documento XML y lo convierte en una enumeración
-     * del tipo {@link TipoAutoconsumo}.
-     * </p>
-     *
-     * <p>Los valores actualmente soportados son:</p>
-     * <ul>
-     *   <li>12 → {@code TipoAutoconsumo._12}</li>
-     *   <li>41 → {@code TipoAutoconsumo._41}</li>
-     *   <li>42 → {@code TipoAutoconsumo._42}</li>
-     *   <li>43 → {@code TipoAutoconsumo._43}</li>
-     *   <li>51 → {@code TipoAutoconsumo._51}</li>
-     * </ul>
-     *
-     * <p>
-     * Si el tipo encontrado no coincide con ninguno de los valores esperados,
-     * se lanza una excepción en tiempo de ejecución indicando que el tipo es desconocido.
-     * </p>
-     *
-     * @param energiaExcedentaria instancia de {@link EnergiaExcedentaria} que será actualizada con el tipo detectado
-     * @return una instancia de {@link TipoAutoconsumo} correspondiente al valor detectado en el XML
-     * @throws ExisteMasDeUnAutoconsumoException si el nodo de tipo de autoconsumo no puede ser obtenido correctamente
-     * @throws RuntimeException si el valor numérico extraído no corresponde a ningún tipo conocido de autoconsumo
-     */
-    private TipoAutoconsumo determinarTipoAutoconsumo(@NonNull EnergiaExcedentaria energiaExcedentaria) throws ExisteMasDeUnAutoconsumoException {
-        int tipoAutoconsumo = NodosUtil.getSingleContentNodeAsInt(
-                NodosUtil.getSingleNodeListByNameFromDocument(this.nombreArchivo, this.doc, "DatosFacturaATR"),
-                "TipoAutoconsumo");
-        switch (tipoAutoconsumo) {
-            case 12:
-                energiaExcedentaria.setTipoAutoconsumo(12);
-                return TipoAutoconsumo._12;
-            case 41:
-                energiaExcedentaria.setTipoAutoconsumo(41);
-                return TipoAutoconsumo._41;
-            case 42:
-                energiaExcedentaria.setTipoAutoconsumo(42);
-                return TipoAutoconsumo._42;
-            case 43:
-                energiaExcedentaria.setTipoAutoconsumo(43);
-                return TipoAutoconsumo._43;
-            case 51:
-                energiaExcedentaria.setTipoAutoconsumo(51);
-                return TipoAutoconsumo._51;
-            default:
-                throw new RuntimeException("Tipo de autoconsumo desconocido: " + tipoAutoconsumo);
-        }
-    }
-
     /**
      * Looks for PrecioCargo node in a xmlFile
      * Maximum values of nodes expected is 12 
@@ -1303,7 +1188,7 @@ public class xmlHelper {
     protected Cargos Cargos(String tipoCargoValue, TIPO_FACTURA tp) {
         elementos =  (ArrayList) IntStream.range(0, 12).mapToDouble(i -> 0.0).boxed().collect(Collectors.toList());
         if (tp == TIPO_FACTURA.C_){
-            this.logger.log(Level.INFO, "Las facturas de tipo C, no tienen Cargos");
+            log.info("Las facturas de tipo C, no tienen Cargos");
             return new Cargos(elementos);
         }
         boolean continuar = true;
@@ -1357,7 +1242,7 @@ public class xmlHelper {
     protected CargoImporteTotal ImporteTotalCargos(String tipoCargoValue, TIPO_FACTURA tp) {
     	elementos =  (ArrayList) IntStream.range(0, 1).mapToDouble(i -> 0.0).boxed().collect(Collectors.toList());
         if (tp == TIPO_FACTURA.C_){
-            this.logger.log(Level.INFO, "Las facturas de tipo C, no tienen Cargos");
+            log.info("Las facturas de tipo C, no tienen Cargos");
             return new CargoImporteTotal(elementos);
         }
         int indice = 0;
@@ -5057,8 +4942,17 @@ public class xmlHelper {
         System.out.println(Cadenas.LINEA + nombreMetodo + elementos);
     }
 
-    private void agregarError(String codError) {
-        if (this.errores.toString().equals("")) {
+    protected final void loadDocument(Document doc) {
+        this.doc = doc;
+    }
+
+    protected final void clearDocumentContext() {
+        this.doc = null;
+    }
+
+
+    protected void agregarError(String codError) {
+        if (this.errores.toString().isEmpty()) {
             this.errores.append(codError);
         } else {
             this.errores.append(", ").append(codError);
@@ -5150,13 +5044,30 @@ public class xmlHelper {
         C_;
     }
 
-    enum TipoAutoconsumo {
-        _12,
-        _41,
-        _42,
-        _43,
-        _51,
-        DESCONOCIDO;
+    @Getter
+    public enum TipoAutoconsumo {
+
+        TIPO_12("12"),
+        TIPO_41("41"),
+        TIPO_42("42"),
+        TIPO_43("43"),
+        TIPO_51("51"),
+        DESCONOCIDO("-1");
+
+        private final String code;
+
+        private static final Map<String, TipoAutoconsumo> BY_CODE =
+                Arrays.stream(values())
+                        .collect(Collectors.toMap(TipoAutoconsumo::getCode, t -> t));
+
+        TipoAutoconsumo(String code) {
+            this.code = code;
+        }
+
+        public static TipoAutoconsumo fromCode(String code) {
+            return BY_CODE.getOrDefault(code, DESCONOCIDO);
+        }
+
     }
 
 }

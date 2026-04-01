@@ -34,11 +34,12 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @EnableWebMvc
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = {"datos"})
-@ComponentScan(basePackages = {"app", "controladores", "controladores.helper", "datos.dao.medidas", "controladores.otrosControladores", "datos", "datos.dao", "datos.service", "documentos.procesamiento"})
+@ComponentScan(basePackages = {"app", "common.publisher.incident", "controladores", "controladores.helper", "datos.dao.medidas", "controladores.otrosControladores", "datos", "datos.dao", "datos.service", "service.warning"})
 @PropertySources({
-        @PropertySource("classpath:persistence-mysql.properties"),
-        @PropertySource("classpath:/cfg/application.properties"),
-        @PropertySource("classpath:/cfg/path.properties")
+        @PropertySource(value = "classpath:config/persistence-mysql.yml", factory = YamlPropertySourceFactory.class),
+        @PropertySource(value = "classpath:config/application.yml", factory = YamlPropertySourceFactory.class),
+        @PropertySource(value = "classpath:config/path.yml", factory = YamlPropertySourceFactory.class),
+        @PropertySource(value = "classpath:config/ftp.yml", factory = YamlPropertySourceFactory.class)
 })
 public class AppConfig implements WebMvcConfigurer{
 

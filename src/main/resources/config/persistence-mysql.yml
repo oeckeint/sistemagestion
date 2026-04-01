@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL_SGE}
+    username: ${DB_USER_SGE}
+    password: ${DB_PASSWORD_SGE}
+
+connection:
+  pool:
+    initialPoolSize: 5
+    minPoolSize: 5
+    maxPoolSize: 20
+    maxIdleTime: 3000
+
+hibernate:
+  dialect: org.hibernate.dialect.MySQLDialect
+  packagesToScan: datos.entity
+  hbm2ddl:
+    auto: none
+  show_sql: true
+  format_sql: true
+
+

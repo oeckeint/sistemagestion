@@ -1,3 +1,5 @@
+name: com4energy
+
 services:
 
   sistemagestion:
@@ -19,7 +21,7 @@ services:
       - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
       - RABBITMQ_USER=${RABBITMQ_USER:-guest}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
-      # Raiz de almacenamiento dentro del contenedor (alineada con path.properties)
+      # Raiz de almacenamiento dentro del contenedor (alineada con path.yml)
       - C4E_STORAGE_ROOT=/usr/local/tomcat/resources
       # SFTP
       - SFTP_HOST=${SFTP_HOST:?Define SFTP_HOST en tu entorno o carga ~/.sistema_gestion_env.sh}

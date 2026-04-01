@@ -60,7 +60,7 @@ curl -i http://localhost:7001/sistemagestion/health/storage
 
 ## Nota de despliegue en Docker
 
-El endpoint depende de `path.properties` y de la variable `C4E_STORAGE_ROOT` en el contenedor.
+El endpoint depende de `path.yml` y de la variable `C4E_STORAGE_ROOT` en el contenedor.
 La configuracion recomendada para Docker es:
 
 - `C4E_STORAGE_ROOT=/usr/local/tomcat/resources`
