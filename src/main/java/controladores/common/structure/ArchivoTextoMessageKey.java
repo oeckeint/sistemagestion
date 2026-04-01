@@ -39,7 +39,8 @@ public enum ArchivoTextoMessageKey implements MessageKey {
     WARNING_CODE_30("archivo.texto.warning.code.30"),
     WARNING_CODE_31("archivo.texto.warning.code.31"),
     WARNING_CODE_32("archivo.texto.warning.code.32"),
-    WARNING_CODE_UNKNOWN("archivo.texto.warning.code.unknown");
+    WARNING_CODE_UNKNOWN("archivo.texto.warning.code.unknown"),
+    FILE_NAME_UNKNOWN("archivo.texto.file.name.unknown");
 
     private final String key;
 

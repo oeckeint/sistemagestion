@@ -357,7 +357,6 @@ public class ProcesarPeaje extends xmlHelper {
             this.existeEnergiaExcedentaria = false;
             this.cargarAutoconsumo(energiaExcedentaria);
             peaje.setEnergiaExcedentaria(energiaExcedentaria);
-            throw new RuntimeException("Evita guardado");
         }
         return peaje;
     }
