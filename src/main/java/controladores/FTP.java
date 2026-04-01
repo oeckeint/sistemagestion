@@ -6,7 +6,6 @@ import com.jcraft.jsch.Session;
 import controladores.helper.Etiquetas;
 import excepciones.CredencialesIncorrectasException;
 import excepciones.ErrorAlConectarConElServidorException;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,10 +13,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Properties;
 import java.util.Vector;
-import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -63,13 +59,6 @@ public class FTP {
         return "comunes/formulario_sftp";
     }
 
-    /**
-     * For testing use filezilla server
-     * Directory where everything is stored is C:\Peajes\ftp\*user1*\httpdocs 
-     * @param files
-     * @return
-     * @throws IOException
-     */
     @PostMapping(path = "/subir", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String subirArchivos(@RequestParam("archivos") MultipartFile[] files) throws IOException {
         FileInputStream fis = null;
@@ -89,11 +78,8 @@ public class FTP {
                 fs = new FileInputStream(f);
                 if (this.cargarConfiguraciones()) {
                 	this.clienteFTP.setFileType(FTPClient.BINARY_FILE_TYPE);
-                    //this.clienteFTP.enterRemotePassiveMode();
-                    //this.clienteFTP.changeWorkingDirectory(".\\httpdocs\\" + this.definirCarpeta(file.getOriginalFilename()));
                     this.clienteFTP.storeFile("httpdocs/" + this.definirCarpeta(file.getOriginalFilename()) + "/" + file.getOriginalFilename(), fs);
                     fs.close();
-                    //this.clienteFTP.rename(file.getOriginalFilename(), "httpdocs/" + file.getOriginalFilename());
 
                     this.clienteFTP.logout();
                     this.clienteFTP.disconnect();

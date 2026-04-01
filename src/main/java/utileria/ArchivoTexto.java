@@ -20,9 +20,8 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.springframework.context.ApplicationContext;
 
 @Slf4j
@@ -30,26 +29,13 @@ public class ArchivoTexto {
 
     private static final ControladoresMessagesLogger CONTROLADORES_MESSAGES_LOGGER = new ControladoresMessagesLogger();
     private static final String PEAJES_PROPERTY = "peajes";
-    private static final String DEFAULT_PEAJES_PATH =
-            System.getProperty("user.home") + "/Downloads/com4energy/Peajes/";
+    private static final String DEFAULT_PEAJES_PATH = System.getProperty("user.home") + "/Downloads/com4energy/Peajes/";
+    private static final String ERROR_PREFIX = "el archivo";
+    private static final String ERROR_SUFFIX = "no se proceso porque";
+    private static final int INDEX_NOT_FOUND = -1;
+    private static final int MAX_WARNING_CODE = 32;
+    private static final String UNKNOWN_WARNING_CODE = "33";
     private static final Map<String, ArchivoTextoMessageKey> WARNING_KEYS_BY_CODE = buildWarningKeys();
-    private static final Pattern FILE_NAME_FROM_ERROR_PATTERN =
-            Pattern.compile("El archivo\\s+(.+?)\\s+no se proceso porque", Pattern.CASE_INSENSITIVE);
-
-    private enum PeajesLogFile {
-        ERRORES("errores.txt"),
-        ADVERTENCIAS("advertencias.txt");
-
-        private final String fileName;
-
-        PeajesLogFile(String fileName) {
-            this.fileName = fileName;
-        }
-
-        public String fileName() {
-            return fileName;
-        }
-    }
 
     public static void escribirError(String contenido) {
         String formateoContenido = limpiarEtiquetasResaltado(contenido);
@@ -122,16 +108,28 @@ public class ArchivoTexto {
 
     private static String extractFileNameFromErrorLine(String errorLine) {
         if (errorLine == null || errorLine.trim().isEmpty()) {
-            return Messages.get(ArchivoTextoMessageKey.FILE_NAME_UNKNOWN);
+            return getUnknownFileName();
         }
 
-        Matcher matcher = FILE_NAME_FROM_ERROR_PATTERN.matcher(errorLine);
-        if (matcher.find()) {
-            String candidate = matcher.group(1);
-            return candidate != null && !candidate.trim().isEmpty()
-                    ? candidate.trim()
-                    : Messages.get(ArchivoTextoMessageKey.FILE_NAME_UNKNOWN);
+        String normalized = errorLine.toLowerCase(Locale.ROOT);
+        int prefixIndex = normalized.indexOf(ERROR_PREFIX);
+        if (prefixIndex == INDEX_NOT_FOUND) {
+            return getUnknownFileName();
         }
+
+        int startIndex = prefixIndex + ERROR_PREFIX.length();
+        int suffixIndex = normalized.indexOf(ERROR_SUFFIX, startIndex);
+        if (suffixIndex == INDEX_NOT_FOUND || suffixIndex <= startIndex) {
+            return getUnknownFileName();
+        }
+
+        String candidate = errorLine.substring(startIndex, suffixIndex).trim();
+        return candidate.isEmpty()
+                ? getUnknownFileName()
+                : candidate;
+    }
+
+    private static String getUnknownFileName() {
         return Messages.get(ArchivoTextoMessageKey.FILE_NAME_UNKNOWN);
     }
 
@@ -186,40 +184,26 @@ public class ArchivoTexto {
 
     private static Map<String, ArchivoTextoMessageKey> buildWarningKeys() {
         Map<String, ArchivoTextoMessageKey> warningKeys = new HashMap<>();
-        warningKeys.put("1", ArchivoTextoMessageKey.WARNING_CODE_1);
-        warningKeys.put("2", ArchivoTextoMessageKey.WARNING_CODE_2);
-        warningKeys.put("3", ArchivoTextoMessageKey.WARNING_CODE_3);
-        warningKeys.put("4", ArchivoTextoMessageKey.WARNING_CODE_4);
-        warningKeys.put("5", ArchivoTextoMessageKey.WARNING_CODE_5);
-        warningKeys.put("6", ArchivoTextoMessageKey.WARNING_CODE_6);
-        warningKeys.put("7", ArchivoTextoMessageKey.WARNING_CODE_7);
-        warningKeys.put("8", ArchivoTextoMessageKey.WARNING_CODE_8);
-        warningKeys.put("9", ArchivoTextoMessageKey.WARNING_CODE_9);
-        warningKeys.put("10", ArchivoTextoMessageKey.WARNING_CODE_10);
-        warningKeys.put("11", ArchivoTextoMessageKey.WARNING_CODE_11);
-        warningKeys.put("12", ArchivoTextoMessageKey.WARNING_CODE_12);
-        warningKeys.put("13", ArchivoTextoMessageKey.WARNING_CODE_13);
-        warningKeys.put("14", ArchivoTextoMessageKey.WARNING_CODE_14);
-        warningKeys.put("15", ArchivoTextoMessageKey.WARNING_CODE_15);
-        warningKeys.put("16", ArchivoTextoMessageKey.WARNING_CODE_16);
-        warningKeys.put("17", ArchivoTextoMessageKey.WARNING_CODE_17);
-        warningKeys.put("18", ArchivoTextoMessageKey.WARNING_CODE_18);
-        warningKeys.put("19", ArchivoTextoMessageKey.WARNING_CODE_19);
-        warningKeys.put("20", ArchivoTextoMessageKey.WARNING_CODE_20);
-        warningKeys.put("21", ArchivoTextoMessageKey.WARNING_CODE_21);
-        warningKeys.put("22", ArchivoTextoMessageKey.WARNING_CODE_22);
-        warningKeys.put("23", ArchivoTextoMessageKey.WARNING_CODE_23);
-        warningKeys.put("24", ArchivoTextoMessageKey.WARNING_CODE_24);
-        warningKeys.put("25", ArchivoTextoMessageKey.WARNING_CODE_25);
-        warningKeys.put("26", ArchivoTextoMessageKey.WARNING_CODE_26);
-        warningKeys.put("27", ArchivoTextoMessageKey.WARNING_CODE_27);
-        warningKeys.put("28", ArchivoTextoMessageKey.WARNING_CODE_28);
-        warningKeys.put("29", ArchivoTextoMessageKey.WARNING_CODE_29);
-        warningKeys.put("30", ArchivoTextoMessageKey.WARNING_CODE_30);
-        warningKeys.put("31", ArchivoTextoMessageKey.WARNING_CODE_31);
-        warningKeys.put("32", ArchivoTextoMessageKey.WARNING_CODE_32);
-        warningKeys.put("33", ArchivoTextoMessageKey.WARNING_CODE_UNKNOWN);
+        for (int code = 1; code <= MAX_WARNING_CODE; code++) {
+            warningKeys.put(String.valueOf(code), ArchivoTextoMessageKey.valueOf("WARNING_CODE_" + code));
+        }
+        warningKeys.put(UNKNOWN_WARNING_CODE, ArchivoTextoMessageKey.WARNING_CODE_UNKNOWN);
         return warningKeys;
     }
-}
 
+    private enum PeajesLogFile {
+        ERRORES("errores.txt"),
+        ADVERTENCIAS("advertencias.txt");
+
+        private final String fileName;
+
+        PeajesLogFile(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public String fileName() {
+            return fileName;
+        }
+    }
+
+}
